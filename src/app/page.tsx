@@ -1,112 +1,102 @@
+"use client";
+
+import Link from "next/link";
 import Image from "next/image";
+import React, { useState } from "react";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 
 export default function Home() {
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
+    <main className="flex h-screen items-center justify-center bg-[#F0F2F5]">
+      <div className="flex w-2/3">
+        <div className="flex flex-1 flex-col items-start">
+          <div>
             <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+              src="/facebook-text.svg"
+              height={400}
+              width={400}
+              alt="facebook-text"
+              className=" ml-[-35px]"
             />
-          </a>
+          </div>
+          <p className="text-start text-3xl">
+            Facebook helps you connect and share with the people in your life.
+          </p>
+
+          <p className="mt-10 font-semibold text-red-500">
+            * Clone version for educational purposes only.
+          </p>
+          <p className="cursor-pointer hover:underline">
+            <Link
+              href="https://github.com/farizbaiquni"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              https://github.com/farizbaiquni
+            </Link>
+          </p>
         </div>
-      </div>
+        <div className="flex-1 flex-col">
+          <div className="mx-16 rounded-md bg-white p-5 shadow-lg shadow-slate-300">
+            <div className="flex flex-col">
+              {/* Email */}
+              <input
+                type="text"
+                placeholder="Email address"
+                className="w-full rounded-sm border border-gray-200 px-4 py-3 text-lg shadow-sm
+                outline-none focus:border-transparent focus:ring-1 focus:ring-[#0866FF]"
+              />
+              {/* Password */}
+              <div className="relative mt-3">
+                <input
+                  type={passwordVisible ? "text" : "password"}
+                  placeholder="Password"
+                  className="w-full rounded-sm border border-gray-200 px-4 py-3 text-lg 
+                  shadow-sm outline-none focus:border-transparent focus:ring-1 focus:ring-[#0866FF]"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 transform"
+                  onClick={togglePasswordVisibility}
+                >
+                  {passwordVisible ? (
+                    <EyeIcon className="h-5 w-5 text-gray-700" />
+                  ) : (
+                    <EyeSlashIcon className="h-5 w-5 text-gray-700" />
+                  )}
+                </button>
+              </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+              {/* Login */}
+              <button className="mt-5 w-full rounded-md bg-[#0866FF] py-2 text-2xl font-semibold text-white hover:bg-[#1877F2]">
+                Log in
+              </button>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
+              {/* Forgotten password */}
+              <p className="text-md mt-5 cursor-pointer text-center text-[#0866FF] hover:underline">
+                Forgotten password ?
+              </p>
+
+              <hr className="my-6" />
+
+              {/* Login */}
+              <div className="flex w-full justify-center">
+                <button className="w-fit rounded-md bg-[#4fc238] px-4 py-3 text-lg font-semibold text-white hover:bg-[#36A420]">
+                  Create new account
+                </button>
+              </div>
+            </div>
+          </div>
+          <p className="mt-5 text-center">
+            <b className=" cursor-pointer hover:underline">Create a Page</b> for
+            a celebrity, brand or business.
           </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+        </div>
       </div>
     </main>
   );
