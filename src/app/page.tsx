@@ -4,45 +4,47 @@ import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import SignUpModal from "@/components/homepage/signup/SignUpModal";
 
 export default function Home() {
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
   return (
     <main className="flex h-screen items-center justify-center bg-[#F0F2F5]">
-      <div className="flex w-2/3">
-        <div className="flex flex-1 flex-col items-start">
-          <div>
-            <Image
-              src="/facebook-text.svg"
-              height={400}
-              width={400}
-              alt="facebook-text"
-              className=" ml-[-35px]"
-            />
-          </div>
-          <p className="text-start text-3xl">
+      <div className="flex w-4/5 max-lg:my-5 max-lg:w-[400px] max-lg:flex-col max-lg:items-center">
+        <div className="flex flex-1 flex-col items-start max-lg:items-center">
+          <Image
+            src="/facebook-text.svg"
+            height={350}
+            width={350}
+            alt="facebook-text"
+            className="lg:ml-[-35px]"
+          />
+          <p className="text-start text-3xl max-lg:text-center max-lg:text-2xl">
             Facebook helps you connect and share with the people in your life.
           </p>
 
-          <p className="mt-10 font-semibold text-red-500">
-            * Clone version for educational purposes only.
-          </p>
-          <p className="cursor-pointer hover:underline">
-            <Link
-              href="https://github.com/farizbaiquni"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              https://github.com/farizbaiquni
-            </Link>
-          </p>
+          <div className="mt-10 max-lg:mt-2 max-lg:text-center">
+            <p className="font-semibold text-red-500">
+              * Clone version for educational purposes only.
+            </p>
+            <p className="cursor-pointer underline hover:underline">
+              <Link
+                href="https://github.com/farizbaiquni"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://github.com/farizbaiquni
+              </Link>
+            </p>
+          </div>
         </div>
-        <div className="flex-1 flex-col">
-          <div className="mx-16 rounded-md bg-white p-5 shadow-lg shadow-slate-300">
+        <div className="flex-1 flex-col max-lg:mt-3">
+          <div className="mx-auto w-[400px] rounded-md bg-white p-5 shadow-lg shadow-slate-300">
             <div className="flex flex-col">
               {/* Email */}
               <input
@@ -84,9 +86,12 @@ export default function Home() {
 
               <hr className="my-6" />
 
-              {/* Login */}
+              {/* Sign Up */}
               <div className="flex w-full justify-center">
-                <button className="w-fit rounded-md bg-[#4fc238] px-4 py-3 text-lg font-semibold text-white hover:bg-[#36A420]">
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-fit rounded-md bg-[#4fc238] px-4 py-3 text-lg font-semibold text-white hover:bg-[#36A420]"
+                >
                   Create new account
                 </button>
               </div>
@@ -98,6 +103,7 @@ export default function Home() {
           </p>
         </div>
       </div>
+      <SignUpModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </main>
   );
 }
