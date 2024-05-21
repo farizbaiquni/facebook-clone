@@ -7,7 +7,7 @@ const Sidebar = () => {
   const [isExpand, setIsExpand] = useState(false);
 
   const menuItems = [
-    { name: "Fariz Baiquni", icon: "/icons_sidebar/user.png" }, // Replace with your profile image path
+    { name: "Fariz Baiquni", icon: "/profile.jpg" }, // Replace with your profile image path
     { name: "Friends", icon: "/icons_sidebar/friends.png" },
     { name: "Memories", icon: "/icons_sidebar/memories.png" },
     { name: "Saved", icon: "/icons_sidebar/saved.png" },
@@ -37,7 +37,7 @@ const Sidebar = () => {
         {itemsToDisplay.map((item, index) => (
           <li
             key={index}
-            className={`my-2 flex cursor-pointer items-center rounded-md p-2 ${
+            className={`my-0 flex cursor-pointer items-center rounded-md p-2 ${
               activeItem === item.name
                 ? "bg-blue-500 text-white"
                 : "text-gray-700 hover:bg-gray-200"
@@ -47,9 +47,9 @@ const Sidebar = () => {
             <Image
               src={item.icon}
               alt={item.name}
-              width={27}
-              height={27}
-              className="mr-4"
+              width={500}
+              height={500}
+              className={`mr-4 h-8 w-8 rounded-full ${index === 0 && "object-fill"}`}
             />
             <p className="whitespace-nowrap text-sm font-semibold">
               {item.name}
