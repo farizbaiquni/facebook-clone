@@ -8,23 +8,37 @@ import Image from "next/image";
 
 const UserActions = () => {
   return (
-    <div className="flex min-w-max items-center">
-      <div className="mr-2 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-300">
-        <Squares2X2Icon className="h-6" aria-hidden="true" />
+    <div className="flex w-60 min-w-max items-center justify-end">
+      <div className="group relative mr-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-gray-300 hover:bg-gray-400">
+        <Squares2X2Icon className="h-5" aria-hidden="true" />
+        <div className="absolute bottom-[-44px] rounded-md bg-black p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-75">
+          <p className="text-xs text-gray-200">menu</p>
+        </div>
       </div>
-      <div className="mr-2 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-300">
+      <div className="group relative mr-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-gray-300 hover:bg-gray-400">
         <ChatBubbleLeftEllipsisIcon className="h-5" aria-hidden="true" />
+        <div className="absolute bottom-[-44px] rounded-md bg-black p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-75">
+          <p className="text-xs text-gray-200">messenger</p>
+        </div>
       </div>
-      <div className="mr-2 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gray-300">
-        <BellIcon className="h-6" aria-hidden="true" />
+      <div className="group relative mr-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-gray-300 hover:bg-gray-400">
+        <BellIcon className="h-6  " aria-hidden="true" />
+        <div className="absolute bottom-[-44px] rounded-md bg-black p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-75">
+          <p className="text-xs text-gray-200">notifications</p>
+        </div>
       </div>
-      <Image
-        src="/icons/user.png"
-        width={56}
-        height={56}
-        alt="facebook-logo"
-        className="w-11 cursor-pointer rounded-full"
-      />
+      <div className="group relative">
+        <Image
+          src="/icons/user.png"
+          width={56}
+          height={56}
+          alt="facebook-logo"
+          className="w-11 cursor-pointer rounded-full"
+        />
+        <div className="absolute bottom-[-40px] right-0 rounded-md bg-black p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-75">
+          <p className="text-xs text-gray-200">account</p>
+        </div>
+      </div>
     </div>
   );
 };

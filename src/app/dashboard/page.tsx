@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Header from "@/components/dashboard/header/Header";
 import { IconType } from "@/components/dashboard/header/NavigationIcons";
+import Sidebar from "@/components/dashboard/sidebar/Sidebar";
 
 export default function Dashbpard() {
   const [isFocused, setIsFocused] = useState(false);
@@ -17,7 +18,14 @@ export default function Dashbpard() {
         setActiveIcon={setActiveIcon}
       />
       {/* Content */}
-      <div></div>
+      <div className="flex h-full w-full pt-14">
+        {/* Left Sidebar */}
+        <Sidebar />
+        {/* Center Content */}
+        <div className="flex-1 bg-green-600"></div>
+        {/* Right Sidebar */}
+        <div className="w-64 bg-violet-600 max-[900px]:hidden"></div>
+      </div>
     </main>
   );
 }

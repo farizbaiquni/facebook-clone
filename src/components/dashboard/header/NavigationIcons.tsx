@@ -33,13 +33,15 @@ const NavigationIcons = ({
   ];
 
   return (
-    <div className="flex flex-1 justify-center px-16">
-      <div className="flex flex-1 justify-around max-[700px]:hidden">
+    <div className="flex flex-1 justify-center">
+      <div className="flex max-w-[500px] flex-1 justify-around max-[750px]:hidden">
         {icons.map(({ type, Icon, label }) => (
           <div
             key={type}
             className={`group relative flex flex-1 cursor-pointer flex-col items-center justify-center border-b-4 ${
-              activeIcon === type ? "border-blue-600" : "border-transparent"
+              activeIcon === type
+                ? "border-blue-600"
+                : "rounded-md border-transparent hover:bg-gray-200"
             }`}
             onClick={() => setActiveIcon(type)}
           >
@@ -47,7 +49,7 @@ const NavigationIcons = ({
               className={`h-7 w-7 ${activeIcon === type ? "text-blue-500" : "text-gray-500"}`}
             />
             <div className="absolute bottom-[-40px] rounded-md bg-black p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-75">
-              <p className="text-xs text-gray-600">{label}</p>
+              <p className="text-xs text-gray-200">{label}</p>
             </div>
           </div>
         ))}

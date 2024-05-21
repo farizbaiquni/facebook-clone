@@ -17,7 +17,7 @@ const Header = ({
   setActiveIcon,
 }: HeaderProps) => {
   return (
-    <div className="flex h-14 bg-white px-3">
+    <div className="fixed z-30 flex h-14 w-full bg-white px-3">
       <SearchBar isFocused={isFocused} setIsFocused={setIsFocused} />
       <NavigationIcons activeIcon={activeIcon} setActiveIcon={setActiveIcon} />
       <UserActions />

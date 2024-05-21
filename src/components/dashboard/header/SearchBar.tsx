@@ -13,9 +13,9 @@ interface SearchBarProps {
 const SearchBar = ({ isFocused, setIsFocused }: SearchBarProps) => {
   return (
     <Fragment>
-      <div className={`${isFocused && "w-60"}`}></div>
+      <div className={`${isFocused && "w-72"}`}></div>
       <div
-        className={`flex items-center ${isFocused && "fixed z-10 h-14"} min-w-max`}
+        className={`flex items-center ${isFocused && "fixed z-50 h-14"} min-w-max`}
       >
         {isFocused ? (
           <ArrowLeftIcon
@@ -26,8 +26,8 @@ const SearchBar = ({ isFocused, setIsFocused }: SearchBarProps) => {
         ) : (
           <Image
             src="/icons/facebook-logo.png"
-            width={44}
-            height={44}
+            width={39}
+            height={39}
             alt="facebook-logo"
             className="cursor-pointer"
           />
@@ -53,10 +53,10 @@ const SearchBar = ({ isFocused, setIsFocused }: SearchBarProps) => {
           </div>
         </div>
         <div
-          className={`ml-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-300 min-[1160px]:hidden ${isFocused && "hidden"}`}
+          className={`ml-2 mr-14 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-300 min-[1160px]:hidden ${isFocused && "hidden"}`}
           onClick={() => setIsFocused(true)}
         >
-          <MagnifyingGlassIcon className="h-6 " aria-hidden="true" />
+          <MagnifyingGlassIcon className="h-6" aria-hidden="true" />
         </div>
       </div>
     </Fragment>
