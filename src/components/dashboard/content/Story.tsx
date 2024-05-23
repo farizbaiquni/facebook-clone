@@ -80,7 +80,7 @@ const Story: React.FC = () => {
       : stories.slice(currentIndex, currentIndex + storiesPerPage);
 
   return (
-    <div className="relative flex items-center px-4 py-6">
+    <div className="relative flex items-center px-4">
       {currentIndex > 0 && (
         <button
           onClick={scrollLeft}
@@ -91,7 +91,7 @@ const Story: React.FC = () => {
       )}
       <div className="flex space-x-4 px-4 py-6">
         {currentIndex === 0 && (
-          <div className="relative flex h-72 w-40 flex-shrink-0 flex-col items-center justify-between rounded-lg bg-gray-800 text-white transition-all duration-300 hover:cursor-pointer">
+          <div className="relative flex h-[250px] w-[140px] flex-shrink-0 flex-col items-center justify-between rounded-lg bg-gray-800 text-white transition-all duration-300 hover:cursor-pointer">
             <div className="relative h-4/5 w-full">
               <Image
                 src="/profile.jpg"
@@ -115,7 +115,7 @@ const Story: React.FC = () => {
         {visibleStories.map((story, index) => (
           <div
             key={index}
-            className="relative h-72 w-40 flex-shrink-0 cursor-pointer transition-all duration-300"
+            className="relative h-[250px] w-[140px] flex-shrink-0 cursor-pointer transition-all duration-300"
           >
             <Image
               src={story.imageUrl}

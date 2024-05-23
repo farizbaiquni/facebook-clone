@@ -33,7 +33,7 @@ const UserActions = () => {
           width={500}
           height={500}
           alt="facebook-logo"
-          className="h-10 w-10 cursor-pointer rounded-full"
+          className="h-10 w-10 cursor-pointer rounded-full object-cover"
         />
         <div className="absolute bottom-[-40px] right-0 rounded-md bg-black p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-75">
           <p className="text-xs text-gray-200">account</p>

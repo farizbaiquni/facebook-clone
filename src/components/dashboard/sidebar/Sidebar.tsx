@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Fragment, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
+import "../../../app/./scrollbar.css";
 
 const Sidebar = () => {
   const [activeItem, setActiveItem] = useState("");
@@ -32,7 +33,7 @@ const Sidebar = () => {
   const itemsToDisplay = isExpand ? menuItems : menuItems.slice(0, 5);
 
   return (
-    <div className="h-full min-w-72 flex-shrink overflow-y-scroll bg-gray-100 pl-2 max-[1100px]:hidden">
+    <div className="custom-scrollbar h-full min-w-72 flex-shrink overflow-y-scroll bg-gray-100 pl-2 max-[1100px]:hidden">
       <ul>
         {itemsToDisplay.map((item, index) => (
           <li
@@ -49,7 +50,7 @@ const Sidebar = () => {
               alt={item.name}
               width={500}
               height={500}
-              className={`mr-4 h-8 w-8 rounded-full ${index === 0 && "object-fill"}`}
+              className={`mr-4 h-8 w-8 rounded-full ${index === 0 && "object-cover"}`}
             />
             <p className="whitespace-nowrap text-sm font-semibold">
               {item.name}
