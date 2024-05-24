@@ -1,19 +1,19 @@
 import { Fragment, useRef } from "react";
-import { ModalType } from "@/types/ModalType";
+import { ModeTypes } from "@/types/ModeTypes";
 import Image from "next/image";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 type UploadImageGridType = {
   images: string[];
   clearImages: () => void;
-  handleModalType: (value: ModalType) => void;
+  handleModeType: (value: ModeTypes) => void;
   handleFilesUpload: (files: FileList) => void;
 };
 
 const UploadImageGrid = ({
   images,
   clearImages,
-  handleModalType,
+  handleModeType,
   handleFilesUpload,
 }: UploadImageGridType) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,7 +33,7 @@ const UploadImageGrid = ({
       <div className="absolute inset-0 z-10 rounded-md bg-black opacity-0 transition-opacity group-hover:opacity-20"></div>
       <div className="absolute left-2 top-2 z-20 hidden group-hover:flex">
         <button
-          onClick={() => handleModalType(ModalType.EditPhotoMode)}
+          onClick={() => handleModeType(ModeTypes.EditPhotoMode)}
           className="mr-2 flex cursor-pointer items-center rounded-md bg-gray-100 px-3 py-2 text-sm font-medium hover:bg-gray-300"
         >
           <Image

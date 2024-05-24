@@ -1,4 +1,5 @@
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { useState } from "react";
+import { ModeTypes } from "@/types/ModeTypes";
 import { AudienceOptions } from "@/types/AudienceOptions";
 import {
   UserIcon,
@@ -7,20 +8,19 @@ import {
   UserMinusIcon,
   LockClosedIcon,
   CogIcon,
+  ArrowLeftIcon,
 } from "@heroicons/react/24/solid";
-import { ModalType } from "@/types/ModalType";
-import { useState } from "react";
 
 type AudienceModeType = {
   uploadedImages: string[];
-  handleModalType: (param: ModalType) => void;
+  handleModeType: (param: ModeTypes) => void;
   selectedAudienceOption: AudienceOptions;
   setSelectedAudienceOption: (param: AudienceOptions) => void;
 };
 
 export default function AudienceMode({
   uploadedImages,
-  handleModalType,
+  handleModeType,
   selectedAudienceOption: selectedAudienceOption,
   setSelectedAudienceOption: setSelectedAudienceOption,
 }: AudienceModeType) {
@@ -67,7 +67,7 @@ export default function AudienceMode({
   );
   const handleClickDone = () => {
     setSelectedAudienceOption(tempSelectedAudienceOption);
-    handleModalType(ModalType.PostingMode);
+    handleModeType(ModeTypes.PostingMode);
   };
   return (
     <div
@@ -79,7 +79,7 @@ export default function AudienceMode({
           Post Audience
         </h3>
         <ArrowLeftIcon
-          onClick={() => handleModalType(ModalType.PostingMode)}
+          onClick={() => handleModeType(ModeTypes.PostingMode)}
           className="absolute left-3 h-10 w-10 cursor-pointer rounded-full bg-gray-200 p-2 text-gray-500 hover:bg-gray-300"
         />
       </div>
@@ -152,7 +152,7 @@ export default function AudienceMode({
             Done
           </button>
           <button
-            onClick={() => handleModalType(ModalType.PostingMode)}
+            onClick={() => handleModeType(ModeTypes.PostingMode)}
             className="ml-2 h-fit rounded bg-gray-200 px-6 py-2 text-gray-700 hover:bg-gray-300"
           >
             Cancel

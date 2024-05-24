@@ -1,20 +1,16 @@
 import { useRef } from "react";
 import Image from "next/image";
 import IconButton from "../components/IconButton";
-import { ModalType } from "@/types/ModalType";
+import { ModeTypes } from "@/types/ModeTypes";
 import UploadImageGrid from "../components/UploadImageGrid";
-import {
-  XMarkIcon,
-  ChevronDownIcon,
-  EllipsisHorizontalIcon,
-} from "@heroicons/react/24/outline";
-import { LockClosedIcon } from "@heroicons/react/24/solid";
 import AudienceLabel from "../components/AudienceLabel";
 import { AudienceOptions } from "@/types/AudienceOptions";
+import { XMarkIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import { FriendTagPeople } from "@/types/EntityObjects";
 
 type PostingModeType = {
   closePostingModal: () => void;
-  handleModalType: (param: ModalType) => void;
+  handleModeType: (param: ModeTypes) => void;
   isUploadModeActive: boolean;
   firstName: string;
   uploadedImages: string[];
@@ -23,14 +19,15 @@ type PostingModeType = {
   handleDragOver: (e: React.DragEvent<HTMLLabelElement>) => void;
   handleDrop: (e: React.DragEvent<HTMLLabelElement>) => void;
   setIsUploadModeActive: (param: boolean) => void;
-  handlePhotoUploadClick: () => void;
   fullName: string;
   selectedAudienceOption: AudienceOptions;
+  handleClickUploadModeActive: (param: boolean) => void;
+  taggedFriends: Map<number, FriendTagPeople>;
 };
 
 export default function PostingMode({
   closePostingModal,
-  handleModalType,
+  handleModeType,
   isUploadModeActive,
   firstName,
   uploadedImages,
@@ -39,14 +36,16 @@ export default function PostingMode({
   handleDragOver,
   handleDrop,
   setIsUploadModeActive,
-  handlePhotoUploadClick,
   fullName,
   selectedAudienceOption: audienceType,
+  handleClickUploadModeActive,
+  taggedFriends,
 }: PostingModeType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className={`flex h-auto w-[500px] flex-col rounded-lg bg-white p-4`}>
+      {/* Header */}
       <div className="flex justify-between">
         <h3 className="flex flex-1 items-center justify-center text-lg font-bold">
           Create Post
@@ -56,25 +55,51 @@ export default function PostingMode({
           className="h-10 w-10 cursor-pointer rounded-full bg-gray-200 p-2 text-gray-500 hover:bg-gray-300"
         />
       </div>
+
       <hr className="my-3" />
+
+      {/* Profile */}
       <div className="mx-2 flex items-center py-2">
-        <Image
-          src="/profile.jpg"
-          width={40}
-          height={40}
-          alt="profile-picture"
-          className="h-11 w-11 rounded-full object-cover"
-        />
+        <div className="min-w-max">
+          <Image
+            src="/profile.jpg"
+            width={100}
+            height={100}
+            alt="profile-picture"
+            className="h-10 w-10 rounded-full object-cover"
+          />
+        </div>
         <div className="ml-3 flex flex-col">
-          <p className="text-sm font-semibold">{fullName}</p>
+          <div className="flex flex-wrap gap-x-1 text-sm font-semibold">
+            <p>{fullName}</p>
+            <p>with</p>
+            {Array.from(taggedFriends)
+              .slice(0, 3)
+              .map(([id, taggedFriend], index) => (
+                <p
+                  key={taggedFriend.id}
+                  className="cursor-pointer hover:underline"
+                >
+                  {taggedFriend.name},{" "}
+                </p>
+              ))}
+            {taggedFriends.size > 3 && (
+              <p className="cursor-pointer hover:underline">
+                and {taggedFriends.size - 3}{" "}
+                {taggedFriends.size > 4 ? "others" : "other"}
+              </p>
+            )}
+          </div>
           <div
-            onClick={() => handleModalType(ModalType.AudienceMode)}
-            className="flex cursor-pointer items-center rounded-md bg-gray-200 px-1 py-1"
+            onClick={() => handleModeType(ModeTypes.AudienceMode)}
+            className="mt-1 flex w-fit cursor-pointer items-center rounded-md bg-gray-200 px-1 py-1"
           >
             <AudienceLabel selectedAudienceOption={audienceType} />
           </div>
         </div>
       </div>
+
+      {/* Content */}
       <div className="custom-scrollbar flex max-h-[350px] w-full flex-col overflow-y-scroll">
         <div className="h-full w-full">
           <textarea
@@ -89,7 +114,7 @@ export default function PostingMode({
               <UploadImageGrid
                 images={uploadedImages}
                 clearImages={() => setUploadedImages([])}
-                handleModalType={handleModalType}
+                handleModeType={handleModeType}
                 handleFilesUpload={handleFilesUpload}
               />
             ) : (
@@ -153,6 +178,8 @@ export default function PostingMode({
           </div>
         )}
       </div>
+
+      {/* Footer */}
       <div className="my-2 flex items-center justify-between rounded-md border-2 border-gray-200 px-4 py-2">
         <p className="cursor-pointer text-sm font-semibold">Add to your post</p>
         <div className="flex items-center">
@@ -160,24 +187,38 @@ export default function PostingMode({
             src="/icons_posting/photo-video.png"
             alt="Photo or Video"
             label="Photo/video"
-            onClick={handlePhotoUploadClick}
+            handleClickUploadModeActive={handleClickUploadModeActive}
+            modeType={ModeTypes.PostingMode}
+            handleModeType={handleModeType}
           />
           <IconButton
             src="/icons_posting/tag.png"
             alt="Tag"
             label="Tag people"
+            modeType={ModeTypes.TagPeople}
+            handleModeType={handleModeType}
           />
           <IconButton
             src="/icons_posting/feeling.png"
             alt="Feeling"
             label="Feeling/activity"
+            modeType={ModeTypes.FeelingActivity}
+            handleModeType={handleModeType}
           />
           <IconButton
             src="/icons_posting/location.png"
             alt="Location"
             label="Check in"
+            modeType={ModeTypes.CheckIn}
+            handleModeType={handleModeType}
           />
-          <IconButton src="/icons_posting/gif.png" alt="GIF" label="GIF" />
+          <IconButton
+            src="/icons_posting/gif.png"
+            alt="GIF"
+            label="GIF"
+            modeType={ModeTypes.GIF}
+            handleModeType={handleModeType}
+          />
           <div className="group relative ml-2 flex cursor-pointer items-center justify-center rounded-full p-1 hover:bg-gray-300">
             <EllipsisHorizontalIcon className="h-7 w-7 text-gray-500" />
             <p className="absolute bottom-11 hidden whitespace-nowrap rounded-md bg-gray-800 p-2 text-xs text-gray-200 opacity-90 group-hover:block">

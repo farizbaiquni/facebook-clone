@@ -1,19 +1,19 @@
 import Image from "next/image";
-import { ModalType } from "@/types/ModalType";
+import { ModeTypes } from "@/types/ModeTypes";
 import { ArrowLeftIcon, TagIcon } from "@heroicons/react/24/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useRef } from "react";
 
 type EditPhotoModeType = {
   uploadedImages: string[];
-  handleModalType: (param: ModalType) => void;
+  handleModeType: (param: ModeTypes) => void;
   handleDeleteImage: (param: number) => void;
   handleFilesUpload: (images: FileList) => void;
 };
 
 export default function EditPhotoMode({
   uploadedImages,
-  handleModalType,
+  handleModeType,
   handleDeleteImage,
   handleFilesUpload,
 }: EditPhotoModeType) {
@@ -33,7 +33,7 @@ export default function EditPhotoMode({
           Create Post
         </h3>
         <ArrowLeftIcon
-          onClick={() => handleModalType(ModalType.PostingMode)}
+          onClick={() => handleModeType(ModeTypes.PostingMode)}
           className="absolute left-3 h-10 w-10 cursor-pointer rounded-full bg-gray-200 p-2 text-gray-500 hover:bg-gray-300"
         />
       </div>
@@ -128,7 +128,7 @@ export default function EditPhotoMode({
           </div>
           <button
             onClick={() => {
-              handleModalType(ModalType.PostingMode);
+              handleModeType(ModeTypes.PostingMode);
             }}
             className="mx-5 rounded-md bg-blue-600 px-8 py-2 text-sm font-semibold text-white"
           >

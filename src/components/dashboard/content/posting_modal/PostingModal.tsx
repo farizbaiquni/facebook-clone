@@ -2,9 +2,11 @@ import { useRef, useState } from "react";
 import "../../../../app/./scrollbar.css";
 import PostingMode from "./modes/PostingMode";
 import EditPhotoMode from "./modes/EditPhotoMode";
-import { ModalType } from "@/types/ModalType";
+import { ModeTypes } from "@/types/ModeTypes";
 import { AudienceOptions } from "@/types/AudienceOptions";
 import AudienceMode from "./modes/AudienceMode";
+import TagPeopleMode from "./modes/TagPeopleMode";
+import { FriendTagPeople } from "@/types/EntityObjects";
 
 type PostingModalProps = {
   isPostingModalOpen: boolean;
@@ -15,7 +17,10 @@ const PostingModal = ({
   isPostingModalOpen,
   closePostingModal,
 }: PostingModalProps) => {
-  const [modalType, setModalType] = useState(ModalType.PostingMode);
+  const [selectedModeType, setSelectedModeType] = useState(
+    ModeTypes.PostingMode,
+  );
+
   const [isUploadModeActive, setIsUploadModeActive] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [firstName, setFirstName] = useState("Fariz");
@@ -24,12 +29,14 @@ const PostingModal = ({
     AudienceOptions.Public,
   );
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [taggedFriends, setTaggedFriends] = useState<
+    Map<number, FriendTagPeople>
+  >(new Map());
 
   if (!isPostingModalOpen) return null;
 
-  const handlePhotoUploadClick = () => {
-    setIsUploadModeActive(true);
+  const handleClickUploadModeActive = (param: boolean) => {
+    setIsUploadModeActive(param);
   };
 
   const handleFilesUpload = (files: FileList) => {
@@ -51,8 +58,8 @@ const PostingModal = ({
     handleFilesUpload(files);
   };
 
-  const handleModalType = (type: ModalType) => {
-    setModalType(type);
+  const handleModeType = (type: ModeTypes) => {
+    setSelectedModeType(type);
   };
 
   const handleDeleteImage = (index: number) => {
@@ -63,10 +70,10 @@ const PostingModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
-      {modalType === ModalType.PostingMode && (
+      {selectedModeType === ModeTypes.PostingMode && (
         <PostingMode
           closePostingModal={closePostingModal}
-          handleModalType={handleModalType}
+          handleModeType={handleModeType}
           isUploadModeActive={isUploadModeActive}
           firstName={firstName}
           uploadedImages={uploadedImages}
@@ -75,25 +82,33 @@ const PostingModal = ({
           handleDragOver={handleDragOver}
           handleDrop={handleDrop}
           setIsUploadModeActive={setIsUploadModeActive}
-          handlePhotoUploadClick={handlePhotoUploadClick}
           fullName={fullName}
           selectedAudienceOption={selectedAudienceOption}
+          handleClickUploadModeActive={handleClickUploadModeActive}
+          taggedFriends={taggedFriends}
         />
       )}
-      {modalType === ModalType.EditPhotoMode && (
+      {selectedModeType === ModeTypes.EditPhotoMode && (
         <EditPhotoMode
           uploadedImages={uploadedImages}
-          handleModalType={handleModalType}
+          handleModeType={handleModeType}
           handleDeleteImage={handleDeleteImage}
           handleFilesUpload={handleFilesUpload}
         />
       )}
-      {modalType === ModalType.AudienceMode && (
+      {selectedModeType === ModeTypes.AudienceMode && (
         <AudienceMode
           uploadedImages={uploadedImages}
-          handleModalType={handleModalType}
+          handleModeType={handleModeType}
           selectedAudienceOption={selectedAudienceOption}
           setSelectedAudienceOption={setSelectedAudienceOption}
+        />
+      )}
+      {selectedModeType === ModeTypes.TagPeople && (
+        <TagPeopleMode
+          handleModeType={handleModeType}
+          taggedFriends={taggedFriends}
+          setTaggedFriends={setTaggedFriends}
         />
       )}
     </div>
