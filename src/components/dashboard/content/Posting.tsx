@@ -4,6 +4,7 @@ import PostingModal from "./posting_modal/PostingModal";
 
 const Posting = () => {
   const [isPostingModalOpen, setIsPostingModalOpen] = useState(false);
+  const [firstName, setFirstName] = useState("Fariz");
 
   const openPostingModal = () => setIsPostingModalOpen(true);
   const closePostingModal = () => setIsPostingModalOpen(false);
@@ -33,12 +34,12 @@ const Posting = () => {
             alt="Profile picture"
             className="h-10 w-10 rounded-full object-cover"
           />
-          <input
-            type="text"
-            placeholder="What's on your mind, Fariz?"
-            className="ml-2 flex-grow cursor-pointer rounded-full bg-gray-100 p-2 hover:bg-gray-200 focus:outline-none"
+          <button
             onClick={openPostingModal}
-          />
+            className="mx-3 flex-1 cursor-pointer rounded-full bg-gray-100 py-1 pl-5 text-left text-gray-600 hover:bg-gray-200"
+          >
+            What&apos;s on your mind, {firstName}?
+          </button>
         </div>
         <hr className="my-2" />
         <div className="flex">

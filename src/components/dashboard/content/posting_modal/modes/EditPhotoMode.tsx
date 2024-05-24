@@ -9,7 +9,6 @@ type EditPhotoModeType = {
   handleModalType: (param: ModalType) => void;
   handleDeleteImage: (param: number) => void;
   handleFilesUpload: (images: FileList) => void;
-  handleClickInputUploadImages: () => void;
 };
 
 export default function EditPhotoMode({
@@ -17,9 +16,13 @@ export default function EditPhotoMode({
   handleModalType,
   handleDeleteImage,
   handleFilesUpload,
-  handleClickInputUploadImages,
 }: EditPhotoModeType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleClickInputUploadImages = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
   return (
     <div
       className={`flex h-auto flex-col rounded-lg bg-white ${uploadedImages.length <= 2 ? "w-[500px]" : uploadedImages.length <= 4 ? "w-[900px]" : "w-[1227px]"}`}
@@ -100,7 +103,10 @@ export default function EditPhotoMode({
       {/* Footer */}
       <div className="flex h-[60px] items-center justify-end border-t border-t-gray-300">
         <div className="flex justify-end">
-          <div className="flex cursor-pointer items-center">
+          <div
+            onClick={handleClickInputUploadImages}
+            className="flex cursor-pointer items-center"
+          >
             <Image
               src={"/icons_posting/add-image-blue.png"}
               width={25}
@@ -116,10 +122,7 @@ export default function EditPhotoMode({
               onChange={(e) => handleFilesUpload(e.target.files!)}
               className="hidden"
             />
-            <p
-              onClick={handleClickInputUploadImages}
-              className="text-sm font-semibold text-blue-600"
-            >
+            <p className="text-sm font-semibold text-blue-600">
               Add photos/Videos
             </p>
           </div>

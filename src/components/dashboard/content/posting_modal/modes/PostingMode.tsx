@@ -1,14 +1,16 @@
+import { useRef } from "react";
 import Image from "next/image";
-import IconButton from "./IconButton";
+import IconButton from "../components/IconButton";
 import { ModalType } from "@/types/ModalType";
-import UploadImageGrid from "./UploadImageGrid";
+import UploadImageGrid from "../components/UploadImageGrid";
 import {
   XMarkIcon,
   ChevronDownIcon,
   EllipsisHorizontalIcon,
 } from "@heroicons/react/24/outline";
 import { LockClosedIcon } from "@heroicons/react/24/solid";
-import { useRef } from "react";
+import AudienceLabel from "../components/AudienceLabel";
+import { AudienceOptions } from "@/types/AudienceOptions";
 
 type PostingModeType = {
   closePostingModal: () => void;
@@ -22,6 +24,8 @@ type PostingModeType = {
   handleDrop: (e: React.DragEvent<HTMLLabelElement>) => void;
   setIsUploadModeActive: (param: boolean) => void;
   handlePhotoUploadClick: () => void;
+  fullName: string;
+  selectedAudienceOption: AudienceOptions;
 };
 
 export default function PostingMode({
@@ -36,6 +40,8 @@ export default function PostingMode({
   handleDrop,
   setIsUploadModeActive,
   handlePhotoUploadClick,
+  fullName,
+  selectedAudienceOption: audienceType,
 }: PostingModeType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -60,14 +66,12 @@ export default function PostingMode({
           className="h-11 w-11 rounded-full object-cover"
         />
         <div className="ml-3 flex flex-col">
-          <p className="text-sm font-semibold">Fariz Baiquni</p>
+          <p className="text-sm font-semibold">{fullName}</p>
           <div
             onClick={() => handleModalType(ModalType.AudienceMode)}
             className="flex cursor-pointer items-center rounded-md bg-gray-200 px-1 py-1"
           >
-            <LockClosedIcon className="h-4 w-4 text-gray-700" />
-            <p className="mx-1 text-xs font-semibold">Only me</p>
-            <ChevronDownIcon className="h-4 w-4 text-gray-700" />
+            <AudienceLabel selectedAudienceOption={audienceType} />
           </div>
         </div>
       </div>

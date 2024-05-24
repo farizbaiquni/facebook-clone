@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import "../../../../app/./scrollbar.css";
-import PostingMode from "./PostingMode";
-import EditPhotoMode from "./EditPhotoMode";
+import PostingMode from "./modes/PostingMode";
+import EditPhotoMode from "./modes/EditPhotoMode";
 import { ModalType } from "@/types/ModalType";
 import { AudienceOptions } from "@/types/AudienceOptions";
-import AudienceMode from "./AudienceMode";
+import AudienceMode from "./modes/AudienceMode";
 
 type PostingModalProps = {
   isPostingModalOpen: boolean;
@@ -18,13 +18,13 @@ const PostingModal = ({
   const [modalType, setModalType] = useState(ModalType.PostingMode);
   const [isUploadModeActive, setIsUploadModeActive] = useState(false);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [firstName, setFirstName] = useState("");
+  const [firstName, setFirstName] = useState("Fariz");
+  const [fullName, setfullName] = useState("Fariz Baiquni");
+  const [selectedAudienceOption, setSelectedAudienceOption] = useState(
+    AudienceOptions.Public,
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [selectedOption, setSelectedOption] = useState<AudienceOptions>(
-    AudienceOptions.OnlyMe,
-  );
 
   if (!isPostingModalOpen) return null;
 
@@ -61,12 +61,6 @@ const PostingModal = ({
     setUploadedImages(newImages);
   };
 
-  const handleClickInputUploadImages = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
       {modalType === ModalType.PostingMode && (
@@ -82,6 +76,8 @@ const PostingModal = ({
           handleDrop={handleDrop}
           setIsUploadModeActive={setIsUploadModeActive}
           handlePhotoUploadClick={handlePhotoUploadClick}
+          fullName={fullName}
+          selectedAudienceOption={selectedAudienceOption}
         />
       )}
       {modalType === ModalType.EditPhotoMode && (
@@ -90,15 +86,14 @@ const PostingModal = ({
           handleModalType={handleModalType}
           handleDeleteImage={handleDeleteImage}
           handleFilesUpload={handleFilesUpload}
-          handleClickInputUploadImages={handleClickInputUploadImages}
         />
       )}
       {modalType === ModalType.AudienceMode && (
         <AudienceMode
           uploadedImages={uploadedImages}
           handleModalType={handleModalType}
-          selectedOption={selectedOption}
-          setSelectedOption={setSelectedOption}
+          selectedAudienceOption={selectedAudienceOption}
+          setSelectedAudienceOption={setSelectedAudienceOption}
         />
       )}
     </div>

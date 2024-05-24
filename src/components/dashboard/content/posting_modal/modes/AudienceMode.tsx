@@ -9,19 +9,20 @@ import {
   CogIcon,
 } from "@heroicons/react/24/solid";
 import { ModalType } from "@/types/ModalType";
+import { useState } from "react";
 
 type AudienceModeType = {
   uploadedImages: string[];
   handleModalType: (param: ModalType) => void;
-  selectedOption: AudienceOptions;
-  setSelectedOption: (param: AudienceOptions) => void;
+  selectedAudienceOption: AudienceOptions;
+  setSelectedAudienceOption: (param: AudienceOptions) => void;
 };
 
 export default function AudienceMode({
   uploadedImages,
   handleModalType,
-  selectedOption,
-  setSelectedOption,
+  selectedAudienceOption: selectedAudienceOption,
+  setSelectedAudienceOption: setSelectedAudienceOption,
 }: AudienceModeType) {
   const audienceOptions = [
     {
@@ -61,6 +62,13 @@ export default function AudienceMode({
       icon: <CogIcon className="h-7 w-7 text-gray-800" />,
     },
   ];
+  const [tempSelectedAudienceOption, setTempSelectedAudienceOption] = useState(
+    selectedAudienceOption,
+  );
+  const handleClickDone = () => {
+    setSelectedAudienceOption(tempSelectedAudienceOption);
+    handleModalType(ModalType.PostingMode);
+  };
   return (
     <div
       className={`flex h-auto flex-col rounded-lg bg-white ${uploadedImages.length <= 2 ? "w-[500px]" : uploadedImages.length <= 4 ? "w-[900px]" : "w-[1227px]"}`}
@@ -93,7 +101,10 @@ export default function AudienceMode({
         </div>
         <ul className="mb-5">
           {audienceOptions.map((option) => (
-            <li key={option.value}>
+            <li
+              key={option.value}
+              onClick={() => setTempSelectedAudienceOption(option.value)}
+            >
               <label className="group flex cursor-pointer items-center rounded py-2">
                 <div className="flex flex-1 items-center">
                   <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-200 group-hover:bg-gray-300">
@@ -112,8 +123,8 @@ export default function AudienceMode({
                   type="radio"
                   name="audience"
                   value={option.value}
-                  checked={selectedOption === option.value}
-                  onChange={() => setSelectedOption(option.value)}
+                  checked={tempSelectedAudienceOption === option.value}
+                  onChange={() => setTempSelectedAudienceOption(option.value)}
                   className="form-radio h-6 w-6 text-blue-600"
                 />
               </label>
@@ -134,10 +145,16 @@ export default function AudienceMode({
           </label>
         </div>
         <div className="flex flex-1 justify-end">
-          <button className="h-fit rounded bg-blue-600 px-6 py-2 text-white hover:bg-blue-700">
+          <button
+            onClick={handleClickDone}
+            className="h-fit rounded bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+          >
             Done
           </button>
-          <button className="ml-2 h-fit rounded bg-gray-200 px-6 py-2 text-gray-700 hover:bg-gray-300">
+          <button
+            onClick={() => handleModalType(ModalType.PostingMode)}
+            className="ml-2 h-fit rounded bg-gray-200 px-6 py-2 text-gray-700 hover:bg-gray-300"
+          >
             Cancel
           </button>
         </div>
