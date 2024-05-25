@@ -37,7 +37,7 @@ const UploadImageGrid = ({
           className="mr-2 flex cursor-pointer items-center rounded-md bg-gray-100 px-3 py-2 text-sm font-medium hover:bg-gray-300"
         >
           <Image
-            src="/icons_posting/edit.png"
+            src="/icons/postings/edit.png"
             alt="Edit all"
             width={15}
             height={15}
@@ -50,7 +50,7 @@ const UploadImageGrid = ({
           className="mr-2 flex cursor-pointer items-center rounded-md bg-gray-100 px-3 py-2 text-sm font-medium hover:bg-gray-300"
         >
           <Image
-            src="/icons_posting/add-image.png"
+            src="/icons/postings/add-image.png"
             alt="Add photos/videos"
             width={15}
             height={15}

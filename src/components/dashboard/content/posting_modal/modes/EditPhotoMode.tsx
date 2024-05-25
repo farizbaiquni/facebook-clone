@@ -41,7 +41,7 @@ export default function EditPhotoMode({
       {uploadedImages.length === 0 && (
         <div className="flex h-[191px] w-full flex-col items-center justify-center">
           <Image
-            src={"/icons_posting/null_states_media_gray_wash.svg"}
+            src={"/icons/postings/null_states_media_gray_wash.svg"}
             width={115}
             height={115}
             alt="add photos/videos"
@@ -108,7 +108,7 @@ export default function EditPhotoMode({
             className="flex cursor-pointer items-center"
           >
             <Image
-              src={"/icons_posting/add-image-blue.png"}
+              src={"/icons/postings/add-image-blue.png"}
               width={25}
               height={25}
               alt="add photos/videos"

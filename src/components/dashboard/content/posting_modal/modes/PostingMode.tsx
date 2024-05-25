@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import Image from "next/image";
 import IconButton from "../components/IconButton";
 import { ModeTypes } from "@/types/ModeTypes";
@@ -7,6 +7,8 @@ import AudienceLabel from "../components/AudienceLabel";
 import { AudienceOptions } from "@/types/AudienceOptions";
 import { XMarkIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { FriendTagPeople } from "@/types/EntityObjects";
+import { FeelingType } from "@/types/Feelings";
+import { ActivityType, SubActivityType } from "@/types/Activities";
 
 type PostingModeType = {
   closePostingModal: () => void;
@@ -23,6 +25,7 @@ type PostingModeType = {
   selectedAudienceOption: AudienceOptions;
   handleClickUploadModeActive: (param: boolean) => void;
   taggedFriends: Map<number, FriendTagPeople>;
+  selectedFeelingActivity: null | FeelingType | ActivityType;
 };
 
 export default function PostingMode({
@@ -40,8 +43,17 @@ export default function PostingMode({
   selectedAudienceOption: audienceType,
   handleClickUploadModeActive,
   taggedFriends,
+  selectedFeelingActivity,
 }: PostingModeType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function isFeelingType(activity: any): activity is FeelingType {
+    return (activity as FeelingType).feelingIcon !== undefined;
+  }
+
+  function isActivityType(activity: any): activity is SubActivityType {
+    return (activity as SubActivityType).activityIcon !== undefined;
+  }
 
   return (
     <div className={`flex h-auto w-[500px] flex-col rounded-lg bg-white p-4`}>
@@ -70,19 +82,47 @@ export default function PostingMode({
           />
         </div>
         <div className="ml-3 flex flex-col">
-          <div className="flex flex-wrap gap-x-1 text-sm font-semibold">
+          <div className="flex flex-wrap gap-x-1 font-semibold">
             <p>{fullName}</p>
-            <p>with</p>
-            {Array.from(taggedFriends)
-              .slice(0, 3)
-              .map(([id, taggedFriend], index) => (
-                <p
-                  key={taggedFriend.id}
-                  className="cursor-pointer hover:underline"
-                >
-                  {taggedFriend.name},{" "}
-                </p>
+            {selectedFeelingActivity !== null &&
+              (isFeelingType(selectedFeelingActivity) ? (
+                <Fragment>
+                  <p>is</p>
+                  <p>{selectedFeelingActivity.feelingIcon}</p>
+                  <p>feeling</p>
+                  <p>{selectedFeelingActivity.label}</p>
+                </Fragment>
+              ) : (
+                isActivityType(selectedFeelingActivity) && (
+                  <Fragment>
+                    <p>is</p>
+                    <Image
+                      width={17}
+                      height={17}
+                      alt={selectedFeelingActivity.label}
+                      src={selectedFeelingActivity.activityIcon}
+                      className="object-contain"
+                    />
+                    <p>celebrating </p>
+                    <p>{selectedFeelingActivity.label}</p>
+                  </Fragment>
+                )
               ))}
+            {taggedFriends.size >= 1 && (
+              <Fragment>
+                <p>with</p>
+                {Array.from(taggedFriends)
+                  .slice(0, 3)
+                  .map(([id, taggedFriend], index) => (
+                    <p
+                      key={taggedFriend.id}
+                      className="cursor-pointer hover:underline"
+                    >
+                      {taggedFriend.name},{" "}
+                    </p>
+                  ))}
+              </Fragment>
+            )}
             {taggedFriends.size > 3 && (
               <p className="cursor-pointer hover:underline">
                 and {taggedFriends.size - 3}{" "}
@@ -128,7 +168,7 @@ export default function PostingMode({
                   <div className="flex w-full flex-1 cursor-pointer flex-col items-center justify-center rounded-md hover:bg-gray-200">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-300 p-2">
                       <Image
-                        src="/icons_posting/add-image.png"
+                        src="/icons/postings/add-image.png"
                         width={25}
                         height={25}
                         alt="Add Photos/Videos"
@@ -153,7 +193,7 @@ export default function PostingMode({
                   <div className="my-3 flex w-full items-center justify-center">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 p-2">
                       <Image
-                        src="/icons_posting/phone.png"
+                        src="/icons/postings/phone.png"
                         width={25}
                         height={25}
                         alt="Add Photos/Videos"
@@ -180,56 +220,60 @@ export default function PostingMode({
       </div>
 
       {/* Footer */}
-      <div className="my-2 flex items-center justify-between rounded-md border-2 border-gray-200 px-4 py-2">
-        <p className="cursor-pointer text-sm font-semibold">Add to your post</p>
-        <div className="flex items-center">
-          <IconButton
-            src="/icons_posting/photo-video.png"
-            alt="Photo or Video"
-            label="Photo/video"
-            handleClickUploadModeActive={handleClickUploadModeActive}
-            modeType={ModeTypes.PostingMode}
-            handleModeType={handleModeType}
-          />
-          <IconButton
-            src="/icons_posting/tag.png"
-            alt="Tag"
-            label="Tag people"
-            modeType={ModeTypes.TagPeople}
-            handleModeType={handleModeType}
-          />
-          <IconButton
-            src="/icons_posting/feeling.png"
-            alt="Feeling"
-            label="Feeling/activity"
-            modeType={ModeTypes.FeelingActivity}
-            handleModeType={handleModeType}
-          />
-          <IconButton
-            src="/icons_posting/location.png"
-            alt="Location"
-            label="Check in"
-            modeType={ModeTypes.CheckIn}
-            handleModeType={handleModeType}
-          />
-          <IconButton
-            src="/icons_posting/gif.png"
-            alt="GIF"
-            label="GIF"
-            modeType={ModeTypes.GIF}
-            handleModeType={handleModeType}
-          />
-          <div className="group relative ml-2 flex cursor-pointer items-center justify-center rounded-full p-1 hover:bg-gray-300">
-            <EllipsisHorizontalIcon className="h-7 w-7 text-gray-500" />
-            <p className="absolute bottom-11 hidden whitespace-nowrap rounded-md bg-gray-800 p-2 text-xs text-gray-200 opacity-90 group-hover:block">
-              More
-            </p>
+      <div className="flex flex-col">
+        <div className="my-2 flex items-center justify-between rounded-md border-2 border-gray-200 px-4 py-2">
+          <p className="cursor-pointer text-sm font-semibold">
+            Add to your post
+          </p>
+          <div className="flex items-center">
+            <IconButton
+              src="/icons/postings/photo-video.png"
+              alt="Photo or Video"
+              label="Photo/video"
+              handleClickUploadModeActive={handleClickUploadModeActive}
+              modeType={ModeTypes.PostingMode}
+              handleModeType={handleModeType}
+            />
+            <IconButton
+              src="/icons/postings/tag.png"
+              alt="Tag"
+              label="Tag people"
+              modeType={ModeTypes.TagPeople}
+              handleModeType={handleModeType}
+            />
+            <IconButton
+              src="/icons/postings/feeling.png"
+              alt="Feeling"
+              label="Feeling/activity"
+              modeType={ModeTypes.FeelingActivity}
+              handleModeType={handleModeType}
+            />
+            <IconButton
+              src="/icons/postings/location.png"
+              alt="Location"
+              label="Check in"
+              modeType={ModeTypes.CheckIn}
+              handleModeType={handleModeType}
+            />
+            <IconButton
+              src="/icons/postings/gif.png"
+              alt="GIF"
+              label="GIF"
+              modeType={ModeTypes.GIF}
+              handleModeType={handleModeType}
+            />
+            <div className="group relative ml-2 flex cursor-pointer items-center justify-center rounded-full p-1 hover:bg-gray-300">
+              <EllipsisHorizontalIcon className="h-7 w-7 text-gray-500" />
+              <p className="absolute bottom-11 hidden whitespace-nowrap rounded-md bg-gray-800 p-2 text-xs text-gray-200 opacity-90 group-hover:block">
+                More
+              </p>
+            </div>
           </div>
         </div>
+        <button className="mt-2 rounded bg-[#0861F2] px-4 py-2 text-sm font-semibold text-white">
+          Post
+        </button>
       </div>
-      <button className="mt-2 rounded bg-[#0861F2] px-4 py-2 text-sm font-semibold text-white">
-        Post
-      </button>
     </div>
   );
 }

@@ -10,14 +10,14 @@ const Posting = () => {
   const closePostingModal = () => setIsPostingModalOpen(false);
 
   const actions = [
-    { src: "/icons_posting/live.png", alt: "live video", label: "Live video" },
+    { src: "/icons/postings/live.png", alt: "live video", label: "Live video" },
     {
-      src: "/icons_posting/photo-video.png",
+      src: "/icons/postings/photo-video.png",
       alt: "photo/video",
       label: "Photo/video",
     },
     {
-      src: "/icons_posting/feeling.png",
+      src: "/icons/postings/feeling.png",
       alt: "feeling/activity",
       label: "Feeling/activity",
     },

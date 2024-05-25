@@ -8,26 +8,26 @@ const Sidebar = () => {
   const [isExpand, setIsExpand] = useState(false);
 
   const menuItems = [
-    { name: "Fariz Baiquni", icon: "/profile.jpg" }, // Replace with your profile image path
-    { name: "Friends", icon: "/icons_sidebar/friends.png" },
-    { name: "Memories", icon: "/icons_sidebar/memories.png" },
-    { name: "Saved", icon: "/icons_sidebar/saved.png" },
-    { name: "Groups", icon: "/icons_sidebar/groups.png" },
-    { name: "Video", icon: "/icons_sidebar/video.png" },
-    { name: "Ads Manager", icon: "/icons_sidebar/ads.png" },
+    { name: "Fariz Baiquni", icon: "/profile.jpg" },
+    { name: "Friends", icon: "/icons/sidebars/friends.png" },
+    { name: "Memories", icon: "/icons/sidebars/memories.png" },
+    { name: "Saved", icon: "/icons/sidebars/saved.png" },
+    { name: "Groups", icon: "/icons/sidebars/groups.png" },
+    { name: "Video", icon: "/icons/sidebars/video.png" },
+    { name: "Ads Manager", icon: "/icons/sidebars/ads.png" },
     {
       name: "Climate Science Center",
-      icon: "/icons_sidebar/climate.png",
+      icon: "/icons/sidebars/climate.png",
     },
-    { name: "Events", icon: "/icons_sidebar/events.png" },
-    { name: "Feeds", icon: "/icons_sidebar/feeds.png" },
-    { name: "Fundraisers", icon: "/icons_sidebar/fundraiser.png" },
-    { name: "Gaming", icon: "/icons_sidebar/gaming.png" },
-    { name: "Messenger", icon: "/icons_sidebar/messenger.png" },
-    { name: "Messenger Kid", icon: "/icons_sidebar/messenger-kid.png" },
-    { name: "Pages", icon: "/icons_sidebar/pages.png" },
-    { name: "Play Games", icon: "/icons_sidebar/games.png" },
-    { name: "Recent Ad Activity", icon: "/icons_sidebar/recent.png" },
+    { name: "Events", icon: "/icons/sidebars/events.png" },
+    { name: "Feeds", icon: "/icons/sidebars/feeds.png" },
+    { name: "Fundraisers", icon: "/icons/sidebars/fundraiser.png" },
+    { name: "Gaming", icon: "/icons/sidebars/gaming.png" },
+    { name: "Messenger", icon: "/icons/sidebars/messenger.png" },
+    { name: "Messenger Kid", icon: "/icons/sidebars/messenger-kid.png" },
+    { name: "Pages", icon: "/icons/sidebars/pages.png" },
+    { name: "Play Games", icon: "/icons/sidebars/games.png" },
+    { name: "Recent Ad Activity", icon: "/icons/sidebars/recent.png" },
   ];
 
   const itemsToDisplay = isExpand ? menuItems : menuItems.slice(0, 5);
