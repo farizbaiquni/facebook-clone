@@ -1,14 +1,17 @@
 import { Fragment, useRef } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import IconButton from "../components/IconButton";
-import { ModeTypes } from "@/types/ModeTypes";
+import { ModeTypes } from "@/types/modes";
 import UploadImageGrid from "../components/UploadImageGrid";
 import AudienceLabel from "../components/AudienceLabel";
-import { AudienceOptions } from "@/types/AudienceOptions";
+import { AudienceOptions } from "@/types/audienceOptions";
 import { XMarkIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
-import { FriendTagPeople } from "@/types/EntityObjects";
-import { FeelingType } from "@/types/Feelings";
-import { ActivityType, SubActivityType } from "@/types/Activities";
+import { FriendTagPeople } from "@/types/entityObjects";
+import { FeelingType } from "@/types/feelings";
+import { SubActivityType } from "@/types/activities";
+import MapComponent from "../components/MapComponent";
+import { LocationType } from "@/types/locations";
 
 type PostingModeType = {
   closePostingModal: () => void;
@@ -25,7 +28,9 @@ type PostingModeType = {
   selectedAudienceOption: AudienceOptions;
   handleClickUploadModeActive: (param: boolean) => void;
   taggedFriends: Map<number, FriendTagPeople>;
-  selectedFeelingActivity: null | FeelingType | ActivityType;
+  selectedFeelingActivity: null | FeelingType | SubActivityType;
+  selectedLocation: LocationType | null;
+  setSelectedLocation: (param: LocationType | null) => void;
 };
 
 export default function PostingMode({
@@ -44,14 +49,23 @@ export default function PostingMode({
   handleClickUploadModeActive,
   taggedFriends,
   selectedFeelingActivity,
+  selectedLocation,
+  setSelectedLocation,
 }: PostingModeType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const DynamicMapComponent = dynamic(
+    () => import("../components/MapComponent"),
+    {
+      ssr: false,
+    },
+  );
 
   function isFeelingType(activity: any): activity is FeelingType {
     return (activity as FeelingType).feelingIcon !== undefined;
   }
 
-  function isActivityType(activity: any): activity is SubActivityType {
+  function isSubActivityType(activity: any): activity is SubActivityType {
     return (activity as SubActivityType).activityIcon !== undefined;
   }
 
@@ -84,18 +98,19 @@ export default function PostingMode({
         <div className="ml-3 flex flex-col">
           <div className="flex flex-wrap gap-x-1 font-semibold">
             <p>{fullName}</p>
+            {(selectedFeelingActivity !== null ||
+              taggedFriends.size > 0 ||
+              selectedLocation !== null) && <p>is</p>}
             {selectedFeelingActivity !== null &&
               (isFeelingType(selectedFeelingActivity) ? (
                 <Fragment>
-                  <p>is</p>
                   <p>{selectedFeelingActivity.feelingIcon}</p>
                   <p>feeling</p>
                   <p>{selectedFeelingActivity.label}</p>
                 </Fragment>
               ) : (
-                isActivityType(selectedFeelingActivity) && (
+                isSubActivityType(selectedFeelingActivity) && (
                   <Fragment>
-                    <p>is</p>
                     <Image
                       width={17}
                       height={17}
@@ -123,6 +138,14 @@ export default function PostingMode({
                   ))}
               </Fragment>
             )}
+            {selectedLocation !== null && (
+              <Fragment>
+                <p>{selectedFeelingActivity !== null ? "at" : "in"}</p>
+                <p className="cursor-pointer hover:underline">
+                  {selectedLocation.display_name}
+                </p>
+              </Fragment>
+            )}
             {taggedFriends.size > 3 && (
               <p className="cursor-pointer hover:underline">
                 and {taggedFriends.size - 3}{" "}
@@ -140,14 +163,15 @@ export default function PostingMode({
       </div>
 
       {/* Content */}
-      <div className="custom-scrollbar flex max-h-[350px] w-full flex-col overflow-y-scroll">
+      <div className="custom-scrollbar flex max-h-[350px] w-full flex-col overflow-y-auto">
         <div className="h-full w-full">
           <textarea
-            className={`h-full w-full rounded-lg p-3 ${isUploadModeActive ? "text-md" : "text-2xl"} outline-none`}
-            rows={isUploadModeActive ? 2 : 4}
+            className={`h-full w-full rounded-lg p-3 ${isUploadModeActive || selectedLocation !== null ? "text-md" : "text-2xl"} outline-none`}
+            rows={isUploadModeActive || selectedLocation !== null ? 2 : 4}
             placeholder={`What's on your mind, ${firstName}?`}
           ></textarea>
         </div>
+
         {isUploadModeActive && (
           <div className="my-2 items-center justify-center border-2 border-gray-200 p-2">
             {uploadedImages.length > 0 ? (
@@ -217,6 +241,15 @@ export default function PostingMode({
             )}
           </div>
         )}
+
+        {selectedLocation !== null &&
+          !isUploadModeActive &&
+          uploadedImages.length <= 0 && (
+            <DynamicMapComponent
+              selectedLocation={selectedLocation}
+              setSelectedLocation={setSelectedLocation}
+            />
+          )}
       </div>
 
       {/* Footer */}
@@ -227,40 +260,45 @@ export default function PostingMode({
           </p>
           <div className="flex items-center">
             <IconButton
-              src="/icons/postings/photo-video.png"
+              src="/icons/postings/add-photo-video.png"
               alt="Photo or Video"
               label="Photo/video"
               handleClickUploadModeActive={handleClickUploadModeActive}
               modeType={ModeTypes.PostingMode}
               handleModeType={handleModeType}
+              style={`${uploadedImages.length > 0 && "bg-[#D8E4CA]"}`}
             />
             <IconButton
               src="/icons/postings/tag.png"
               alt="Tag"
               label="Tag people"
-              modeType={ModeTypes.TagPeople}
+              modeType={ModeTypes.TagPeopleMode}
               handleModeType={handleModeType}
+              style={`${taggedFriends.size > 0 && "bg-[#C0E2EC]"}`}
             />
             <IconButton
-              src="/icons/postings/feeling.png"
+              src="/icons/postings/feeling-activity.png"
               alt="Feeling"
               label="Feeling/activity"
-              modeType={ModeTypes.FeelingActivity}
+              modeType={ModeTypes.FeelingActivityMode}
               handleModeType={handleModeType}
+              style={`${selectedFeelingActivity !== null && "bg-[#F1E6C6]"}`}
             />
             <IconButton
               src="/icons/postings/location.png"
               alt="Location"
               label="Check in"
-              modeType={ModeTypes.CheckIn}
+              modeType={ModeTypes.LocationMode}
               handleModeType={handleModeType}
+              style={`${selectedLocation !== null && "bg-[#EEC2C7]"}`}
             />
             <IconButton
               src="/icons/postings/gif.png"
               alt="GIF"
               label="GIF"
-              modeType={ModeTypes.GIF}
+              modeType={ModeTypes.GIFMode}
               handleModeType={handleModeType}
+              style={`${selectedFeelingActivity !== null && "bg-[#C7E4DE]"}`}
             />
             <div className="group relative ml-2 flex cursor-pointer items-center justify-center rounded-full p-1 hover:bg-gray-300">
               <EllipsisHorizontalIcon className="h-7 w-7 text-gray-500" />

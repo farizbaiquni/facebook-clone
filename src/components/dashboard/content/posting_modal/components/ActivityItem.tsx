@@ -1,4 +1,4 @@
-import { ActivityOptions, ActivityType } from "@/types/Activities";
+import { ActivityOptions, ActivityType } from "@/types/activities";
 import { ChevronRightIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 

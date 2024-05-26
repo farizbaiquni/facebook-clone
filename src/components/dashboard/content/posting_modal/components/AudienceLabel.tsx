@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { AudienceOptions, audienceOptionToText } from "@/types/AudienceOptions";
+import { AudienceOptions, audienceOptionToText } from "@/types/audienceOptions";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import {
   UserIcon,

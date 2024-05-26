@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ModeTypes } from "@/types/ModeTypes";
+import { ModeTypes } from "@/types/modes";
 import { ArrowLeftIcon, TagIcon } from "@heroicons/react/24/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useRef } from "react";

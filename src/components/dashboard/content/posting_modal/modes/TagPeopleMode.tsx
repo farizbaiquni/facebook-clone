@@ -1,4 +1,4 @@
-import { ModeTypes } from "@/types/ModeTypes";
+import { ModeTypes } from "@/types/modes";
 import {
   ArrowLeftIcon,
   MagnifyingGlassIcon,
@@ -7,7 +7,7 @@ import {
 import "@/app/scrollbar.css";
 import Image from "next/image";
 import { useState } from "react";
-import { FriendTagPeople } from "@/types/EntityObjects";
+import { FriendTagPeople } from "@/types/entityObjects";
 
 type TagPeopleModeType = {
   handleModeType: (param: ModeTypes) => void;

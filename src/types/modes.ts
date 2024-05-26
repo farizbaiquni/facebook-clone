@@ -2,8 +2,8 @@ export enum ModeTypes {
   PostingMode,
   EditPhotoMode,
   AudienceMode,
-  TagPeople,
-  FeelingActivity,
-  CheckIn,
-  GIF,
+  TagPeopleMode,
+  FeelingActivityMode,
+  LocationMode,
+  GIFMode,
 }

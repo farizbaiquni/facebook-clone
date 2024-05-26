@@ -1,4 +1,4 @@
-import { FeelingType } from "@/types/Feelings";
+import { FeelingType } from "@/types/feelings";
 
 type FeelingItemType = {
   feeling: FeelingType;

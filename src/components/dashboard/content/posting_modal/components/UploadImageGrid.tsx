@@ -1,5 +1,5 @@
 import { Fragment, useRef } from "react";
-import { ModeTypes } from "@/types/ModeTypes";
+import { ModeTypes } from "@/types/modes";
 import Image from "next/image";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 

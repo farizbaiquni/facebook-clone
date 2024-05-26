@@ -1,4 +1,4 @@
-import { ActivityType, SubActivityType } from "@/types/Activities";
+import { ActivityType, SubActivityType } from "@/types/activities";
 import Image from "next/image";
 
 type SubActivityItemType = {

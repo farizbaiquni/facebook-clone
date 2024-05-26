@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ModeTypes } from "@/types/ModeTypes";
-import { AudienceOptions } from "@/types/AudienceOptions";
+import { ModeTypes } from "@/types/modes";
+import { AudienceOptions } from "@/types/audienceOptions";
 import {
   UserIcon,
   UsersIcon,

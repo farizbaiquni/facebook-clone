@@ -12,12 +12,12 @@ const Posting = () => {
   const actions = [
     { src: "/icons/postings/live.png", alt: "live video", label: "Live video" },
     {
-      src: "/icons/postings/photo-video.png",
+      src: "/icons/postings/add-photo-video.png",
       alt: "photo/video",
       label: "Photo/video",
     },
     {
-      src: "/icons/postings/feeling.png",
+      src: "/icons/postings/feeling-activity.png",
       alt: "feeling/activity",
       label: "Feeling/activity",
     },

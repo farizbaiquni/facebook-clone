@@ -2,14 +2,16 @@ import { useState } from "react";
 import "../../../../app/./scrollbar.css";
 import PostingMode from "./modes/PostingMode";
 import EditPhotoMode from "./modes/EditPhotoMode";
-import { ModeTypes } from "@/types/ModeTypes";
-import { AudienceOptions } from "@/types/AudienceOptions";
 import AudienceMode from "./modes/AudienceMode";
 import TagPeopleMode from "./modes/TagPeopleMode";
-import { FriendTagPeople } from "@/types/EntityObjects";
-import FeelingActivity from "./modes/FeelingActivity";
-import { FeelingType } from "@/types/Feelings";
-import { SubActivityType } from "@/types/Activities";
+import FeelingActivityMode from "./modes/FeelingActivityMode";
+import { ModeTypes } from "@/types/modes";
+import { AudienceOptions } from "@/types/audienceOptions";
+import { FriendTagPeople } from "@/types/entityObjects";
+import { FeelingType } from "@/types/feelings";
+import { SubActivityType } from "@/types/activities";
+import { LocationType } from "@/types/locations";
+import LocationMode from "./modes/LocationMode";
 
 type PostingModalProps = {
   isPostingModalOpen: boolean;
@@ -38,6 +40,10 @@ const PostingModal = ({
   const [selectedFeelingActivity, setSelectedFeelingActivity] = useState<
     FeelingType | SubActivityType | null
   >(null);
+
+  const [selectedLocation, setSelectedLocation] = useState<LocationType | null>(
+    null,
+  );
 
   if (!isPostingModalOpen) return null;
 
@@ -94,6 +100,8 @@ const PostingModal = ({
           handleClickUploadModeActive={handleClickUploadModeActive}
           taggedFriends={taggedFriends}
           selectedFeelingActivity={selectedFeelingActivity}
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
         />
       )}
 
@@ -118,7 +126,7 @@ const PostingModal = ({
       )}
 
       {/* Tag People Mode */}
-      {selectedModeType === ModeTypes.TagPeople && (
+      {selectedModeType === ModeTypes.TagPeopleMode && (
         <TagPeopleMode
           handleModeType={handleModeType}
           taggedFriends={taggedFriends}
@@ -127,10 +135,19 @@ const PostingModal = ({
       )}
 
       {/* Feeling / Activity Mode */}
-      {selectedModeType === ModeTypes.FeelingActivity && (
-        <FeelingActivity
+      {selectedModeType === ModeTypes.FeelingActivityMode && (
+        <FeelingActivityMode
           handleModeType={handleModeType}
           setSelectedFeelingActivity={setSelectedFeelingActivity}
+        />
+      )}
+
+      {/* Location */}
+      {selectedModeType === ModeTypes.LocationMode && (
+        <LocationMode
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+          handleModeType={handleModeType}
         />
       )}
     </div>

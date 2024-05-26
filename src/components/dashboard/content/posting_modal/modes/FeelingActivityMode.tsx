@@ -1,25 +1,26 @@
-import { ModeTypes } from "@/types/ModeTypes";
+import { ModeTypes } from "@/types/modes";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ArrowLeftIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
-import { FeelingType, feelings } from "@/types/Feelings";
+import { FeelingType, feelings } from "@/types/feelings";
 import {
   activities,
   ActivityOptions,
-  ActivityType,
   subActivitiesMap,
   SubActivityType,
-} from "@/types/Activities";
+} from "@/types/activities";
 import FeelingItem from "../components/FeelingItem";
 import ActivityItem from "../components/ActivityItem";
 import SubActivityItem from "../components/SubActivityItem";
 
 type FeelingActivityType = {
   handleModeType: (param: ModeTypes) => void;
-  setSelectedFeelingActivity: (param: SubActivityType | FeelingType) => void;
+  setSelectedFeelingActivity: (
+    param: SubActivityType | FeelingType | null,
+  ) => void;
 };
 
-export default function FeelingActivity({
+export default function FeelingActivityMode({
   handleModeType,
   setSelectedFeelingActivity,
 }: FeelingActivityType) {
@@ -66,6 +67,7 @@ export default function FeelingActivity({
 
   const handleCloseSubActivities = () => {
     setIsSubActivityActive(false);
+    setSelectedFeelingActivity(null);
   };
 
   const filteredFeelings = feelings.filter((feeling) =>
