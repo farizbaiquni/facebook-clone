@@ -67,27 +67,31 @@ export default function LocationMode({
     <div className="flex h-auto w-[500px] flex-col rounded-lg bg-white">
       <div className="mx-4 flex flex-col">
         {/* Header */}
-        <div className="relative mb-5 flex h-[60px] items-center justify-center overflow-hidden border-b border-b-gray-300">
-          <h3 className="flex flex-1 items-center justify-center text-lg font-[1200]">
-            Search for location
-          </h3>
-          <ArrowLeftIcon
-            onClick={() => handleModeType(ModeTypes.PostingMode)}
-            className="absolute left-0 h-10 w-10 cursor-pointer rounded-full bg-gray-200 p-2 text-gray-500 hover:bg-gray-300"
-          />
-        </div>
-        <div className="mb-4 w-full rounded-full bg-[#E4E6EB] px-8 py-2">
-          <div className="relative w-full">
-            <input
-              type="text"
-              className="ml-2 w-full bg-[#E4E6EB] placeholder-gray-700 outline-none"
-              placeholder="Where are you?"
-              value={searchKeyword}
-              onChange={handleSearchChange}
+        <div>
+          <div className="relative mb-5 flex h-[60px] items-center justify-center border-b border-b-gray-300">
+            <p className="flex flex-1 items-center justify-center text-lg font-extrabold">
+              Search for location
+            </p>
+            <ArrowLeftIcon
+              onClick={() => handleModeType(ModeTypes.PostingMode)}
+              className="absolute left-0 h-10 w-10 cursor-pointer rounded-full bg-gray-200 p-2 text-gray-500 hover:bg-gray-300"
             />
-            <MagnifyingGlassIcon className="absolute left-[-15px] top-1/2 h-4 w-4 -translate-y-1/2" />
+          </div>
+
+          <div className="mb-4 w-full rounded-full bg-[#E4E6EB] px-8 py-2">
+            <div className="relative w-full">
+              <input
+                type="text"
+                className="ml-2 w-full bg-[#E4E6EB] placeholder-gray-700 outline-none"
+                placeholder="Where are you?"
+                value={searchKeyword}
+                onChange={handleSearchChange}
+              />
+              <MagnifyingGlassIcon className="absolute left-[-15px] top-1/2 h-4 w-4 -translate-y-1/2" />
+            </div>
           </div>
         </div>
+        {/* Body */}
         {isLoading ? (
           <div className="custom-scrollbar mb-5 mt-2 flex h-[335px] items-center justify-center">
             <Image

@@ -12,6 +12,7 @@ import { FeelingType } from "@/types/feelings";
 import { SubActivityType } from "@/types/activities";
 import MapComponent from "../components/MapComponent";
 import { LocationType } from "@/types/locations";
+import { GifType } from "@/types/gifs";
 
 type PostingModeType = {
   closePostingModal: () => void;
@@ -31,6 +32,8 @@ type PostingModeType = {
   selectedFeelingActivity: null | FeelingType | SubActivityType;
   selectedLocation: LocationType | null;
   setSelectedLocation: (param: LocationType | null) => void;
+  selectedGif: GifType | null;
+  setSelectedGif: (param: GifType | null) => void;
 };
 
 export default function PostingMode({
@@ -51,6 +54,8 @@ export default function PostingMode({
   selectedFeelingActivity,
   selectedLocation,
   setSelectedLocation,
+  selectedGif,
+  setSelectedGif,
 }: PostingModeType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -68,6 +73,10 @@ export default function PostingMode({
   function isSubActivityType(activity: any): activity is SubActivityType {
     return (activity as SubActivityType).activityIcon !== undefined;
   }
+
+  const handleClickCloseGif = () => {
+    setSelectedGif(null);
+  };
 
   return (
     <div className={`flex h-auto w-[500px] flex-col rounded-lg bg-white p-4`}>
@@ -166,8 +175,14 @@ export default function PostingMode({
       <div className="custom-scrollbar flex max-h-[350px] w-full flex-col overflow-y-auto">
         <div className="h-full w-full">
           <textarea
-            className={`h-full w-full rounded-lg p-3 ${isUploadModeActive || selectedLocation !== null ? "text-md" : "text-2xl"} outline-none`}
-            rows={isUploadModeActive || selectedLocation !== null ? 2 : 4}
+            className={`h-full w-full rounded-lg p-3 ${isUploadModeActive || selectedLocation !== null || selectedGif !== null ? "text-md" : "text-2xl"} outline-none`}
+            rows={
+              isUploadModeActive ||
+              selectedLocation !== null ||
+              selectedGif !== null
+                ? 2
+                : 4
+            }
             placeholder={`What's on your mind, ${firstName}?`}
           ></textarea>
         </div>
@@ -242,6 +257,24 @@ export default function PostingMode({
           </div>
         )}
 
+        {selectedGif !== null && !isUploadModeActive && (
+          <div className="relative" onClick={handleClickCloseGif}>
+            <Image
+              width={40}
+              height={40}
+              src={selectedGif.media_formats.gif.url}
+              alt={selectedGif.content_description}
+              className="mb-3 h-auto w-full rounded-lg"
+            />
+            <div className="absolute right-2 top-2 h-8 w-8 cursor-pointer rounded-full bg-gray-100 p-1 text-gray-500 hover:bg-gray-200">
+              <XMarkIcon
+                onClick={() => setIsUploadModeActive(false)}
+                className=""
+              />
+            </div>
+          </div>
+        )}
+
         {selectedLocation !== null &&
           !isUploadModeActive &&
           uploadedImages.length <= 0 && (
@@ -267,6 +300,7 @@ export default function PostingMode({
               modeType={ModeTypes.PostingMode}
               handleModeType={handleModeType}
               style={`${uploadedImages.length > 0 && "bg-[#D8E4CA]"}`}
+              isDisabled={selectedGif !== null ? true : false}
             />
             <IconButton
               src="/icons/postings/tag.png"
@@ -275,6 +309,7 @@ export default function PostingMode({
               modeType={ModeTypes.TagPeopleMode}
               handleModeType={handleModeType}
               style={`${taggedFriends.size > 0 && "bg-[#C0E2EC]"}`}
+              isDisabled={false}
             />
             <IconButton
               src="/icons/postings/feeling-activity.png"
@@ -283,6 +318,7 @@ export default function PostingMode({
               modeType={ModeTypes.FeelingActivityMode}
               handleModeType={handleModeType}
               style={`${selectedFeelingActivity !== null && "bg-[#F1E6C6]"}`}
+              isDisabled={false}
             />
             <IconButton
               src="/icons/postings/location.png"
@@ -291,6 +327,7 @@ export default function PostingMode({
               modeType={ModeTypes.LocationMode}
               handleModeType={handleModeType}
               style={`${selectedLocation !== null && "bg-[#EEC2C7]"}`}
+              isDisabled={false}
             />
             <IconButton
               src="/icons/postings/gif.png"
@@ -299,6 +336,7 @@ export default function PostingMode({
               modeType={ModeTypes.GIFMode}
               handleModeType={handleModeType}
               style={`${selectedFeelingActivity !== null && "bg-[#C7E4DE]"}`}
+              isDisabled={uploadedImages.length > 0 ? true : false}
             />
             <div className="group relative ml-2 flex cursor-pointer items-center justify-center rounded-full p-1 hover:bg-gray-300">
               <EllipsisHorizontalIcon className="h-7 w-7 text-gray-500" />

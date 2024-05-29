@@ -12,6 +12,8 @@ import { FeelingType } from "@/types/feelings";
 import { SubActivityType } from "@/types/activities";
 import { LocationType } from "@/types/locations";
 import LocationMode from "./modes/LocationMode";
+import GifMode from "./modes/GifMode";
+import { GifType } from "@/types/gifs";
 
 type PostingModalProps = {
   isPostingModalOpen: boolean;
@@ -44,6 +46,8 @@ const PostingModal = ({
   const [selectedLocation, setSelectedLocation] = useState<LocationType | null>(
     null,
   );
+
+  const [selectedGif, setSelectedGif] = useState<GifType | null>(null);
 
   if (!isPostingModalOpen) return null;
 
@@ -102,6 +106,8 @@ const PostingModal = ({
           selectedFeelingActivity={selectedFeelingActivity}
           selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}
+          selectedGif={selectedGif}
+          setSelectedGif={setSelectedGif}
         />
       )}
 
@@ -148,6 +154,14 @@ const PostingModal = ({
           selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}
           handleModeType={handleModeType}
+        />
+      )}
+
+      {/* Gif */}
+      {selectedModeType === ModeTypes.GIFMode && (
+        <GifMode
+          handleModeType={handleModeType}
+          setSelectedGif={setSelectedGif}
         />
       )}
     </div>

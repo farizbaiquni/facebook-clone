@@ -1,0 +1,24 @@
+/* styles/IconButton.module.css */
+.imageWrapper {
+  position: relative;
+  display: inline-block;
+  cursor: not-allowed;
+}
+
+.baseImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.imageWrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #d9d9d9;
+  mix-blend-mode: color;
+  pointer-events: none; /* This ensures the overlay doesn't interfere with user interactions */
+}
