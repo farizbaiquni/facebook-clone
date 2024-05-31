@@ -33,7 +33,7 @@ const Sidebar = () => {
   const itemsToDisplay = isExpand ? menuItems : menuItems.slice(0, 5);
 
   return (
-    <div className="custom-scrollbar h-full min-w-72 flex-shrink overflow-y-scroll bg-gray-100 pl-2 max-[1100px]:hidden">
+    <div className="custom-scrollbar fixed h-screen min-w-72 flex-shrink overflow-y-scroll bg-gray-100 pl-2 max-[1100px]:hidden">
       <ul>
         {itemsToDisplay.map((item, index) => (
           <li

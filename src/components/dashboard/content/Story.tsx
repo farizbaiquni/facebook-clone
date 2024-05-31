@@ -10,52 +10,52 @@ import {
 const stories = [
   {
     name: "Rosineia Rocha Ramos",
-    imageUrl: "/images_story/story-1.jpg",
+    imageUrl: "/images/stories/story-1.jpg",
     profileImageUrl: "/icons/user.png",
   },
   {
     name: "Angélica Martínez",
-    imageUrl: "/images_story/story-2.jpg",
+    imageUrl: "/images/stories/story-2.jpg",
     profileImageUrl: "/icons/user.png",
   },
   {
     name: "Maria Fernanda",
-    imageUrl: "/images_story/story-3.jpg",
+    imageUrl: "/images/stories/story-3.jpg",
     profileImageUrl: "/icons/user.png",
   },
   {
     name: "John Doe",
-    imageUrl: "/images_story/story-4.jpg",
+    imageUrl: "/images/stories/story-4.jpg",
     profileImageUrl: "/icons/user.png",
   },
   {
     name: "Jane Smith",
-    imageUrl: "/images_story/story-5.jpg",
+    imageUrl: "/images/stories/story-5.jpg",
     profileImageUrl: "/icons/user.png",
   },
   {
     name: "Alice Johnson",
-    imageUrl: "/images_story/story-6.jpg",
+    imageUrl: "/images/stories/story-6.jpg",
     profileImageUrl: "/icons/user.png",
   },
   {
     name: "Robert Brown",
-    imageUrl: "/images_story/story-7.jpg",
+    imageUrl: "/images/stories/story-7.jpg",
     profileImageUrl: "/icons/user.png",
   },
   {
     name: "Emily Davis",
-    imageUrl: "/images_story/story-8.jpg",
+    imageUrl: "/images/stories/story-8.jpg",
     profileImageUrl: "/icons/user.png",
   },
   {
     name: "Michael Wilson",
-    imageUrl: "/images_story/story-9.jpg",
+    imageUrl: "/images/stories/story-9.jpg",
     profileImageUrl: "/icons/user.png",
   },
   {
     name: "Jessica Garcia",
-    imageUrl: "/images_story/story-10.jpg",
+    imageUrl: "/images/stories/story-10.jpg",
     profileImageUrl: "/icons/user.png",
   },
 ];

@@ -6,14 +6,14 @@ import { IconType } from "@/components/dashboard/header/NavigationIcons";
 import Sidebar from "@/components/dashboard/sidebar/Sidebar";
 import Story from "@/components/dashboard/content/Story";
 import Posting from "@/components/dashboard/content/Posting";
-import PostingModal from "@/components/dashboard/content/posting_modal/PostingModal";
+import Post from "@/components/dashboard/content/Post";
 
 export default function Dashbpard() {
   const [isFocused, setIsFocused] = useState(false);
   const [activeIcon, setActiveIcon] = useState<IconType>(IconType.Home);
 
   return (
-    <main className="flex h-screen flex-col bg-gray-700">
+    <main className="flex flex-col bg-gray-700">
       {/* Header Havbar */}
       <Header
         isFocused={isFocused}
@@ -26,9 +26,10 @@ export default function Dashbpard() {
         {/* Left Sidebar */}
         <Sidebar />
         {/* Center Content */}
-        <div className="flex flex-1 flex-col items-center bg-green-600">
+        <div className="ml-72 flex flex-1 flex-col items-center bg-green-600 max-[1100px]:ml-0">
           {/* <Story /> */}
           <Posting />
+          <Post />
         </div>
         {/* Right Sidebar */}
         <div className="w-64 bg-violet-600 max-[900px]:hidden"></div>
