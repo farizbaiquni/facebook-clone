@@ -3,7 +3,7 @@ import { Fragment, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import "../../../app/./scrollbar.css";
 
-const Sidebar = () => {
+const SidebarLeft = () => {
   const [activeItem, setActiveItem] = useState("");
   const [isExpand, setIsExpand] = useState(false);
 
@@ -34,7 +34,7 @@ const Sidebar = () => {
 
   return (
     <div className="custom-scrollbar fixed h-screen min-w-72 flex-shrink overflow-y-scroll bg-gray-100 pl-2 max-[1100px]:hidden">
-      <ul>
+      <ul className="pb-16">
         {itemsToDisplay.map((item, index) => (
           <li
             key={index}
@@ -87,4 +87,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default SidebarLeft;

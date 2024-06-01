@@ -3,17 +3,18 @@
 import { useState } from "react";
 import Header from "@/components/dashboard/header/Header";
 import { IconType } from "@/components/dashboard/header/NavigationIcons";
-import Sidebar from "@/components/dashboard/sidebar/Sidebar";
+import SidebarLeft from "@/components/dashboard/sidebar/SidebarLeft";
 import Story from "@/components/dashboard/content/Story";
 import Posting from "@/components/dashboard/content/Posting";
 import Post from "@/components/dashboard/content/Post";
+import SidebarRight from "@/components/dashboard/sidebar/SidebarRight";
 
 export default function Dashbpard() {
   const [isFocused, setIsFocused] = useState(false);
   const [activeIcon, setActiveIcon] = useState<IconType>(IconType.Home);
 
   return (
-    <main className="flex flex-col bg-gray-700">
+    <main className="flex flex-col bg-[#F0F2F5]">
       {/* Header Havbar */}
       <Header
         isFocused={isFocused}
@@ -24,15 +25,15 @@ export default function Dashbpard() {
       {/* Content */}
       <div className="flex h-full w-full pt-14">
         {/* Left Sidebar */}
-        <Sidebar />
+        <SidebarLeft />
         {/* Center Content */}
-        <div className="ml-72 flex flex-1 flex-col items-center bg-green-600 max-[1100px]:ml-0">
-          {/* <Story /> */}
+        <div className="ml-72 flex flex-1 flex-col items-center max-[1100px]:ml-0">
+          <Story />
           <Posting />
           <Post />
         </div>
         {/* Right Sidebar */}
-        <div className="w-64 bg-violet-600 max-[900px]:hidden"></div>
+        <SidebarRight />
       </div>
     </main>
   );

@@ -66,7 +66,7 @@ const Post = () => {
       {/* Text Post */}
       <div className="flex flex-col px-4">
         <p
-          className={`relative text-gray-700 ${isExpandedTextPost ? "line-clamp-none" : "line-clamp-[8]"}`}
+          className={`relative break-words text-gray-700 ${isExpandedTextPost ? "line-clamp-none" : "line-clamp-[8]"}`}
         >
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid in ad
           atque ducimus ab et modi quae quis voluptate, libero odio quaerat,
