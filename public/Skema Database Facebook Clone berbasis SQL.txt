@@ -1,0 +1,169 @@
+CREATE TABLE Users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    profile_picture VARCHAR(255),
+    cover_photo VARCHAR(255),
+    bio TEXT,
+    birth_date DATE,
+    gender_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (gender_id) REFERENCES Gender(gender_id)
+);
+
+CREATE TABLE Gender (
+    gender_id INT AUTO_INCREMENT PRIMARY KEY,
+    gender_name VARCHAR(50) NOT NULL
+);
+
+INSERT INTO Gender (gender_name) VALUES ('Male'), ('Female'), ('Other');
+
+CREATE TABLE Posts (
+    post_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    content TEXT,
+    emoji VARCHAR(10),
+    activity_icon_url VARCHAR(255),
+    gif_url VARCHAR(255),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    location_name VARCHAR(255),
+    audience_type_id INT DEFAULT 2, -- Default to 'public'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (audience_type_id) REFERENCES AudienceType(audience_type_id)
+);
+
+CREATE TABLE AudienceType (
+    audience_type_id INT AUTO_INCREMENT PRIMARY KEY,
+    audience_type_name VARCHAR(50) NOT NULL
+);
+
+INSERT INTO AudienceType (audience_type_name) VALUES ('only me', 'public', 'friends', 'friends except', 'specific friends', 'custom');
+
+CREATE TABLE Media (
+    media_id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    media_type_id INT NOT NULL,
+    media_url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES Posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (media_type_id) REFERENCES MediaType(media_type_id)
+);
+
+CREATE TABLE MediaType (
+    media_type_id INT AUTO_INCREMENT PRIMARY KEY,
+    media_type_name VARCHAR(50) NOT NULL
+);
+
+INSERT INTO MediaType (media_type_name) VALUES ('image'), ('video'), ('gif');
+
+CREATE TABLE TaggedUsers (
+    tag_id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES Posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY (post_id, user_id)
+);
+
+CREATE TABLE Comments (
+    comment_id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT,
+    parent_comment_id INT,
+    user_id INT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES Posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_comment_id) REFERENCES Comments(comment_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE CommentMedia (
+    comment_media_id INT AUTO_INCREMENT PRIMARY KEY,
+    comment_id INT NOT NULL,
+    media_type_id INT NOT NULL,
+    media_url VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (comment_id) REFERENCES Comments(comment_id) ON DELETE CASCADE,
+    FOREIGN KEY (media_type_id) REFERENCES MediaType(media_type_id)
+);
+
+CREATE TABLE Friendships (
+    friendship_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    friend_id INT NOT NULL,
+    status ENUM('Pending', 'Accepted', 'Declined') DEFAULT 'Pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY (user_id, friend_id)
+);
+
+CREATE TABLE Reactions (
+    reaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    reaction_name VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO Reactions (reaction_name) VALUES ('like'), ('love'), ('care'), ('haha'), ('wow'), ('sad'), ('angry');
+
+CREATE TABLE PostReactions (
+    post_reaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    post_id INT NOT NULL,
+    reaction_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES Posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (reaction_id) REFERENCES Reactions(reaction_id),
+    UNIQUE KEY (user_id, post_id)
+);
+
+CREATE TABLE CommentReactions (
+    comment_reaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    comment_id INT NOT NULL,
+    reaction_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (comment_id) REFERENCES Comments(comment_id) ON DELETE CASCADE,
+    FOREIGN KEY (reaction_id) REFERENCES Reactions(reaction_id),
+    UNIQUE KEY (user_id, comment_id)
+);
+
+CREATE TABLE Messages (
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES Users(user_id) ON DELETE CASCADE
+);
+
+CREATE TABLE AudienceExclude (
+    exception_id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES Posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY (post_id, user_id)
+);
+
+CREATE TABLE AudienceInclude (
+    include_id INT AUTO_INCREMENT PRIMARY KEY,
+    post_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES Posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY (post_id, user_id)
+);

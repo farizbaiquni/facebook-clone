@@ -19,10 +19,11 @@ export default function Home() {
         <div className="flex flex-1 flex-col items-start max-lg:items-center">
           <Image
             src="/facebook-text.svg"
-            height={350}
-            width={350}
+            height={0}
+            width={0}
             alt="facebook-text"
-            className="lg:ml-[-35px]"
+            className="h-[106px] w-[321px] lg:ml-[-35px]"
+            priority
           />
           <p className="text-start text-3xl max-lg:text-center max-lg:text-2xl">
             Facebook helps you connect and share with the people in your life.

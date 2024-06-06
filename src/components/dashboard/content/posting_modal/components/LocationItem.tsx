@@ -1,4 +1,4 @@
-import { MapPinIcon } from "@heroicons/react/24/solid";
+import { LocationType } from "@/types/locations";
 import Image from "next/image";
 
 type LocationItemType = {

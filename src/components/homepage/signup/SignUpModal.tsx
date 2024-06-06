@@ -6,13 +6,27 @@ import {
   getDaysInMonth,
   generateYearOptions,
   generateMonthOptions,
+  monthNameToIntMap,
 } from "../../../utils/dateUtils";
 import ExclamationCircleIcon from "../icons/ExclamationCircleIcon";
+import axios from "axios";
 
-interface SignUpModalProps {
+type UserData = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+  profile_picture: string | null;
+  cover_photo: string | null;
+  bio: string | null;
+  birth_date: string;
+  gender_id: number;
+};
+
+type SignUpModalProps = {
   isOpen: boolean;
   onClose: () => void;
-}
+};
 
 const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
   const currentYear = new Date().getFullYear();
@@ -21,14 +35,9 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
 
   const [firstName, setFirstName] = useState("");
   const [surname, setSurname] = useState("");
-  const [emailOrPhone, setEmailOrPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const [incorrectFirstName, setIncorrectFirstName] = useState(false);
-  const [incorrectSurname, setIncorrectSurname] = useState(false);
-  const [incorrectEmailOrPhone, setIncorrectEmailOrPhone] = useState(false);
-  const [incorrectPassword, setIncorrectPassword] = useState(false);
-  const [incorrectGender, setIncorrectGender] = useState(false);
+  const [dateOfBirth, setDateOfBirth] = useState("");
 
   const [dateOfBirthDay, setDateOfBirthDay] = useState(currentDay);
   const [dateOfBirthMonth, setDateOfBirthMonth] = useState(currentMonth);
@@ -38,6 +47,12 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
   const [days, setDays] = useState<string[]>([]);
   const [showDateOfBirthError, setShowDateOfBirthError] = useState(false);
 
+  const [incorrectFirstName, setIncorrectFirstName] = useState(false);
+  const [incorrectSurname, setIncorrectSurname] = useState(false);
+  const [incorrectEmail, setIncorrectEmail] = useState(false);
+  const [incorrectPassword, setIncorrectPassword] = useState(false);
+  const [incorrectGender, setIncorrectGender] = useState(false);
+
   useEffect(() => {
     setDays(getDaysInMonth(dateOfBirthYear, dateOfBirthMonth));
   }, [dateOfBirthYear, dateOfBirthMonth]);
@@ -46,12 +61,42 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
     setDays(getDaysInMonth(currentYear.toString(), currentMonth));
   }, [currentMonth, currentYear]);
 
+  useEffect(() => {
+    onChangeDateOfBirth(
+      parseInt(dateOfBirthYear),
+      monthNameToIntMap.get(dateOfBirthMonth.toLocaleLowerCase()) ?? 0,
+      parseInt(dateOfBirthDay),
+    );
+  }, [dateOfBirthDay, dateOfBirthMonth, dateOfBirthYear]);
+
+  const handleSignUpNewUser = async (userData: UserData): Promise<void> => {
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/users/signUp",
+        userData,
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  const checkIsEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+  };
+
+  const onChangeDateOfBirth = (year: number, month: number, day: number) => {
+    const date = `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day}`;
+    setDateOfBirth(date);
+  };
+
   const handleValidation =
     (setter: (value: boolean) => void) => (isValid: boolean) => {
       setter(!isValid);
     };
 
-  const handleSignUp = (
+  const handleSignUp = async (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ) => {
     event.preventDefault();
@@ -71,11 +116,17 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
       setIncorrectSurname(false);
     }
 
-    if (emailOrPhone.trim() === "") {
-      setIncorrectEmailOrPhone(true);
+    if (email.trim() === "") {
+      setIncorrectEmail(true);
       hasError = true;
     } else {
-      setIncorrectEmailOrPhone(false);
+      const isEmail = checkIsEmail(email.trim());
+      if (isEmail) {
+        setIncorrectEmail(false);
+      } else {
+        setIncorrectEmail(true);
+        hasError = true;
+      }
     }
 
     if (password.trim() === "") {
@@ -115,9 +166,20 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
       return;
     }
 
-    // Proceed with sign up logic
-    console.log("Sign Up logic here...");
+    const userData: UserData = {
+      first_name: firstName,
+      last_name: surname,
+      email: email,
+      password: password,
+      profile_picture: null,
+      cover_photo: null,
+      bio: null,
+      birth_date: dateOfBirth,
+      gender_id: 1,
+    };
 
+    // Proceed with sign up logic
+    handleSignUpNewUser(userData);
     onClose();
   };
 
@@ -148,6 +210,7 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
               error={incorrectFirstName}
               onValidation={handleValidation(setIncorrectFirstName)}
             />
+
             {/* Surname */}
             <InputField
               type="text"
@@ -158,15 +221,17 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
               onValidation={handleValidation(setIncorrectSurname)}
             />
           </div>
+
           {/* Mobile number or email address */}
           <InputField
             type="text"
-            label="Mobile number or email address"
-            value={emailOrPhone}
-            onChange={(e) => setEmailOrPhone(e.target.value)}
-            error={incorrectEmailOrPhone}
-            onValidation={handleValidation(setIncorrectEmailOrPhone)}
+            label="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={incorrectEmail}
+            onValidation={handleValidation(setIncorrectEmail)}
           />
+
           {/* Password */}
           <InputField
             type="password"
@@ -178,11 +243,12 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
           />
 
           <div className="mr-3 flex justify-between">
-            <p className="text-xs text-gray-700">Gender</p>
+            <p className="text-xs text-gray-700">Date of birth</p>
             {showDateOfBirthError && (
               <ExclamationCircleIcon className="ml-2 h-6 w-6 self-center text-[#B94A48]" />
             )}
           </div>
+
           <div className="mb-3 flex space-x-3">
             <SelectField
               options={days.map((day) => ({ value: day, label: day }))}
