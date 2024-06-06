@@ -21,17 +21,20 @@ export default function Login() {
           className="h-[79px] w-[240px] lg:ml-[-35px]"
           priority
         />
+
         {/* Card Login */}
         <div className="flex w-[395px] flex-col items-center rounded-md border border-gray-300 bg-white font-[Helvetica] shadow-md">
           <div className="flex w-full flex-col items-center px-5 pt-5">
             <p className="pb-5 text-lg">Log in to Facebook</p>
-            {/* Input */}
+
+            {/* Input Email*/}
             <input
               type="text"
               placeholder="Email address"
               className="mb-3 w-full rounded-md border border-gray-300 p-3 text-lg outline-none"
             />
-            {/* Password */}
+
+            {/* Input Password */}
             <div className="relative mb-3 w-full">
               <input
                 type={passwordVisible ? "text" : "password"}
@@ -51,16 +54,21 @@ export default function Login() {
                 )}
               </button>
             </div>
+
             <button className="w-full rounded-md bg-[#1877f2] py-2 text-lg font-semibold text-white">
               Log In
             </button>
+
             <p className="mt-3 text-sm text-[#1877f2]">Forgotten account?</p>
           </div>
+
+          {/* OR */}
           <div className="flex w-full items-center px-2 py-2">
             <hr className="w-full border border-gray-200" />
             <p className="px-3 text-sm text-[#96999e]">or</p>
             <hr className="w-full border border-gray-200" />
           </div>
+
           <button className="mb-5 rounded-md bg-[#36a420] p-2 text-[17px] text-lg font-semibold text-white">
             Create new account
           </button>

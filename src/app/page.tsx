@@ -9,6 +9,7 @@ import SignUpModal from "@/components/homepage/signup/SignUpModal";
 export default function Home() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAlertSucessLogin, setIsAlertSucessLogin] = useState(false);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -104,7 +105,27 @@ export default function Home() {
           </p>
         </div>
       </div>
-      <SignUpModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+
+      {isAlertSucessLogin && (
+        <div
+          className="w-full-h-full fixed inset-0 z-50 bg-black bg-opacity-70"
+          onClick={() => setIsAlertSucessLogin(false)}
+        >
+          <div
+            className="fixed right-10 top-5 w-96 cursor-pointer border-l-4 border-green-600 bg-green-200 p-4 text-green-600"
+            role="alert"
+          >
+            <p className="font-extrabold">Log in success</p>
+            <p>Redirect to login page, please login</p>
+          </div>
+        </div>
+      )}
+
+      <SignUpModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        setIsAlertSucessLogin={setIsAlertSucessLogin}
+      />
     </main>
   );
 }

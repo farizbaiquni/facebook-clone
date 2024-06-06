@@ -10,6 +10,7 @@ import {
 } from "../../../utils/dateUtils";
 import ExclamationCircleIcon from "../icons/ExclamationCircleIcon";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 type UserData = {
   first_name: string;
@@ -26,9 +27,14 @@ type UserData = {
 type SignUpModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  setIsAlertSucessLogin: (param: boolean) => void;
 };
 
-const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
+const SignUpModal = ({
+  isOpen,
+  onClose,
+  setIsAlertSucessLogin,
+}: SignUpModalProps) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().toLocaleString("default", { month: "long" });
   const currentDay = new Date().getDate().toString();
@@ -69,13 +75,19 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
     );
   }, [dateOfBirthDay, dateOfBirthMonth, dateOfBirthYear]);
 
+  const router = useRouter();
+
   const handleSignUpNewUser = async (userData: UserData): Promise<void> => {
     try {
-      const response = await axios.post(
-        "http://localhost:4000/users/signUp",
-        userData,
-      );
-      console.log(response.data);
+      // const response = await axios.post(
+      //   "http://localhost:4000/users/signUp",
+      //   userData,
+      // );
+      setIsAlertSucessLogin(true);
+      setTimeout(() => {
+        setIsAlertSucessLogin(false);
+        router.replace("/login");
+      }, 3000);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -186,7 +198,7 @@ const SignUpModal = ({ isOpen, onClose }: SignUpModalProps) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex min-w-max items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-40 flex min-w-max items-center justify-center bg-black bg-opacity-50">
       <div className="w-full max-w-md rounded-lg bg-white px-5 py-6">
         <div className="mb-1 flex items-center justify-between">
           <h2 className="text-3xl font-bold text-gray-800">Sign Up</h2>
