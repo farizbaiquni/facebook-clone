@@ -79,10 +79,10 @@ const SignUpModal = ({
 
   const handleSignUpNewUser = async (userData: UserData): Promise<void> => {
     try {
-      // const response = await axios.post(
-      //   "http://localhost:4000/users/signUp",
-      //   userData,
-      // );
+      const response = await axios.post(
+        "http://localhost:4000/users/signUp",
+        userData,
+      );
       setIsAlertSucessLogin(true);
       setTimeout(() => {
         setIsAlertSucessLogin(false);

@@ -3,17 +3,32 @@
 import Link from "next/link";
 import Image from "next/image";
 import React, { useState } from "react";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import SignUpModal from "@/components/homepage/signup/SignUpModal";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { authLogin } from "@/utils/authUtils";
+import InvalidCredential from "@/components/InvalidCredential";
 
 export default function Home() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAlertSucessLogin, setIsAlertSucessLogin] = useState(false);
+  const [isInvalidCredential, setIsInvalidCredential] = useState(false);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
+
+  const handleLogin = async () => {
+    try {
+      const response = await authLogin(email, password);
+    } catch (error) {
+      setIsInvalidCredential(true);
+    }
+  };
+
   return (
     <main className="flex h-screen items-center justify-center bg-[#F0F2F5]">
       <div className="flex w-4/5 max-lg:my-5 max-lg:w-[400px] max-lg:flex-col max-lg:items-center">
@@ -48,9 +63,11 @@ export default function Home() {
         <div className="flex-1 flex-col max-lg:mt-3">
           <div className="mx-auto w-[400px] rounded-md bg-white p-5 shadow-lg shadow-slate-300">
             <div className="flex flex-col">
+              {isInvalidCredential && <InvalidCredential />}
               {/* Email */}
               <input
                 type="text"
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email address"
                 className="w-full rounded-sm border border-gray-200 px-4 py-3 text-lg shadow-sm
                 outline-none focus:border-transparent focus:ring-1 focus:ring-[#0866FF]"
@@ -59,6 +76,7 @@ export default function Home() {
               <div className="relative mt-3">
                 <input
                   type={passwordVisible ? "text" : "password"}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
                   className="w-full rounded-sm border border-gray-200 px-4 py-3 text-lg 
                   shadow-sm outline-none focus:border-transparent focus:ring-1 focus:ring-[#0866FF]"
@@ -77,7 +95,10 @@ export default function Home() {
               </div>
 
               {/* Login */}
-              <button className="mt-5 w-full rounded-md bg-[#0866FF] py-2 text-2xl font-semibold text-white hover:bg-[#1877F2]">
+              <button
+                onClick={handleLogin}
+                className="mt-5 w-full rounded-md bg-[#0866FF] py-2 text-2xl font-semibold text-white hover:bg-[#1877F2]"
+              >
                 Log in
               </button>
 

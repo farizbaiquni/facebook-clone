@@ -96,9 +96,9 @@ const Story: React.FC = () => {
               <Image
                 src="/profile.jpg"
                 alt="User Profile"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-t-lg"
+                sizes="50"
+                fill
+                className="rounded-t-lg object-cover"
               />
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 transform rounded-full border-4 border-gray-300 bg-blue-600 p-1">
                 <PlusIcon className="h-6 w-6 text-white" />
@@ -120,16 +120,17 @@ const Story: React.FC = () => {
             <Image
               src={story.imageUrl}
               alt={story.name}
-              layout="fill"
-              objectFit="cover"
-              className="rounded-lg"
+              sizes="50"
+              fill
+              className="rounded-lg object-cover"
             />
             <div className="absolute left-2 top-2 h-10 w-10 overflow-hidden rounded-full border-2 border-white">
               <Image
                 src={story.profileImageUrl}
                 alt={`${story.name} profile`}
-                layout="fill"
-                objectFit="cover"
+                width={70}
+                height={70}
+                className="object-cover"
               />
             </div>
             <div className="absolute bottom-0 left-0 right-0 rounded-b-lg bg-black bg-opacity-50 p-1 text-center text-white">
