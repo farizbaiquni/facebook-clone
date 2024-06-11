@@ -1,4 +1,5 @@
-// components/Story.tsx
+"use client";
+
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -6,63 +7,68 @@ import {
   ChevronRightIcon,
   PlusIcon,
 } from "@heroicons/react/24/solid";
+import { UserType } from "@/types/user";
 
-const stories = [
-  {
-    name: "Rosineia Rocha Ramos",
-    imageUrl: "/images/stories/story (1).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-  {
-    name: "Angélica Martínez",
-    imageUrl: "/images/stories/story (2).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-  {
-    name: "Maria Fernanda",
-    imageUrl: "/images/stories/story (3).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-  {
-    name: "John Doe",
-    imageUrl: "/images/stories/story (4).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-  {
-    name: "Jane Smith",
-    imageUrl: "/images/stories/story (5).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-  {
-    name: "Alice Johnson",
-    imageUrl: "/images/stories/story (6).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-  {
-    name: "Robert Brown",
-    imageUrl: "/images/stories/story (7).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-  {
-    name: "Emily Davis",
-    imageUrl: "/images/stories/story (8).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-  {
-    name: "Michael Wilson",
-    imageUrl: "/images/stories/story (9).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-  {
-    name: "Jessica Garcia",
-    imageUrl: "/images/stories/story (10).jpg",
-    profileImageUrl: "/icons/user.png",
-  },
-];
+type StoryProps = {
+  user: UserType;
+};
 
-const Story: React.FC = () => {
+export default function Story({ user }: StoryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const storiesPerPage = 4;
+
+  const stories = [
+    {
+      name: "Rosineia Rocha Ramos",
+      imageUrl: "/images/stories/story (1).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "Angélica Martínez",
+      imageUrl: "/images/stories/story (2).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "Maria Fernanda",
+      imageUrl: "/images/stories/story (3).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "John Doe",
+      imageUrl: "/images/stories/story (4).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "Jane Smith",
+      imageUrl: "/images/stories/story (5).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "Alice Johnson",
+      imageUrl: "/images/stories/story (6).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "Robert Brown",
+      imageUrl: "/images/stories/story (7).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "Emily Davis",
+      imageUrl: "/images/stories/story (8).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "Michael Wilson",
+      imageUrl: "/images/stories/story (9).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "Jessica Garcia",
+      imageUrl: "/images/stories/story (10).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+  ];
 
   const scrollLeft = () => {
     setCurrentIndex((prevIndex) => Math.max(prevIndex - storiesPerPage, 0));
@@ -93,13 +99,26 @@ const Story: React.FC = () => {
         {currentIndex === 0 && (
           <div className="relative flex h-[250px] w-[140px] flex-shrink-0 flex-col items-center justify-between rounded-lg bg-gray-800 text-white transition-all duration-300 hover:cursor-pointer">
             <div className="relative h-4/5 w-full">
-              <Image
-                src="/profile.jpg"
-                alt="User Profile"
-                sizes="50"
-                fill
-                className="rounded-t-lg object-cover"
-              />
+              {user?.profilePicture ? (
+                <Image
+                  src={user?.profilePicture}
+                  alt="User Profile"
+                  sizes="50"
+                  fill
+                  className="rounded-t-lg object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <Image
+                    src={"/icons/user-non-rounded.png"}
+                    alt="User Profile"
+                    width={50}
+                    height={50}
+                    className="rounded-t-lg object-cover"
+                  />
+                </div>
+              )}
+
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 transform rounded-full border-4 border-gray-300 bg-blue-600 p-1">
                 <PlusIcon className="h-6 w-6 text-white" />
               </div>
@@ -150,6 +169,4 @@ const Story: React.FC = () => {
       )}
     </div>
   );
-};
-
-export default Story;
+}

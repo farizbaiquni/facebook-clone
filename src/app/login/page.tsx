@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { login } from "@/services/login";
+import { loginService } from "@/services/login";
 import { authLogin } from "@/utils/authUtils";
 import InvalidCredential from "@/components/InvalidCredential";
 

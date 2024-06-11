@@ -3,18 +3,19 @@ import { ModeTypes } from "@/types/modes";
 import { ArrowLeftIcon, TagIcon } from "@heroicons/react/24/solid";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useRef } from "react";
+import { MediaImageVideoEnum, MediaImageVideoType } from "@/types/mediaPost";
 
 type EditPhotoModeType = {
-  uploadedImages: string[];
+  imagesVideos: MediaImageVideoType[];
   handleModeType: (param: ModeTypes) => void;
-  handleDeleteImage: (param: number) => void;
+  handleDeleteImageVideo: (param: number) => void;
   handleFilesUpload: (images: FileList) => void;
 };
 
 export default function EditPhotoMode({
-  uploadedImages,
+  imagesVideos,
   handleModeType,
-  handleDeleteImage,
+  handleDeleteImageVideo,
   handleFilesUpload,
 }: EditPhotoModeType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -25,7 +26,7 @@ export default function EditPhotoMode({
   };
   return (
     <div
-      className={`flex h-auto flex-col rounded-lg bg-white ${uploadedImages.length <= 2 ? "w-[500px]" : uploadedImages.length <= 4 ? "w-[900px]" : "w-[1227px]"}`}
+      className={`flex h-auto flex-col rounded-lg bg-white ${imagesVideos.length <= 2 ? "w-[500px]" : imagesVideos.length <= 4 ? "w-[900px]" : "w-[1227px]"}`}
     >
       {/* Header */}
       <div className="relative mb-5 flex h-[60px] items-center justify-center overflow-hidden border-b border-b-gray-300">
@@ -38,7 +39,7 @@ export default function EditPhotoMode({
         />
       </div>
       {/* Content */}
-      {uploadedImages.length === 0 && (
+      {imagesVideos.length === 0 && (
         <div className="flex h-[191px] w-full flex-col items-center justify-center">
           <Image
             src={"/icons/postings/null_states_media_gray_wash.svg"}
@@ -50,35 +51,51 @@ export default function EditPhotoMode({
           <p className="text-gray-500">Start by adding a photo/video</p>
         </div>
       )}
-      {uploadedImages.length >= 1 && (
+      {imagesVideos.length >= 1 && (
         <div
-          className={`relative grid ${uploadedImages.length <= 1 ? "h-[230px] " : "h-[496px]"} gap-2 overflow-y-scroll bg-[#D1D5DB] p-2 ${uploadedImages.length <= 2 ? "grid-cols-1" : uploadedImages.length <= 4 ? "grid-cols-2" : "grid-cols-3"}`}
+          className={`relative grid ${imagesVideos.length <= 1 ? "h-[230px] " : "h-[496px]"} gap-2 overflow-y-scroll bg-[#D1D5DB] p-2 ${imagesVideos.length <= 2 ? "grid-cols-1" : imagesVideos.length <= 4 ? "grid-cols-2" : "grid-cols-3"}`}
         >
-          {uploadedImages.map((image, index) => (
+          {imagesVideos.map((imageVideo, index) => (
             <div
-              className={`relative rounded-md bg-white ${uploadedImages.length <= 1 ? "h-[215px]" : "h-[325px]"}`}
+              className={`relative rounded-md bg-white ${imagesVideos.length <= 1 ? "h-[215px]" : "h-[325px]"}`}
               key={index}
             >
               <XMarkIcon
-                onClick={() => handleDeleteImage(index)}
+                onClick={() => handleDeleteImageVideo(index)}
                 className="absolute right-1 top-1 z-30 h-8 w-8 cursor-pointer rounded-full bg-gray-200 p-2 text-gray-500 hover:bg-gray-300"
               />
               <div className="relative h-[193px] overflow-hidden rounded-t-md bg-gray-500">
                 <div
                   className="absolute inset-0 bg-cover bg-center blur-md filter"
-                  style={{ backgroundImage: `url(${image})` }}
+                  style={{ backgroundImage: `url(${imageVideo})` }}
                 ></div>
                 <div className="relative flex h-full w-full items-center justify-center">
-                  <Image
-                    width={100}
-                    height={100}
-                    src={image}
-                    alt={`Uploaded ${index}`}
-                    className="mx-auto h-full w-auto rounded-bl-md object-contain"
-                  />
+                  {imageVideo.type === MediaImageVideoEnum.IMAGE ? (
+                    <Image
+                      width={100}
+                      height={100}
+                      src={imageVideo.url}
+                      alt={`Uploaded ${index}`}
+                      className="mx-auto h-full w-auto rounded-bl-md object-contain"
+                    />
+                  ) : (
+                    <video
+                      src={imageVideo.urlObject}
+                      width="200"
+                      onMouseOver={(e) =>
+                        (e.currentTarget as HTMLVideoElement).play()
+                      }
+                      onMouseOut={(e) =>
+                        (e.currentTarget as HTMLVideoElement).pause()
+                      }
+                      controls
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  )}
                   <div className="group absolute bottom-2 left-2 z-30 flex cursor-pointer items-center rounded-full bg-gray-700">
                     <TagIcon
-                      onClick={() => handleDeleteImage(index)}
+                      onClick={() => handleDeleteImageVideo(index)}
                       className="text-white0 h-6 w-6 rounded-full bg-gray-700 p-1 text-white"
                     />
                     <p className="hidden pr-2 text-xs text-white group-hover:block">
@@ -87,7 +104,7 @@ export default function EditPhotoMode({
                   </div>
                 </div>
               </div>
-              {uploadedImages.length > 1 && (
+              {imagesVideos.length > 1 && (
                 <div className="p-2">
                   <textarea
                     className="h-[84px] w-full rounded-lg border border-gray-300 p-3 outline-none ring-blue-600 focus:ring-2"
@@ -116,7 +133,7 @@ export default function EditPhotoMode({
             />
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,video/*"
               multiple
               ref={fileInputRef}
               onChange={(e) => handleFilesUpload(e.target.files!)}

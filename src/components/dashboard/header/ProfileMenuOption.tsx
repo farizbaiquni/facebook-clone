@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import Image from "next/image";
-import { logout } from "@/services/logout";
+import { logoutService } from "@/services/logout";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import {
   ArrowRightEndOnRectangleIcon,
@@ -35,7 +35,7 @@ const menuItems = [
     icon: ArrowRightEndOnRectangleIcon,
     label: "Log out",
     onClick: async () => {
-      const response = await logout();
+      const response = await logoutService();
       if (response) {
         window.location.href = "/";
       }

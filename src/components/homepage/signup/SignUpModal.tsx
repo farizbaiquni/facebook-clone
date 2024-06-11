@@ -11,18 +11,7 @@ import {
 import ExclamationCircleIcon from "../icons/ExclamationCircleIcon";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-
-type UserData = {
-  first_name: string;
-  last_name: string;
-  email: string;
-  password: string;
-  profile_picture: string | null;
-  cover_photo: string | null;
-  bio: string | null;
-  birth_date: string;
-  gender_id: number;
-};
+import { UserCreateType } from "@/types/user";
 
 type SignUpModalProps = {
   isOpen: boolean;
@@ -77,7 +66,9 @@ const SignUpModal = ({
 
   const router = useRouter();
 
-  const handleSignUpNewUser = async (userData: UserData): Promise<void> => {
+  const handleSignUpNewUser = async (
+    userData: UserCreateType,
+  ): Promise<void> => {
     try {
       const response = await axios.post(
         "http://localhost:4000/users/signUp",
@@ -178,7 +169,7 @@ const SignUpModal = ({
       return;
     }
 
-    const userData: UserData = {
+    const userData: UserCreateType = {
       first_name: firstName,
       last_name: surname,
       email: email,

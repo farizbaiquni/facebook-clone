@@ -1,8 +1,15 @@
+"use client";
+
 import React, { Fragment, useState } from "react";
 import Image from "next/image";
 import PostingModal from "./posting_modal/PostingModal";
+import { UserType } from "@/types/user";
 
-const Posting = () => {
+type PostingProps = {
+  user: UserType;
+};
+
+const Posting = ({ user }: PostingProps) => {
   const [isPostingModalOpen, setIsPostingModalOpen] = useState(false);
   const [firstName, setFirstName] = useState("Fariz");
 
@@ -63,8 +70,10 @@ const Posting = () => {
         </div>
       </div>
       <PostingModal
+        user={user}
         isPostingModalOpen={isPostingModalOpen}
         closePostingModal={closePostingModal}
+        setIsPostingModalOpen={setIsPostingModalOpen}
       />
     </Fragment>
   );

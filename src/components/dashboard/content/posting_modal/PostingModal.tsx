@@ -1,40 +1,52 @@
-import { useState } from "react";
 import "../../../../app/./scrollbar.css";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import PostingMode from "./modes/PostingMode";
 import EditPhotoMode from "./modes/EditPhotoMode";
 import AudienceMode from "./modes/AudienceMode";
 import TagPeopleMode from "./modes/TagPeopleMode";
 import FeelingActivityMode from "./modes/FeelingActivityMode";
-import { ModeTypes } from "@/types/modes";
+import LocationMode from "./modes/LocationMode";
+import GifMode from "./modes/GifMode";
+import { MediaImageVideoEnum, MediaImageVideoType } from "@/types/mediaPost";
 import { AudienceOptions } from "@/types/audienceOptions";
 import { FriendTagPeople } from "@/types/entityObjects";
 import { FeelingType } from "@/types/feelings";
 import { SubActivityType } from "@/types/activities";
 import { LocationType } from "@/types/locations";
-import LocationMode from "./modes/LocationMode";
-import GifMode from "./modes/GifMode";
+import { ModeTypes } from "@/types/modes";
 import { GifType } from "@/types/gifs";
+import { UserType } from "@/types/user";
 
 type PostingModalProps = {
+  user: UserType;
   isPostingModalOpen: boolean;
   closePostingModal: () => void;
+  setIsPostingModalOpen: (param: boolean) => void;
 };
 
 const PostingModal = ({
+  user,
   isPostingModalOpen,
   closePostingModal,
+  setIsPostingModalOpen,
 }: PostingModalProps) => {
   const [selectedModeType, setSelectedModeType] = useState(
     ModeTypes.PostingMode,
   );
-
   const [isUploadModeActive, setIsUploadModeActive] = useState(false);
+  const [imagesVideos, setImagesVideos] = useState<MediaImageVideoType[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [firstName, setFirstName] = useState("Fariz");
-  const [fullName, setfullName] = useState("Fariz Baiquni");
+  const [selectedGif, setSelectedGif] = useState<GifType | null>(null);
   const [selectedAudienceOption, setSelectedAudienceOption] = useState(
     AudienceOptions.Public,
   );
+  const [selectedAudienceInclude, setSelectedAudienceInclude] = useState<
+    string[]
+  >([]);
+  const [selectedAudienceExclude, setSelectedAudienceExclude] = useState<
+    string[]
+  >([]);
 
   const [taggedFriends, setTaggedFriends] = useState<
     Map<number, FriendTagPeople>
@@ -42,24 +54,23 @@ const PostingModal = ({
   const [selectedFeelingActivity, setSelectedFeelingActivity] = useState<
     FeelingType | SubActivityType | null
   >(null);
-
   const [selectedLocation, setSelectedLocation] = useState<LocationType | null>(
     null,
   );
 
-  const [selectedGif, setSelectedGif] = useState<GifType | null>(null);
-
-  if (!isPostingModalOpen) return null;
+  const handleClearAllInput = () => {
+    setImagesVideos([]);
+    setSelectedGif(null);
+    setSelectedAudienceInclude([]);
+    setSelectedAudienceExclude([]);
+    setTaggedFriends(new Map());
+    setSelectedFeelingActivity(null);
+    setSelectedLocation(null);
+    setIsPostingModalOpen(false);
+  };
 
   const handleClickUploadModeActive = (param: boolean) => {
     setIsUploadModeActive(param);
-  };
-
-  const handleFilesUpload = (files: FileList) => {
-    const newImages = Array.from(files).map((file) =>
-      URL.createObjectURL(file),
-    );
-    setUploadedImages((prevImages) => [...prevImages, ...newImages]);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
@@ -78,45 +89,108 @@ const PostingModal = ({
     setSelectedModeType(type);
   };
 
-  const handleDeleteImage = (index: number) => {
-    const newImages = [...uploadedImages];
-    newImages.splice(index, 1);
-    setUploadedImages(newImages);
+  const handleDeleteImageVideo = (index: number) => {
+    const newImagesVideos = [...imagesVideos];
+    newImagesVideos.splice(index, 1);
+    setImagesVideos(newImagesVideos);
   };
+
+  const createThumbnail = (url: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const videoElement = document.createElement("video");
+      videoElement.src = url;
+      videoElement.addEventListener("loadeddata", () => {
+        videoElement.currentTime = 1;
+      });
+      videoElement.addEventListener("seeked", () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+          const thumbnailUrl = canvas.toDataURL();
+          resolve(thumbnailUrl);
+        }
+      });
+    });
+  };
+
+  const handleFilesUpload = async (files: FileList) => {
+    const isVideoFile = (file: File) => {
+      return file.type.startsWith("video/");
+    };
+
+    const newImagesVideos = Array.from(files).map((file) => {
+      const id = uuidv4();
+      const imageVideo: MediaImageVideoType = {
+        id: id,
+        file: file,
+        downloadUrl: null,
+        type: isVideoFile(file)
+          ? MediaImageVideoEnum.VIDEO
+          : MediaImageVideoEnum.IMAGE,
+        url: URL.createObjectURL(file),
+        urlObject: URL.createObjectURL(file),
+      };
+      return imageVideo;
+    });
+
+    if (newImagesVideos) {
+      const thumbnailPromises = newImagesVideos.map((file) => {
+        if (file.type === MediaImageVideoEnum.VIDEO) {
+          return createThumbnail(file.url).then((thumbnail) => {
+            URL.revokeObjectURL(file.url);
+            return {
+              ...file,
+              url: thumbnail,
+            };
+          });
+        } else {
+          return Promise.resolve(file);
+        }
+      });
+
+      const updatedFiles = await Promise.all(thumbnailPromises);
+      setImagesVideos((prevState) => [...prevState, ...updatedFiles]);
+    }
+  };
+
+  if (!isPostingModalOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
       {/* Posting Mode */}
       {selectedModeType === ModeTypes.PostingMode && (
         <PostingMode
+          user={user}
+          imagesVideos={imagesVideos}
+          selectedFeelingActivity={selectedFeelingActivity}
+          selectedGif={selectedGif}
+          selectedLocation={selectedLocation}
+          selectedAudienceOption={selectedAudienceOption}
+          taggedFriends={taggedFriends}
+          isUploadModeActive={isUploadModeActive}
+          setImagesVideos={setImagesVideos}
           closePostingModal={closePostingModal}
           handleModeType={handleModeType}
-          isUploadModeActive={isUploadModeActive}
-          firstName={firstName}
-          uploadedImages={uploadedImages}
-          setUploadedImages={setUploadedImages}
           handleFilesUpload={handleFilesUpload}
           handleDragOver={handleDragOver}
           handleDrop={handleDrop}
           setIsUploadModeActive={setIsUploadModeActive}
-          fullName={fullName}
-          selectedAudienceOption={selectedAudienceOption}
           handleClickUploadModeActive={handleClickUploadModeActive}
-          taggedFriends={taggedFriends}
-          selectedFeelingActivity={selectedFeelingActivity}
-          selectedLocation={selectedLocation}
           setSelectedLocation={setSelectedLocation}
-          selectedGif={selectedGif}
           setSelectedGif={setSelectedGif}
+          handleClearAllInput={handleClearAllInput}
         />
       )}
 
       {/* Edit Photo Mode */}
       {selectedModeType === ModeTypes.EditPhotoMode && (
         <EditPhotoMode
-          uploadedImages={uploadedImages}
+          imagesVideos={imagesVideos}
           handleModeType={handleModeType}
-          handleDeleteImage={handleDeleteImage}
+          handleDeleteImageVideo={handleDeleteImageVideo}
           handleFilesUpload={handleFilesUpload}
         />
       )}
@@ -128,6 +202,8 @@ const PostingModal = ({
           handleModeType={handleModeType}
           selectedAudienceOption={selectedAudienceOption}
           setSelectedAudienceOption={setSelectedAudienceOption}
+          setSelectedAudienceInclude={setSelectedAudienceInclude}
+          setSelectedAudienceExclude={setSelectedAudienceExclude}
         />
       )}
 

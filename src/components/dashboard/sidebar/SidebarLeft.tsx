@@ -1,14 +1,24 @@
+"use client";
+
 import Image from "next/image";
 import { Fragment, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import "../../../app/./scrollbar.css";
+import { UserType } from "@/types/user";
 
-const SidebarLeft = () => {
+type SidebarLeftProps = {
+  user: UserType;
+};
+
+const SidebarLeft = ({ user }: SidebarLeftProps) => {
   const [activeItem, setActiveItem] = useState("");
   const [isExpand, setIsExpand] = useState(false);
 
   const menuItems = [
-    { name: "Fariz Baiquni", icon: "/profile.jpg" },
+    {
+      name: `${user?.firstName} ${user?.lastName}`,
+      icon: `${user?.profilePicture ? user.profilePicture : "/icons/user.png"}`,
+    },
     { name: "Friends", icon: "/icons/sidebars/friends.png" },
     { name: "Memories", icon: "/icons/sidebars/memories.png" },
     { name: "Saved", icon: "/icons/sidebars/saved.png" },
@@ -34,7 +44,7 @@ const SidebarLeft = () => {
 
   return (
     <div className="custom-scrollbar fixed h-screen min-w-72 flex-shrink overflow-y-scroll bg-gray-100 pl-2 max-[1100px]:hidden">
-      <ul className="pb-16">
+      <ul className="pb-16 pt-5">
         {itemsToDisplay.map((item, index) => (
           <li
             key={index}

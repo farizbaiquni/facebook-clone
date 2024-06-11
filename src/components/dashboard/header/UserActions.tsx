@@ -5,12 +5,14 @@ import {
   Squares2X2Icon,
 } from "@heroicons/react/24/solid";
 import Image from "next/image";
+import { UserType } from "@/types/user";
 
-type UserActionsType = {
+type UserActionsProps = {
+  user: UserType | null;
   handleOnClickPhotoProfile: () => void;
 };
 
-const UserActions = ({ handleOnClickPhotoProfile }: UserActionsType) => {
+const UserActions = ({ user, handleOnClickPhotoProfile }: UserActionsProps) => {
   return (
     <div className="flex w-60 min-w-max items-center justify-end">
       <div className="group relative mr-2 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-gray-300 hover:bg-gray-400">
@@ -33,7 +35,7 @@ const UserActions = ({ handleOnClickPhotoProfile }: UserActionsType) => {
       </div>
       <div className="group relative">
         <Image
-          src="/profile.jpg"
+          src={user?.profilePicture ? user.profilePicture : "/icons/user.png"}
           width={500}
           height={500}
           alt="facebook-logo"

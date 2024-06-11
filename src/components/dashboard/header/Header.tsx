@@ -3,12 +3,14 @@ import SearchBar from "./SearchBar";
 import NavigationIcons, { IconType } from "./NavigationIcons";
 import UserActions from "./UserActions";
 import ProfileMenuOption from "./ProfileMenuOption";
+import { UserType } from "@/types/user";
 
 interface HeaderProps {
   isFocused: boolean;
   setIsFocused: (focused: boolean) => void;
   activeIcon: IconType;
   setActiveIcon: (icon: IconType) => void;
+  user: UserType;
 }
 
 const Header = ({
@@ -16,6 +18,7 @@ const Header = ({
   setIsFocused,
   activeIcon,
   setActiveIcon,
+  user,
 }: HeaderProps) => {
   const [isShowProfileMenuOption, setIsShowProfileMenuOption] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -48,7 +51,10 @@ const Header = ({
     <div className="fixed z-30 flex h-14 w-full bg-white px-3">
       <SearchBar isFocused={isFocused} setIsFocused={setIsFocused} />
       <NavigationIcons activeIcon={activeIcon} setActiveIcon={setActiveIcon} />
-      <UserActions handleOnClickPhotoProfile={handleOnClickPhotoProfile} />
+      <UserActions
+        handleOnClickPhotoProfile={handleOnClickPhotoProfile}
+        user={user}
+      />
       {isShowProfileMenuOption && (
         <ProfileMenuOption
           ref={profileMenuRef}

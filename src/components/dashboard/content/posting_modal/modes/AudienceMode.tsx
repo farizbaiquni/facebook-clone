@@ -16,13 +16,17 @@ type AudienceModeType = {
   handleModeType: (param: ModeTypes) => void;
   selectedAudienceOption: AudienceOptions;
   setSelectedAudienceOption: (param: AudienceOptions) => void;
+  setSelectedAudienceInclude: (param: string[]) => void;
+  setSelectedAudienceExclude: (param: string[]) => void;
 };
 
 export default function AudienceMode({
   uploadedImages,
   handleModeType,
-  selectedAudienceOption: selectedAudienceOption,
-  setSelectedAudienceOption: setSelectedAudienceOption,
+  selectedAudienceOption,
+  setSelectedAudienceOption,
+  setSelectedAudienceInclude,
+  setSelectedAudienceExclude,
 }: AudienceModeType) {
   const audienceOptions = [
     {
@@ -69,6 +73,7 @@ export default function AudienceMode({
     setSelectedAudienceOption(tempSelectedAudienceOption);
     handleModeType(ModeTypes.PostingMode);
   };
+  const handleOnChangeAudience = () => {};
   return (
     <div
       className={`flex h-auto flex-col rounded-lg bg-white ${uploadedImages.length <= 2 ? "w-[500px]" : uploadedImages.length <= 4 ? "w-[900px]" : "w-[1227px]"}`}
@@ -111,7 +116,7 @@ export default function AudienceMode({
                     {option.icon}
                   </div>
                   <div className="ml-3">
-                    <p className="text-md font-medium">{option.label}</p>
+                    <p className="text-md font-semibold">{option.label}</p>
                     {option.description && (
                       <p className="text-sm text-gray-500">
                         {option.description}

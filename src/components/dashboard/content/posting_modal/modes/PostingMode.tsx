@@ -1,11 +1,11 @@
-import { Fragment, useRef } from "react";
+import { Fragment, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import IconButton from "../components/IconButton";
 import { ModeTypes } from "@/types/modes";
 import UploadImageGrid from "../components/UploadImageGrid";
 import AudienceLabel from "../components/AudienceLabel";
-import { AudienceOptions } from "@/types/audienceOptions";
+import { AudienceOptions, AudiencePostType } from "@/types/audienceOptions";
 import { XMarkIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { FriendTagPeople } from "@/types/entityObjects";
 import { FeelingType } from "@/types/feelings";
@@ -13,51 +13,72 @@ import { SubActivityType } from "@/types/activities";
 import MapComponent from "../components/MapComponent";
 import { LocationType } from "@/types/locations";
 import { GifType } from "@/types/gifs";
+import { UserType } from "@/types/user";
+import axios from "axios";
+import { PostCreateType } from "@/types/post";
+import {
+  MediaImageUploadType,
+  MediaImageVideoEnum,
+  MediaImageVideoType,
+  MediaPostEnum,
+  MediaPostType,
+} from "@/types/mediaPost";
+import { getStorageInstance } from "@/utils/firebaseDB";
+import { v4 as uuidv4 } from "uuid";
+import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+
+type UploadedImageVideoUrlType = {
+  url: string;
+  type: MediaImageVideoEnum;
+};
 
 type PostingModeType = {
+  user: UserType;
+  imagesVideos: MediaImageVideoType[];
+  selectedGif: GifType | null;
   closePostingModal: () => void;
   handleModeType: (param: ModeTypes) => void;
   isUploadModeActive: boolean;
-  firstName: string;
-  uploadedImages: string[];
-  setUploadedImages: (images: string[]) => void;
+  setImagesVideos: (images: MediaImageVideoType[]) => void;
   handleFilesUpload: (images: FileList) => void;
   handleDragOver: (e: React.DragEvent<HTMLLabelElement>) => void;
   handleDrop: (e: React.DragEvent<HTMLLabelElement>) => void;
   setIsUploadModeActive: (param: boolean) => void;
-  fullName: string;
   selectedAudienceOption: AudienceOptions;
   handleClickUploadModeActive: (param: boolean) => void;
   taggedFriends: Map<number, FriendTagPeople>;
   selectedFeelingActivity: null | FeelingType | SubActivityType;
   selectedLocation: LocationType | null;
   setSelectedLocation: (param: LocationType | null) => void;
-  selectedGif: GifType | null;
   setSelectedGif: (param: GifType | null) => void;
+  handleClearAllInput: () => void;
 };
 
 export default function PostingMode({
+  user,
+  imagesVideos,
+  selectedFeelingActivity,
+  selectedGif,
+  selectedLocation,
+  selectedAudienceOption: audienceType,
+  taggedFriends,
+  isUploadModeActive,
   closePostingModal,
   handleModeType,
-  isUploadModeActive,
-  firstName,
-  uploadedImages,
-  setUploadedImages,
+  setImagesVideos,
   handleFilesUpload,
   handleDragOver,
   handleDrop,
   setIsUploadModeActive,
-  fullName,
-  selectedAudienceOption: audienceType,
   handleClickUploadModeActive,
-  taggedFriends,
-  selectedFeelingActivity,
-  selectedLocation,
   setSelectedLocation,
-  selectedGif,
   setSelectedGif,
+  handleClearAllInput,
 }: PostingModeType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isLoadingPosting, setIsLoadingPosting] = useState(false);
+  const fullName = `${user.firstName} ${user.lastName}`;
+  const [contentText, setcontentText] = useState("");
 
   const DynamicMapComponent = dynamic(
     () => import("../components/MapComponent"),
@@ -65,6 +86,27 @@ export default function PostingMode({
       ssr: false,
     },
   );
+
+  const checkSelectedFeelingActivityType = (
+    selectedFeelingActivity: FeelingType | SubActivityType | null,
+  ) => {
+    function isFeelingType(arg: any): arg is FeelingType {
+      return arg && typeof arg.feelingIcon === "string";
+    }
+
+    function isSubActivityType(arg: any): arg is SubActivityType {
+      return arg && typeof arg.activityIcon === "string";
+    }
+    if (selectedFeelingActivity === null) {
+      return [null, null];
+    } else if (isFeelingType(selectedFeelingActivity)) {
+      return [selectedFeelingActivity.feelingIcon, null];
+    } else if (isSubActivityType(selectedFeelingActivity)) {
+      return [null, selectedFeelingActivity.activityIcon];
+    } else {
+      return [null, null];
+    }
+  };
 
   function isFeelingType(activity: any): activity is FeelingType {
     return (activity as FeelingType).feelingIcon !== undefined;
@@ -78,8 +120,174 @@ export default function PostingMode({
     setSelectedGif(null);
   };
 
+  const handleMediaPost = (
+    uploadedImageVideoUrls: UploadedImageVideoUrlType[],
+  ) => {
+    let mediaPost: MediaPostType[] = [];
+    if (imagesVideos.length <= 0 && selectedGif === null) {
+      return mediaPost;
+    }
+
+    if (imagesVideos.length > 0) {
+      mediaPost = uploadedImageVideoUrls.map((uploadedImageVideoUrls) => {
+        const media: MediaPostType = {
+          post_id: 0,
+          media_type_id:
+            uploadedImageVideoUrls.type === MediaImageVideoEnum.IMAGE
+              ? MediaPostEnum.IMAGE
+              : MediaPostEnum.VIDEO,
+          media_url: uploadedImageVideoUrls.url,
+        };
+        return media;
+      });
+    } else if (selectedGif !== null) {
+      const media: MediaPostType = {
+        post_id: 0,
+        media_type_id: MediaPostEnum.GIF,
+        media_url: selectedGif.url,
+      };
+      mediaPost.push(media);
+    }
+
+    return mediaPost;
+  };
+
+  const handleUploadImagesVideos = async (Files: MediaImageVideoType[]) => {
+    let uploadedImageVideoUrls: UploadedImageVideoUrlType[] = [];
+
+    const uploadImageVideo = async (imageVideo: MediaImageVideoType) => {
+      const storage = getStorageInstance();
+      const getFileExtension = (fileName: string): string | null => {
+        const regex = /(?:\.([^.]+))?$/;
+        const match = fileName.match(regex);
+        return match && match[1] ? match[1] : null;
+      };
+
+      const randomName = uuidv4();
+      const format = getFileExtension(imageVideo.file.name);
+      const storageRef = ref(
+        storage,
+        `posts/${imageVideo.type === MediaImageVideoEnum.IMAGE ? "images" : "videos"}/${randomName}.${format}`,
+      );
+      const uploadTask = uploadBytesResumable(storageRef, imageVideo.file);
+
+      return new Promise<string>((resolve, reject) => {
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress =
+              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          },
+          (error) => {
+            console.error(error);
+            reject(error);
+          },
+          () => {
+            getDownloadURL(uploadTask.snapshot.ref)
+              .then((downloadURL) => {
+                const uploadedImageVideo: UploadedImageVideoUrlType = {
+                  url: downloadURL,
+                  type: imageVideo.file.type.startsWith("video/")
+                    ? MediaImageVideoEnum.VIDEO
+                    : MediaImageVideoEnum.IMAGE,
+                };
+                uploadedImageVideoUrls.push(uploadedImageVideo);
+                resolve(downloadURL);
+              })
+              .catch((error) => reject(error));
+          },
+        );
+      });
+    };
+
+    try {
+      await Promise.all(imagesVideos.map((image) => uploadImageVideo(image)));
+    } catch (error) {
+      console.error("Error uploading images:", error);
+    }
+    return uploadedImageVideoUrls;
+  };
+
+  const handleClickPost = async () => {
+    if (
+      contentText.length <= 0 &&
+      imagesVideos.length <= 0 &&
+      selectedGif == null
+    ) {
+      return;
+    }
+
+    setIsLoadingPosting(true);
+
+    let uploadedImageVideoUrls: UploadedImageVideoUrlType[] = [];
+
+    if (imagesVideos.length >= 1) {
+      uploadedImageVideoUrls = await handleUploadImagesVideos(imagesVideos);
+    }
+
+    console.log(uploadedImageVideoUrls);
+
+    const feelingAndActivity = checkSelectedFeelingActivityType(
+      selectedFeelingActivity,
+    );
+    const feeling = feelingAndActivity[0];
+    const activity = feelingAndActivity[1];
+    const mediaPost = handleMediaPost(uploadedImageVideoUrls);
+    const audienceInclude: AudiencePostType[] = [];
+    const audienceExclude: AudiencePostType[] = [];
+
+    try {
+      const postData: PostCreateType = {
+        user_id: user.userId,
+        content: contentText,
+        emoji: feeling,
+        activity_icon_url: activity,
+        gif_url: selectedGif?.url === undefined ? null : selectedGif.url,
+        latitude:
+          selectedLocation?.lat === undefined ? null : selectedLocation.lat,
+        longitude:
+          selectedLocation?.lon === undefined ? null : selectedLocation.lon,
+        location_name:
+          selectedLocation?.display_name === undefined
+            ? null
+            : selectedLocation.display_name,
+        audience_type_id: audienceType,
+        media: mediaPost,
+        audience_include: audienceInclude,
+        audience_exclude: audienceExclude,
+      };
+      console.log("POST DATA : ", postData);
+      const response = await axios.post(
+        "http://localhost:4000/posts",
+        postData,
+      );
+      console.log("RESPONSE : ", response.data);
+    } catch (error) {
+      console.log("ERROR : ", error);
+    } finally {
+      setIsLoadingPosting(false);
+      handleClearAllInput();
+    }
+  };
+
   return (
-    <div className={`flex h-auto w-[500px] flex-col rounded-lg bg-white p-4`}>
+    <div
+      className={`relative flex h-auto w-[500px] flex-col rounded-lg bg-white p-4`}
+    >
+      {isLoadingPosting && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-gray-300 bg-opacity-70">
+          <span className="flex flex-col">
+            <Image
+              alt="loading-posting"
+              src="/gifs/loading-posting.gif"
+              width={50}
+              height={50}
+            />
+            <p className="mt-1 font-semibold text-gray-700">Posting</p>
+          </span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between">
         <h3 className="flex flex-1 items-center justify-center text-lg font-bold">
@@ -183,16 +391,18 @@ export default function PostingMode({
                 ? 2
                 : 4
             }
-            placeholder={`What's on your mind, ${firstName}?`}
+            value={contentText}
+            onChange={(e) => setcontentText(e.target.value)}
+            placeholder={`What's on your mind, ${user.firstName}?`}
           ></textarea>
         </div>
 
         {isUploadModeActive && (
           <div className="my-2 items-center justify-center border-2 border-gray-200 p-2">
-            {uploadedImages.length > 0 ? (
+            {imagesVideos.length > 0 ? (
               <UploadImageGrid
-                images={uploadedImages}
-                clearImages={() => setUploadedImages([])}
+                imagesVideos={imagesVideos}
+                clearImages={() => setImagesVideos([])}
                 handleModeType={handleModeType}
                 handleFilesUpload={handleFilesUpload}
               />
@@ -277,7 +487,7 @@ export default function PostingMode({
 
         {selectedLocation !== null &&
           !isUploadModeActive &&
-          uploadedImages.length <= 0 && (
+          imagesVideos.length <= 0 && (
             <DynamicMapComponent
               selectedLocation={selectedLocation}
               setSelectedLocation={setSelectedLocation}
@@ -299,7 +509,7 @@ export default function PostingMode({
               handleClickUploadModeActive={handleClickUploadModeActive}
               modeType={ModeTypes.PostingMode}
               handleModeType={handleModeType}
-              style={`${uploadedImages.length > 0 && "bg-[#D8E4CA]"}`}
+              style={`${imagesVideos.length > 0 && "bg-[#D8E4CA]"}`}
               isDisabled={selectedGif !== null ? true : false}
             />
             <IconButton
@@ -336,7 +546,7 @@ export default function PostingMode({
               modeType={ModeTypes.GIFMode}
               handleModeType={handleModeType}
               style={`${selectedFeelingActivity !== null && "bg-[#C7E4DE]"}`}
-              isDisabled={uploadedImages.length > 0 ? true : false}
+              isDisabled={imagesVideos.length > 0 ? true : false}
             />
             <div className="group relative ml-2 flex cursor-pointer items-center justify-center rounded-full p-1 hover:bg-gray-300">
               <EllipsisHorizontalIcon className="h-7 w-7 text-gray-500" />
@@ -346,7 +556,10 @@ export default function PostingMode({
             </div>
           </div>
         </div>
-        <button className="mt-2 rounded bg-[#0861F2] px-4 py-2 text-sm font-semibold text-white">
+        <button
+          onClick={handleClickPost}
+          className={`mt-2 rounded bg-[#0861F2] px-4 py-2 text-sm font-semibold text-white ${contentText.length <= 0 && imagesVideos.length <= 0 && selectedGif === null && "bg-[#E4E6EB] text-[#BDC1C5]"}`}
+        >
           Post
         </button>
       </div>

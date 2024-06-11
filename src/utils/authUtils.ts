@@ -1,8 +1,8 @@
-import { login } from "@/services/login";
+import { loginService } from "@/services/login";
 
 export const authLogin = async (email: string, password: string) => {
   try {
-    const response = await login(email, password);
+    const response = await loginService(email, password);
     if (response.status === 200) {
       // window.location.href = "/dashboard";
     }

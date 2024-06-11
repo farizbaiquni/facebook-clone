@@ -22,7 +22,8 @@ export default function Dashboard() {
     try {
       const response = await axios.get("/api/users");
       const data = response.data.results.results[0];
-      const userData: UserType = {
+      const userData = {
+        userId: data.user_id,
         firstName: data.first_name,
         lastName: data.last_name,
         email: data.email,
@@ -32,6 +33,7 @@ export default function Dashboard() {
         birthDate: data.birth_date,
         genderId: data.gender_id,
       };
+      setUser(userData);
     } catch (error) {
       setIsError(true);
     } finally {
@@ -46,9 +48,13 @@ export default function Dashboard() {
   return (
     <main className="flex flex-col bg-[#F0F2F5]">
       {isLoading ? (
-        <p>loading...</p>
+        <div className="flex h-screen items-center justify-center">
+          <p className="text-lg text-gray-600">loading...</p>
+        </div>
       ) : isError ? (
         <p>error</p>
+      ) : user === null ? (
+        <p>No user</p>
       ) : (
         <Fragment>
           {/* Header Navbar */}
@@ -57,6 +63,7 @@ export default function Dashboard() {
             setIsFocused={setIsFocused}
             activeIcon={activeIcon}
             setActiveIcon={setActiveIcon}
+            user={user}
           />
           {/* Content */}
           <div className="flex h-full w-full pt-14">
@@ -64,11 +71,11 @@ export default function Dashboard() {
               <b>CHECK</b>
             </button>
             {/* Left Sidebar */}
-            <SidebarLeft />
+            <SidebarLeft user={user} />
             {/* Center Content */}
             <div className="ml-72 flex flex-1 flex-col items-center max-[1100px]:ml-0">
-              <Story />
-              <Posting />
+              <Story user={user} />
+              <Posting user={user} />
               <Post />
             </div>
             {/* Right Sidebar */}
