@@ -38,9 +38,9 @@ const UserActions = ({ user, handleOnClickPhotoProfile }: UserActionsProps) => {
           src={user?.profilePicture ? user.profilePicture : "/icons/user.png"}
           width={500}
           height={500}
-          alt="facebook-logo"
+          alt="user"
           onClick={handleOnClickPhotoProfile}
-          className="h-10 w-10 cursor-pointer rounded-full object-cover"
+          className="h-10 w-10 cursor-pointer rounded-full border border-gray-200 object-cover"
         />
         <div className="absolute bottom-[-40px] right-0 rounded-md bg-black p-2 opacity-0 transition-opacity duration-300 group-hover:opacity-75">
           <p className="text-xs text-gray-200">account</p>

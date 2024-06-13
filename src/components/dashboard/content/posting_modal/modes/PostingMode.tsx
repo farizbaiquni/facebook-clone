@@ -5,7 +5,7 @@ import IconButton from "../components/IconButton";
 import { ModeTypes } from "@/types/modes";
 import UploadImageGrid from "../components/UploadImageGrid";
 import AudienceLabel from "../components/AudienceLabel";
-import { AudienceOptions, AudiencePostType } from "@/types/audienceOptions";
+import { AudienceOptions } from "@/types/audiences";
 import { XMarkIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { FriendTagPeople } from "@/types/entityObjects";
 import { FeelingType } from "@/types/feelings";
@@ -36,22 +36,24 @@ type PostingModeType = {
   user: UserType;
   imagesVideos: MediaImageVideoType[];
   selectedGif: GifType | null;
-  closePostingModal: () => void;
-  handleModeType: (param: ModeTypes) => void;
   isUploadModeActive: boolean;
-  setImagesVideos: (images: MediaImageVideoType[]) => void;
-  handleFilesUpload: (images: FileList) => void;
-  handleDragOver: (e: React.DragEvent<HTMLLabelElement>) => void;
-  handleDrop: (e: React.DragEvent<HTMLLabelElement>) => void;
-  setIsUploadModeActive: (param: boolean) => void;
   selectedAudienceOption: AudienceOptions;
-  handleClickUploadModeActive: (param: boolean) => void;
   taggedFriends: Map<number, FriendTagPeople>;
   selectedFeelingActivity: null | FeelingType | SubActivityType;
   selectedLocation: LocationType | null;
+  selectedAudienceInclude: string[];
+  selectedAudienceExclude: string[];
+  closePostingModal: () => void;
+  handleClearAllInput: () => void;
+  handleModeType: (param: ModeTypes) => void;
+  handleFilesUpload: (images: FileList) => void;
+  handleDragOver: (e: React.DragEvent<HTMLLabelElement>) => void;
+  handleDrop: (e: React.DragEvent<HTMLLabelElement>) => void;
+  handleClickUploadModeActive: (param: boolean) => void;
+  setIsUploadModeActive: (param: boolean) => void;
+  setImagesVideos: (images: MediaImageVideoType[]) => void;
   setSelectedLocation: (param: LocationType | null) => void;
   setSelectedGif: (param: GifType | null) => void;
-  handleClearAllInput: () => void;
 };
 
 export default function PostingMode({
@@ -63,17 +65,19 @@ export default function PostingMode({
   selectedAudienceOption: audienceType,
   taggedFriends,
   isUploadModeActive,
+  selectedAudienceInclude,
+  selectedAudienceExclude,
   closePostingModal,
+  handleClearAllInput,
   handleModeType,
-  setImagesVideos,
   handleFilesUpload,
   handleDragOver,
   handleDrop,
-  setIsUploadModeActive,
   handleClickUploadModeActive,
+  setImagesVideos,
+  setIsUploadModeActive,
   setSelectedLocation,
   setSelectedGif,
-  handleClearAllInput,
 }: PostingModeType) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoadingPosting, setIsLoadingPosting] = useState(false);
@@ -131,7 +135,6 @@ export default function PostingMode({
     if (imagesVideos.length > 0) {
       mediaPost = uploadedImageVideoUrls.map((uploadedImageVideoUrls) => {
         const media: MediaPostType = {
-          post_id: 0,
           media_type_id:
             uploadedImageVideoUrls.type === MediaImageVideoEnum.IMAGE
               ? MediaPostEnum.IMAGE
@@ -142,7 +145,6 @@ export default function PostingMode({
       });
     } else if (selectedGif !== null) {
       const media: MediaPostType = {
-        post_id: 0,
         media_type_id: MediaPostEnum.GIF,
         media_url: selectedGif.url,
       };
@@ -225,16 +227,12 @@ export default function PostingMode({
       uploadedImageVideoUrls = await handleUploadImagesVideos(imagesVideos);
     }
 
-    console.log(uploadedImageVideoUrls);
-
     const feelingAndActivity = checkSelectedFeelingActivityType(
       selectedFeelingActivity,
     );
     const feeling = feelingAndActivity[0];
     const activity = feelingAndActivity[1];
     const mediaPost = handleMediaPost(uploadedImageVideoUrls);
-    const audienceInclude: AudiencePostType[] = [];
-    const audienceExclude: AudiencePostType[] = [];
 
     try {
       const postData: PostCreateType = {
@@ -253,8 +251,8 @@ export default function PostingMode({
             : selectedLocation.display_name,
         audience_type_id: audienceType,
         media: mediaPost,
-        audience_include: audienceInclude,
-        audience_exclude: audienceExclude,
+        audience_include: selectedAudienceInclude,
+        audience_exclude: selectedAudienceExclude,
       };
       console.log("POST DATA : ", postData);
       const response = await axios.post(

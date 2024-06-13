@@ -1,4 +1,3 @@
-import { AudiencePostType } from "./audienceOptions";
 import { MediaPostType } from "./mediaPost";
 
 export type PostType = {};
@@ -14,6 +13,6 @@ export type PostCreateType = {
   location_name: string | null;
   audience_type_id: number;
   media: MediaPostType[] | null;
-  audience_include: AudiencePostType[] | null;
-  audience_exclude: AudiencePostType[] | null;
+  audience_include: string[] | null;
+  audience_exclude: string[] | null;
 };

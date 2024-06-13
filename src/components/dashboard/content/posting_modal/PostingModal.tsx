@@ -1,5 +1,5 @@
 import "../../../../app/./scrollbar.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import PostingMode from "./modes/PostingMode";
 import EditPhotoMode from "./modes/EditPhotoMode";
@@ -9,7 +9,7 @@ import FeelingActivityMode from "./modes/FeelingActivityMode";
 import LocationMode from "./modes/LocationMode";
 import GifMode from "./modes/GifMode";
 import { MediaImageVideoEnum, MediaImageVideoType } from "@/types/mediaPost";
-import { AudienceOptions } from "@/types/audienceOptions";
+import { AudienceFriendType, AudienceOptions } from "@/types/audiences";
 import { FriendTagPeople } from "@/types/entityObjects";
 import { FeelingType } from "@/types/feelings";
 import { SubActivityType } from "@/types/activities";
@@ -36,17 +36,16 @@ const PostingModal = ({
   );
   const [isUploadModeActive, setIsUploadModeActive] = useState(false);
   const [imagesVideos, setImagesVideos] = useState<MediaImageVideoType[]>([]);
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [selectedGif, setSelectedGif] = useState<GifType | null>(null);
   const [selectedAudienceOption, setSelectedAudienceOption] = useState(
     AudienceOptions.Public,
   );
   const [selectedAudienceInclude, setSelectedAudienceInclude] = useState<
-    string[]
-  >([]);
+    Map<number, AudienceFriendType>
+  >(new Map());
   const [selectedAudienceExclude, setSelectedAudienceExclude] = useState<
-    string[]
-  >([]);
+    Map<number, AudienceFriendType>
+  >(new Map());
 
   const [taggedFriends, setTaggedFriends] = useState<
     Map<number, FriendTagPeople>
@@ -61,8 +60,8 @@ const PostingModal = ({
   const handleClearAllInput = () => {
     setImagesVideos([]);
     setSelectedGif(null);
-    setSelectedAudienceInclude([]);
-    setSelectedAudienceExclude([]);
+    setSelectedAudienceInclude(new Map());
+    setSelectedAudienceExclude(new Map());
     setTaggedFriends(new Map());
     setSelectedFeelingActivity(null);
     setSelectedLocation(null);
@@ -171,17 +170,23 @@ const PostingModal = ({
           selectedAudienceOption={selectedAudienceOption}
           taggedFriends={taggedFriends}
           isUploadModeActive={isUploadModeActive}
-          setImagesVideos={setImagesVideos}
+          selectedAudienceInclude={Array.from(
+            selectedAudienceInclude.keys(),
+          ).map(String)}
+          selectedAudienceExclude={Array.from(
+            selectedAudienceExclude.keys(),
+          ).map(String)}
           closePostingModal={closePostingModal}
           handleModeType={handleModeType}
           handleFilesUpload={handleFilesUpload}
           handleDragOver={handleDragOver}
           handleDrop={handleDrop}
-          setIsUploadModeActive={setIsUploadModeActive}
           handleClickUploadModeActive={handleClickUploadModeActive}
+          handleClearAllInput={handleClearAllInput}
+          setImagesVideos={setImagesVideos}
+          setIsUploadModeActive={setIsUploadModeActive}
           setSelectedLocation={setSelectedLocation}
           setSelectedGif={setSelectedGif}
-          handleClearAllInput={handleClearAllInput}
         />
       )}
 
@@ -198,9 +203,10 @@ const PostingModal = ({
       {/* Audience Mode */}
       {selectedModeType === ModeTypes.AudienceMode && (
         <AudienceMode
-          uploadedImages={uploadedImages}
           handleModeType={handleModeType}
           selectedAudienceOption={selectedAudienceOption}
+          selectedAudienceInclude={selectedAudienceInclude}
+          selectedAudienceExclude={selectedAudienceExclude}
           setSelectedAudienceOption={setSelectedAudienceOption}
           setSelectedAudienceInclude={setSelectedAudienceInclude}
           setSelectedAudienceExclude={setSelectedAudienceExclude}

@@ -4,7 +4,7 @@ import { ModeTypes } from "@/types/modes";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import GifItem from "../components/GifItem";
-import useDebounce from "@/hooks/useDebounce";
+import useDebounce from "@/hooks/useDebounceRef";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import axios from "axios";
 

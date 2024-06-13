@@ -7,6 +7,13 @@ export enum AudienceOptions {
   Custom = 6,
 }
 
+export enum AudienceSelectorModeEnum {
+  MAIN,
+  FRIENDS_EXCEPT,
+  SPECIFIC_FRIENDS,
+  CUSTOM,
+}
+
 export const audienceOptionToText = new Map<AudienceOptions, string>([
   [AudienceOptions.Public, "public"],
   [AudienceOptions.Friends, "friends"],
@@ -16,7 +23,14 @@ export const audienceOptionToText = new Map<AudienceOptions, string>([
   [AudienceOptions.Custom, "custom"],
 ]);
 
-export type AudiencePostType = {
-  post_id: number;
-  user_id: string;
+export type AudienceFriendType = {
+  id: number;
+  name: string;
+  imageUrl: string | null;
+  isTagged: boolean;
 };
+
+export enum IncludeOrExcludeAudienceSelectorModeEnum {
+  FRIENDS_EXCEPT,
+  SPECIFIC_FRIENDS,
+}

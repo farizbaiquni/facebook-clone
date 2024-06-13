@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import useDebounce from "./useDebounce";
+import useDebounce from "./useDebounceRef";
 
 const useInfiniteScroll = (
   callback: Function,
