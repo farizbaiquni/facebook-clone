@@ -24,6 +24,16 @@ type PostProps = {
 const Post = ({ authUser, postParam }: PostProps) => {
   const relativeTime = formatRelativeTime(postParam.created_at);
   const fullName = `${postParam.first_name} ${postParam.last_name}`;
+  const inputRef = useRef<{ focus: () => void; scrollIntoView: () => void }>(
+    null,
+  );
+
+  const handleFocusAndScrollClick = () => {
+    if (inputRef.current) {
+      inputRef.current.scrollIntoView();
+      inputRef.current.focus();
+    }
+  };
 
   const [post, setPost] = useState<PostGetType>(postParam);
 
@@ -73,6 +83,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
       </div>
 
       {/* Body */}
+
       {/* Text Post */}
       <div className="relative flex flex-col px-4 text-[15px]">
         <p
@@ -97,6 +108,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
           )}
         </div>
       </div>
+
       {/* Images Post */}
       {post.media.length > 0 && <ImagesGrid images={images} />}
 
@@ -108,12 +120,14 @@ const Post = ({ authUser, postParam }: PostProps) => {
         totalReactions={post.reactions.total}
         totalComments={post.total_comments}
         totalShares={post.total_shares}
+        handleFocusClick={handleFocusAndScrollClick}
       />
 
       {/* Comment */}
       {post.total_comments > 0 && <Comment />}
+
       {/* Input Comment */}
-      <InputComment />
+      <InputComment ref={inputRef} />
     </div>
   );
 };

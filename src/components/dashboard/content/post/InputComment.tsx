@@ -1,4 +1,10 @@
-import React, { useState, ChangeEvent, forwardRef } from "react";
+import React, {
+  useState,
+  ChangeEvent,
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+} from "react";
 import {
   ChatBubbleOvalLeftIcon as ChatBubbleOvalLeftIconOutline,
   FaceSmileIcon,
@@ -10,8 +16,51 @@ import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import ActionButtonInputComment from "./ActionButtonInputComment";
 
+const icons = [
+  {
+    icon: (
+      <ChatBubbleOvalLeftIconOutline className="h-7 w-7 scale-x-[-1] transform cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200" />
+    ),
+    tooltip: "Comment with an avatar sticker",
+  },
+  {
+    icon: (
+      <FaceSmileIcon className="ml-1 h-7 w-7 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200" />
+    ),
+    tooltip: "Insert an emoji",
+  },
+  {
+    icon: (
+      <CameraIcon className="ml-1 h-7 w-7 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200" />
+    ),
+    tooltip: "Attach a photo or video",
+  },
+  {
+    icon: (
+      <GifIcon className="ml-1 h-7 w-7 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200" />
+    ),
+    tooltip: "Comment with a GIF",
+  },
+  {
+    icon: (
+      <StopIcon className="ml-1 h-7 w-7 -rotate-45 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200" />
+    ),
+    tooltip: "Comment with a sticker",
+  },
+];
+
 const InputComment = forwardRef((props, ref) => {
   const [value, setValue] = useState<string>("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => textareaRef.current?.focus(),
+    scrollIntoView: () =>
+      textareaRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      }),
+  }));
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = event.target;
@@ -32,77 +81,27 @@ const InputComment = forwardRef((props, ref) => {
         />
       </div>
       <div className="flex flex-1 flex-col">
-        <div className="flex flex-1 flex-col">
-          <textarea
-            value={value}
-            onChange={handleChange}
-            placeholder="Write an answer..."
-            className="resize-none overflow-hidden leading-[19px] outline-none"
-            style={{ height: "auto" }}
-          />
-        </div>
+        <textarea
+          ref={textareaRef}
+          value={value}
+          onChange={handleChange}
+          placeholder="Write an answer..."
+          className="resize-none overflow-hidden leading-[19px] outline-none"
+          style={{ height: "auto" }}
+        />
         <div className="flex items-center justify-between py-2">
           <div className="flex">
-            <ActionButtonInputComment
-              icon={
-                <ChatBubbleOvalLeftIconOutline
-                  width={21}
-                  height={21}
-                  className="h-7 w-7 scale-x-[-1] transform cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200"
-                />
-              }
-              tooltip="Comment with an avatar sticker"
-            />
-            <ActionButtonInputComment
-              icon={
-                <FaceSmileIcon
-                  width={21}
-                  height={21}
-                  className="ml-1 h-7 w-7 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200"
-                />
-              }
-              tooltip="Insert an emoji"
-            />
-            <ActionButtonInputComment
-              icon={
-                <CameraIcon
-                  width={21}
-                  height={21}
-                  className="ml-1 h-7 w-7 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200"
-                />
-              }
-              tooltip="Attach a photo or video"
-            />
-            <ActionButtonInputComment
-              icon={
-                <GifIcon
-                  width={21}
-                  height={21}
-                  className="ml-1 h-7 w-7 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200"
-                />
-              }
-              tooltip="Comment with a GIF"
-            />
-            <ActionButtonInputComment
-              icon={
-                <StopIcon
-                  width={21}
-                  height={21}
-                  className="ml-1 h-7 w-7 -rotate-45 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-gray-200"
-                />
-              }
-              tooltip="Comment with a sticker"
-            />
+            {icons.map((icon, index) => (
+              <ActionButtonInputComment
+                key={index}
+                icon={icon.icon}
+                tooltip={icon.tooltip}
+              />
+            ))}
           </div>
           <div className="group relative cursor-pointer">
-            <PaperAirplaneIcon
-              width={21}
-              height={21}
-              className="ml-1 h-7 w-7 cursor-pointer rounded-full p-1 text-[#005DC6] hover:bg-gray-200"
-            />
-            <p
-              className={`absolute bottom-6 left-1/2 hidden -translate-x-1/2 transform whitespace-nowrap rounded-md bg-gray-800 p-2 text-xs text-gray-200 opacity-90 group-hover:block`}
-            >
+            <PaperAirplaneIcon className="ml-1 h-7 w-7 cursor-pointer rounded-full p-1 text-[#005DC6] hover:bg-gray-200" />
+            <p className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 transform whitespace-nowrap rounded-md bg-gray-800 p-2 text-xs text-gray-200 opacity-90 group-hover:block">
               Comment
             </p>
           </div>

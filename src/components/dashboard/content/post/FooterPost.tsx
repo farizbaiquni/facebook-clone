@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
 import { ChatBubbleOvalLeftIcon as ChatBubbleOvalLeftIconOutline } from "@heroicons/react/24/outline";
@@ -29,14 +29,16 @@ const IconReaction = ({
   height = 35,
   onClick,
 }: IconProps) => (
-  <Image
-    src={src}
-    width={width}
-    height={height}
-    alt={alt}
-    className={`mr-2 cursor-pointer rounded-full border border-gray-200 object-cover ${className}`}
-    onClick={onClick}
-  />
+  <li>
+    <Image
+      src={src}
+      width={width}
+      height={height}
+      alt={alt}
+      className={`mr-2 cursor-pointer rounded-full border border-gray-200 object-cover ${className}`}
+      onClick={onClick}
+    />
+  </li>
 );
 
 type Top3ReactionsType = {
@@ -51,6 +53,7 @@ type FooterPostProps = {
   totalReactions: number;
   totalComments: number;
   totalShares: number;
+  handleFocusClick: () => void;
 };
 
 export default function FooterPost({
@@ -60,15 +63,90 @@ export default function FooterPost({
   totalReactions,
   totalComments,
   totalShares,
+  handleFocusClick,
 }: FooterPostProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [currentTotalReactions, setCurrentTotalReactions] =
     useState(totalReactions);
   const [reactionId, setReactionId] = useState<ReactionsEnum | null>(null);
   const [top3Reactions, setTop3Reactions] = useState<
     Map<ReactionsEnum, Top3ReactionsType>
   >(new Map());
-  const [isError, setIsError] = useState(false);
+
+  const div1Ref = useRef<HTMLDivElement>(null);
+  const ulRef = useRef<HTMLUListElement>(null);
+  const [isUlVisible, setIsUlVisible] = useState(false);
+  const enterTimeout = useRef<NodeJS.Timeout | null>(null);
+  const leaveTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnterDiv1 = useCallback(() => {
+    enterTimeout.current = setTimeout(() => {
+      setIsUlVisible(true);
+    }, 300);
+  }, []);
+
+  const handleMouseLeave = useCallback((event: MouseEvent) => {
+    const divRefCurrent = div1Ref.current;
+    const ulRefCurrent = ulRef.current;
+
+    if (
+      divRefCurrent &&
+      !divRefCurrent.contains(event.relatedTarget as Node) &&
+      ulRefCurrent &&
+      !ulRefCurrent.contains(event.relatedTarget as Node)
+    ) {
+      leaveTimeout.current = setTimeout(() => {
+        setIsUlVisible(false);
+      }, 300);
+    }
+  }, []);
+
+  const handleLiClick = useCallback(() => {
+    setIsUlVisible(false);
+  }, []);
+
+  useEffect(() => {
+    const divRefCurrent = div1Ref.current;
+    const ulRefCurrent = ulRef.current;
+    let liElements: NodeListOf<HTMLLIElement> | undefined;
+
+    if (divRefCurrent) {
+      divRefCurrent.addEventListener("mouseenter", handleMouseEnterDiv1);
+      divRefCurrent.addEventListener("mouseleave", handleMouseLeave);
+    }
+
+    if (ulRefCurrent) {
+      ulRefCurrent.addEventListener("mouseleave", handleMouseLeave);
+
+      liElements = ulRefCurrent.querySelectorAll("li");
+      liElements.forEach((li) => {
+        li.addEventListener("click", handleLiClick);
+      });
+    }
+
+    return () => {
+      if (divRefCurrent) {
+        divRefCurrent.removeEventListener("mouseenter", handleMouseEnterDiv1);
+        divRefCurrent.removeEventListener("mouseleave", handleMouseLeave);
+      }
+      if (ulRefCurrent) {
+        ulRefCurrent.removeEventListener("mouseleave", handleMouseLeave);
+
+        if (liElements) {
+          liElements.forEach((li) => {
+            li.removeEventListener("click", handleLiClick);
+          });
+        }
+      }
+      if (enterTimeout.current) {
+        clearTimeout(enterTimeout.current);
+      }
+      if (leaveTimeout.current) {
+        clearTimeout(leaveTimeout.current);
+      }
+    };
+  }, [handleMouseEnterDiv1, handleMouseLeave, handleLiClick]);
 
   const getReactionMessage = (): string => {
     const convertedReactions = convertTotalReactionsToWord(
@@ -309,22 +387,11 @@ export default function FooterPost({
           </div>
         </div>
       )}
-      <div className="group relative mb-2 flex border-b border-b-gray-300 py-1 text-[15px]">
-        <div className="group absolute bottom-8 hidden rounded-full border border-gray-200 bg-white p-2 shadow-md group-hover:block">
-          <div className="flex">
-            {reactionOptions.map((reaction, index) => (
-              <IconReaction
-                key={index}
-                src={reaction.src}
-                alt={reaction.alt}
-                onClick={reaction.action}
-              />
-            ))}
-          </div>
-        </div>
+      <div className="relative mb-2 flex border-b border-b-gray-300 py-1 text-[15px]">
         <div
+          ref={div1Ref}
           onClick={handleReactionToggle}
-          className="group flex flex-1 cursor-pointer items-center justify-center rounded-md py-1 font-semibold text-gray-500 hover:bg-[#F2F2F2]"
+          className="peer flex flex-1 cursor-pointer items-center justify-center rounded-md py-1 font-semibold text-gray-500 hover:bg-[#F2F2F2]"
         >
           {reactionId === null || reactionId === ReactionsEnum.LIKE ? (
             <HandThumbUpIcon
@@ -344,9 +411,26 @@ export default function FooterPost({
         <ActionButtonPost
           Icon={ChatBubbleOvalLeftIconOutline}
           label="Comment"
+          handleFocusClick={handleFocusClick}
         />
         <ActionButtonPost Icon={PhoneIcon} label="Send" />
         <ActionButtonPost Icon={ArrowUturnRightIcon} label="Share" />
+        {/* Reaction Options */}
+        <ul
+          ref={ulRef}
+          className={`absolute bottom-8 rounded-full border border-gray-200 bg-white p-2 shadow-md ${isUlVisible ? "" : "hidden"}`}
+        >
+          <div className="flex h-full w-full">
+            {reactionOptions.map((reaction, index) => (
+              <IconReaction
+                key={index}
+                src={reaction.src}
+                alt={reaction.alt}
+                onClick={reaction.action}
+              />
+            ))}
+          </div>
+        </ul>
       </div>
     </div>
   );
