@@ -24,18 +24,28 @@ export default function Story({ user }: StoryProps) {
       profileImageUrl: "/icons/user.png",
     },
     {
+      name: "Michael Wilson",
+      imageUrl: "/images/stories/story (9).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
+      name: "Robert Brown",
+      imageUrl: "/images/stories/story (7).jpg",
+      profileImageUrl: "/icons/user.png",
+    },
+    {
       name: "Angélica Martínez",
       imageUrl: "/images/stories/story (2).jpg",
       profileImageUrl: "/icons/user.png",
     },
     {
-      name: "Maria Fernanda",
-      imageUrl: "/images/stories/story (3).jpg",
+      name: "John Doe",
+      imageUrl: "/images/stories/story (4).jpg",
       profileImageUrl: "/icons/user.png",
     },
     {
-      name: "John Doe",
-      imageUrl: "/images/stories/story (4).jpg",
+      name: "Maria Fernanda",
+      imageUrl: "/images/stories/story (3).jpg",
       profileImageUrl: "/icons/user.png",
     },
     {
@@ -48,19 +58,10 @@ export default function Story({ user }: StoryProps) {
       imageUrl: "/images/stories/story (6).jpg",
       profileImageUrl: "/icons/user.png",
     },
-    {
-      name: "Robert Brown",
-      imageUrl: "/images/stories/story (7).jpg",
-      profileImageUrl: "/icons/user.png",
-    },
+
     {
       name: "Emily Davis",
       imageUrl: "/images/stories/story (8).jpg",
-      profileImageUrl: "/icons/user.png",
-    },
-    {
-      name: "Michael Wilson",
-      imageUrl: "/images/stories/story (9).jpg",
       profileImageUrl: "/icons/user.png",
     },
     {

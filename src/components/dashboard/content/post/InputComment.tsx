@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, forwardRef } from "react";
 import {
   ChatBubbleOvalLeftIcon as ChatBubbleOvalLeftIconOutline,
   FaceSmileIcon,
@@ -10,7 +10,7 @@ import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import ActionButtonInputComment from "./ActionButtonInputComment";
 
-const InputComment: React.FC = () => {
+const InputComment = forwardRef((props, ref) => {
   const [value, setValue] = useState<string>("");
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -110,6 +110,8 @@ const InputComment: React.FC = () => {
       </div>
     </div>
   );
-};
+});
+
+InputComment.displayName = "InputComment";
 
 export default InputComment;

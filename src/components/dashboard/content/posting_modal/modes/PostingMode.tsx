@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import IconButton from "../components/IconButton";
@@ -27,6 +27,13 @@ import { getStorageInstance } from "@/utils/firebaseDB";
 import { v4 as uuidv4 } from "uuid";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
 
+const DynamicMapComponent = dynamic(
+  () => import("../components/MapComponent"),
+  {
+    ssr: false,
+  },
+);
+
 type UploadedImageVideoUrlType = {
   url: string;
   type: MediaImageVideoEnum;
@@ -34,6 +41,7 @@ type UploadedImageVideoUrlType = {
 
 type PostingModeType = {
   user: UserType;
+  contentText: string;
   imagesVideos: MediaImageVideoType[];
   selectedGif: GifType | null;
   isUploadModeActive: boolean;
@@ -41,8 +49,9 @@ type PostingModeType = {
   taggedFriends: Map<number, FriendTagPeople>;
   selectedFeelingActivity: null | FeelingType | SubActivityType;
   selectedLocation: LocationType | null;
-  selectedAudienceInclude: string[];
-  selectedAudienceExclude: string[];
+  selectedAudienceInclude: number[];
+  selectedAudienceExclude: number[];
+  setcontentText: (param: string) => void;
   closePostingModal: () => void;
   handleClearAllInput: () => void;
   handleModeType: (param: ModeTypes) => void;
@@ -58,6 +67,7 @@ type PostingModeType = {
 
 export default function PostingMode({
   user,
+  contentText,
   imagesVideos,
   selectedFeelingActivity,
   selectedGif,
@@ -67,6 +77,7 @@ export default function PostingMode({
   isUploadModeActive,
   selectedAudienceInclude,
   selectedAudienceExclude,
+  setcontentText,
   closePostingModal,
   handleClearAllInput,
   handleModeType,
@@ -82,14 +93,6 @@ export default function PostingMode({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoadingPosting, setIsLoadingPosting] = useState(false);
   const fullName = `${user.firstName} ${user.lastName}`;
-  const [contentText, setcontentText] = useState("");
-
-  const DynamicMapComponent = dynamic(
-    () => import("../components/MapComponent"),
-    {
-      ssr: false,
-    },
-  );
 
   const checkSelectedFeelingActivityType = (
     selectedFeelingActivity: FeelingType | SubActivityType | null,
@@ -214,7 +217,7 @@ export default function PostingMode({
     if (
       contentText.length <= 0 &&
       imagesVideos.length <= 0 &&
-      selectedGif == null
+      selectedGif === null
     ) {
       return;
     }

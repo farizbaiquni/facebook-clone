@@ -34,6 +34,8 @@ const PostingModal = ({
   const [selectedModeType, setSelectedModeType] = useState(
     ModeTypes.PostingMode,
   );
+
+  const [contentText, setcontentText] = useState("");
   const [isUploadModeActive, setIsUploadModeActive] = useState(false);
   const [imagesVideos, setImagesVideos] = useState<MediaImageVideoType[]>([]);
   const [selectedGif, setSelectedGif] = useState<GifType | null>(null);
@@ -163,6 +165,7 @@ const PostingModal = ({
       {selectedModeType === ModeTypes.PostingMode && (
         <PostingMode
           user={user}
+          contentText={contentText}
           imagesVideos={imagesVideos}
           selectedFeelingActivity={selectedFeelingActivity}
           selectedGif={selectedGif}
@@ -170,12 +173,13 @@ const PostingModal = ({
           selectedAudienceOption={selectedAudienceOption}
           taggedFriends={taggedFriends}
           isUploadModeActive={isUploadModeActive}
-          selectedAudienceInclude={Array.from(
-            selectedAudienceInclude.keys(),
-          ).map(String)}
-          selectedAudienceExclude={Array.from(
-            selectedAudienceExclude.keys(),
-          ).map(String)}
+          setcontentText={setcontentText}
+          setIsUploadModeActive={setIsUploadModeActive}
+          setImagesVideos={setImagesVideos}
+          setSelectedLocation={setSelectedLocation}
+          setSelectedGif={setSelectedGif}
+          selectedAudienceInclude={Array.from(selectedAudienceInclude.keys())}
+          selectedAudienceExclude={Array.from(selectedAudienceExclude.keys())}
           closePostingModal={closePostingModal}
           handleModeType={handleModeType}
           handleFilesUpload={handleFilesUpload}
@@ -183,10 +187,6 @@ const PostingModal = ({
           handleDrop={handleDrop}
           handleClickUploadModeActive={handleClickUploadModeActive}
           handleClearAllInput={handleClearAllInput}
-          setImagesVideos={setImagesVideos}
-          setIsUploadModeActive={setIsUploadModeActive}
-          setSelectedLocation={setSelectedLocation}
-          setSelectedGif={setSelectedGif}
         />
       )}
 

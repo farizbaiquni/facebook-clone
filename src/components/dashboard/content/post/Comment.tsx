@@ -13,7 +13,7 @@ export default function Comment() {
       {/* Photo Profile */}
       <div className="mr-2 min-w-max">
         <Image
-          src="/profile.jpg"
+          src="/icons/user.png"
           width={30}
           height={30}
           alt="profile"
@@ -27,7 +27,7 @@ export default function Comment() {
           <div className="flex rounded-xl bg-[#F0F2F5] p-2">
             <div className="flex flex-col">
               <p className="text-sm font-semibold">Lorem Ipsum</p>
-              <p className="line-clamp-2 overflow-clip leading-5">
+              <p className="line-clamp-2 overflow-clip text-[15px] leading-5">
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
                 Architecto quod consequuntur rerum saepe ipsum velit porro
                 debitis reprehenderit quidem libero?
@@ -64,7 +64,7 @@ export default function Comment() {
           </div>
         </div>
 
-        <p className="cursor-pointer pl-2 font-semibold text-gray-500 hover:underline">
+        <p className="cursor-pointer pl-2 text-[15px] font-semibold text-gray-500 hover:underline">
           View all 14 replies
         </p>
       </div>

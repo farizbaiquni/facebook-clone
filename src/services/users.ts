@@ -13,7 +13,6 @@ export const getUserByIdService = async (
     });
     return response;
   } catch (error) {
-    console.error("Login error: ", error);
     throw error;
   }
 };
