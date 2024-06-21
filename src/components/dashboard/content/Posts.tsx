@@ -2,7 +2,7 @@ import { getPostsService } from "@/services/posts";
 import { PostGetType } from "@/types/post";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import Post from "./Post";
+import Post from "./post/Post";
 import { UserContext } from "@/hooks/useContext";
 import { UserType } from "@/types/user";
 

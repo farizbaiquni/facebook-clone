@@ -19,7 +19,7 @@ import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
 import ActionButtonInputComment from "./ActionButtonInputComment";
-import GifCommentSelector from "./comments/GifCommentSelector";
+import GifCommentSelector from "../comments/GifCommentSelector";
 import {
   MediaImageVideoEnum,
   MediaImageVideoType,

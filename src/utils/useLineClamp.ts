@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function useLineClamp<T extends HTMLElement>(
+export function useLineClamp<T extends HTMLElement>(
   ref: React.RefObject<T>,
   { lines }: { lines: number },
 ) {

@@ -1,21 +1,20 @@
 "use client";
 
+import { useState, useRef } from "react";
+import Image from "next/image";
 import {
   EllipsisHorizontalIcon,
   UsersIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
-import Image from "next/image";
-import { useState, useRef, useImperativeHandle } from "react";
-import ImagesGrid from "./post/ImagesGrid";
-import InputComment from "./post/InputComment";
-import Comment from "./post/Comment";
 import { PostGetType } from "@/types/post";
-import { formatRelativeTime } from "@/utils/formatRelativeTime";
-import useLineClamp from "@/utils/useLineClamp";
-import FooterPost from "./post/FooterPost";
 import { UserType } from "@/types/user";
-import Comments from "./post/Comments";
+import { formatRelativeTime } from "@/utils/formatRelativeTime";
+import { useLineClamp } from "@/utils/useLineClamp";
+import ImagesGrid from "./ImagesGrid";
+import InputComment from "../input_comment/InputComment";
+import FooterPost from "./footer_post/FooterPost";
+import Comments from "../comments/Comments";
 
 type PostProps = {
   authUser: UserType;

@@ -26,3 +26,8 @@ export const reactionEnumToText = (id: ReactionsEnum): string => {
       return "Angry";
   }
 };
+
+export type Top3ReactionsType = {
+  reaction_id: ReactionsEnum;
+  total_count: number;
+};

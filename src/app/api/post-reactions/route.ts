@@ -1,3 +1,7 @@
+import {
+  DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND,
+  DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER,
+} from "@/types/responses";
 import axios from "axios";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,7 +14,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const postId = searchParams.get("postId");
 
   if (token === undefined) {
-    return NextResponse.json({ error: 400, message: "Cookie not found" });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND);
   }
 
   try {
@@ -26,11 +30,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     );
     return NextResponse.json(response.data);
   } catch (error) {
-    return NextResponse.json({
-      error: 500,
-      message: "Internal server error",
-      detail: error,
-    });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER);
   }
 }
 
@@ -39,11 +39,11 @@ export async function POST(req: Request, res: Response) {
   const params = await req.json();
 
   if (token === undefined) {
-    return NextResponse.json({ error: 400, message: "Cookie not found" });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND);
   }
 
   try {
-    const res = await axios.post(
+    const response = await axios.post(
       "http://localhost:4000/v1/post-reactions",
       params,
       {
@@ -54,13 +54,9 @@ export async function POST(req: Request, res: Response) {
         withCredentials: true,
       },
     );
-    return NextResponse.json({ status: 200, results: res.data });
+    return NextResponse.json(response.data);
   } catch (error) {
-    return NextResponse.json({
-      error: 500,
-      message: "Internal server error",
-      detail: error,
-    });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER);
   }
 }
 
@@ -68,27 +64,24 @@ export async function DELETE(req: Request, res: Response) {
   const token = cookies().get("facebook-clone");
   const params = await req.json();
 
-  // return NextResponse.json({ error: 400, data: params });
-
   if (token === undefined) {
-    return NextResponse.json({ error: 400, message: "Cookie not found" });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND);
   }
 
   try {
-    const res = await axios.delete("http://localhost:4000/v1/post-reactions", {
-      headers: {
-        Authorization: `Bearer ${token.value}`,
-        Cookie: `facebook-clone=${token.value}`,
+    const response = await axios.delete(
+      "http://localhost:4000/v1/post-reactions",
+      {
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+          Cookie: `facebook-clone=${token.value}`,
+        },
+        data: params,
+        withCredentials: true,
       },
-      data: params,
-      withCredentials: true,
-    });
-    return NextResponse.json({ status: 200, results: res.data });
+    );
+    return NextResponse.json(response.data);
   } catch (error) {
-    return NextResponse.json({
-      error: 500,
-      message: "Internal server error",
-      detail: error,
-    });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER);
   }
 }
