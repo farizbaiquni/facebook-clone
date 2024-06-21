@@ -15,6 +15,7 @@ import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import useLineClamp from "@/utils/useLineClamp";
 import FooterPost from "./post/FooterPost";
 import { UserType } from "@/types/user";
+import Comments from "./post/Comments";
 
 type PostProps = {
   authUser: UserType;
@@ -22,25 +23,6 @@ type PostProps = {
 };
 
 const Post = ({ authUser, postParam }: PostProps) => {
-  const relativeTime = formatRelativeTime(postParam.created_at);
-  const fullName = `${postParam.first_name} ${postParam.last_name}`;
-  const inputRef = useRef<{ focus: () => void; scrollIntoView: () => void }>(
-    null,
-  );
-
-  const handleFocusAndScrollClick = () => {
-    if (inputRef.current) {
-      inputRef.current.scrollIntoView();
-      inputRef.current.focus();
-    }
-  };
-
-  const [post, setPost] = useState<PostGetType>(postParam);
-
-  const refContentText = useRef<HTMLParagraphElement>(null);
-  const isContentTextClamped = useLineClamp(refContentText, { lines: 4 });
-  const [isExpandedContentText, setIsExpandedTextPost] = useState(false);
-
   const [images, setImages] = useState<string[]>([
     "/images/posts/post (1).jpg",
     "/images/posts/post (2).jpg",
@@ -49,6 +31,22 @@ const Post = ({ authUser, postParam }: PostProps) => {
     "/images/posts/post (5).jpg",
     "/images/posts/post (6).jpg",
   ]);
+  const relativeTime = formatRelativeTime(postParam.created_at);
+  const fullName = `${postParam.first_name} ${postParam.last_name}`;
+  const inputRef = useRef<{ focus: () => void; scrollIntoView: () => void }>(
+    null,
+  );
+  const [post, setPost] = useState<PostGetType>(postParam);
+  const refContentText = useRef<HTMLParagraphElement>(null);
+  const isContentTextClamped = useLineClamp(refContentText, { lines: 4 });
+  const [isExpandedContentText, setIsExpandedTextPost] = useState(false);
+
+  const handleFocusAndScrollClick = () => {
+    if (inputRef.current) {
+      inputRef.current.scrollIntoView();
+      inputRef.current.focus();
+    }
+  };
 
   return (
     <div className="my-5 w-[500px] rounded-lg bg-white shadow-md">
@@ -124,10 +122,14 @@ const Post = ({ authUser, postParam }: PostProps) => {
       />
 
       {/* Comment */}
-      {post.total_comments > 0 && <Comment />}
+      {post.total_comments > 0 && <Comments postId={post.post_id} />}
 
       {/* Input Comment */}
-      <InputComment ref={inputRef} />
+      <InputComment
+        userId={authUser.userId}
+        postId={post.post_id}
+        ref={inputRef}
+      />
     </div>
   );
 };

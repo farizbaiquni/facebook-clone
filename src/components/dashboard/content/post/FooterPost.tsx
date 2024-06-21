@@ -80,6 +80,44 @@ export default function FooterPost({
   const enterTimeout = useRef<NodeJS.Timeout | null>(null);
   const leaveTimeout = useRef<NodeJS.Timeout | null>(null);
 
+  const reactionOptions = [
+    {
+      src: "/icons/posts/like.svg",
+      alt: "like",
+      action: () => handleOnClickReactionOption(ReactionsEnum.LIKE),
+    },
+    {
+      src: "/icons/posts/love.svg",
+      alt: "love",
+      action: () => handleOnClickReactionOption(ReactionsEnum.LOVE),
+    },
+    {
+      src: "/icons/posts/care.svg",
+      alt: "care",
+      action: () => handleOnClickReactionOption(ReactionsEnum.CARE),
+    },
+    {
+      src: "/icons/posts/haha.svg",
+      alt: "haha",
+      action: () => handleOnClickReactionOption(ReactionsEnum.HAHA),
+    },
+    {
+      src: "/icons/posts/wow.svg",
+      alt: "wow",
+      action: () => handleOnClickReactionOption(ReactionsEnum.WOW),
+    },
+    {
+      src: "/icons/posts/sad.svg",
+      alt: "sad",
+      action: () => handleOnClickReactionOption(ReactionsEnum.SAD),
+    },
+    {
+      src: "/icons/posts/angry.svg",
+      alt: "angry",
+      action: () => handleOnClickReactionOption(ReactionsEnum.ANGRY),
+    },
+  ];
+
   const handleMouseEnterDiv1 = useCallback(() => {
     enterTimeout.current = setTimeout(() => {
       setIsUlVisible(true);
@@ -105,48 +143,6 @@ export default function FooterPost({
   const handleLiClick = useCallback(() => {
     setIsUlVisible(false);
   }, []);
-
-  useEffect(() => {
-    const divRefCurrent = div1Ref.current;
-    const ulRefCurrent = ulRef.current;
-    let liElements: NodeListOf<HTMLLIElement> | undefined;
-
-    if (divRefCurrent) {
-      divRefCurrent.addEventListener("mouseenter", handleMouseEnterDiv1);
-      divRefCurrent.addEventListener("mouseleave", handleMouseLeave);
-    }
-
-    if (ulRefCurrent) {
-      ulRefCurrent.addEventListener("mouseleave", handleMouseLeave);
-
-      liElements = ulRefCurrent.querySelectorAll("li");
-      liElements.forEach((li) => {
-        li.addEventListener("click", handleLiClick);
-      });
-    }
-
-    return () => {
-      if (divRefCurrent) {
-        divRefCurrent.removeEventListener("mouseenter", handleMouseEnterDiv1);
-        divRefCurrent.removeEventListener("mouseleave", handleMouseLeave);
-      }
-      if (ulRefCurrent) {
-        ulRefCurrent.removeEventListener("mouseleave", handleMouseLeave);
-
-        if (liElements) {
-          liElements.forEach((li) => {
-            li.removeEventListener("click", handleLiClick);
-          });
-        }
-      }
-      if (enterTimeout.current) {
-        clearTimeout(enterTimeout.current);
-      }
-      if (leaveTimeout.current) {
-        clearTimeout(leaveTimeout.current);
-      }
-    };
-  }, [handleMouseEnterDiv1, handleMouseLeave, handleLiClick]);
 
   const getReactionMessage = (): string => {
     const convertedReactions = convertTotalReactionsToWord(
@@ -213,64 +209,6 @@ export default function FooterPost({
     }
   };
 
-  const addPostReaction = async (id: ReactionsEnum): Promise<boolean> => {
-    try {
-      await axios.post("/api/post-reactions", {
-        user_id: userId,
-        post_id: postId,
-        reaction_id: id,
-      });
-      return true;
-    } catch (error) {
-      console.error("Error: ", error);
-      return false;
-    }
-  };
-
-  const deletePostReaction = async (): Promise<boolean> => {
-    try {
-      await axios.delete("/api/post-reactions", {
-        data: {
-          user_id: userId,
-          post_id: postId,
-        },
-      });
-      return true;
-    } catch (error) {
-      console.error("Error: ", error);
-      return false;
-    }
-  };
-
-  const getTop3PostReactionsByPostIdModel = useCallback(async () => {
-    try {
-      const res = await axios.get(
-        `/api/post-reactions/top-3-reactions?postId=${postId}`,
-      );
-      const data: Top3ReactionsType[] = res.data.results.data[0];
-      const map: Map<ReactionsEnum, Top3ReactionsType> = new Map();
-      data.map((data) => {
-        map.set(data.reaction_id, data);
-      });
-      setTop3Reactions(map);
-    } catch (error) {
-      console.error("Error: ", error);
-      setIsError(true);
-    }
-  }, [postId]);
-
-  const getPostReactionById = useCallback(async () => {
-    try {
-      const res = await axios.get(
-        `/api/post-reactions?userId=${userId}&postId=${postId}`,
-      );
-      setReactionId(res.data.results.data[0]?.reaction_id ?? null);
-    } catch (error) {
-      console.error("Error: ", error);
-      setIsError(true);
-    }
-  }, [postId, userId]);
-
   const handleReactionToggle = async () => {
     if (reactionId !== null) {
       if (await deletePostReaction()) {
@@ -300,51 +238,113 @@ export default function FooterPost({
     }
   };
 
-  const reactionOptions = [
-    {
-      src: "/icons/posts/like.svg",
-      alt: "like",
-      action: () => handleOnClickReactionOption(ReactionsEnum.LIKE),
-    },
-    {
-      src: "/icons/posts/love.svg",
-      alt: "love",
-      action: () => handleOnClickReactionOption(ReactionsEnum.LOVE),
-    },
-    {
-      src: "/icons/posts/care.svg",
-      alt: "care",
-      action: () => handleOnClickReactionOption(ReactionsEnum.CARE),
-    },
-    {
-      src: "/icons/posts/haha.svg",
-      alt: "haha",
-      action: () => handleOnClickReactionOption(ReactionsEnum.HAHA),
-    },
-    {
-      src: "/icons/posts/wow.svg",
-      alt: "wow",
-      action: () => handleOnClickReactionOption(ReactionsEnum.WOW),
-    },
-    {
-      src: "/icons/posts/sad.svg",
-      alt: "sad",
-      action: () => handleOnClickReactionOption(ReactionsEnum.SAD),
-    },
-    {
-      src: "/icons/posts/angry.svg",
-      alt: "angry",
-      action: () => handleOnClickReactionOption(ReactionsEnum.ANGRY),
-    },
-  ];
+  const getTop3PostReactionsByPostId = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        `/api/post-reactions/top-3-reactions?postId=${postId}`,
+      );
+      const reactions: Top3ReactionsType[] = res.data.data;
+      const reactionsMap: Map<ReactionsEnum, Top3ReactionsType> = new Map();
+      reactions.map((data) => {
+        reactionsMap.set(data.reaction_id, data);
+      });
+      setTop3Reactions(reactionsMap);
+    } catch (error) {
+      console.error("Error get top 3 reactions by post Id: ", error);
+      setIsError(true);
+    }
+  }, [postId]);
+
+  const getPostReactionByUserId = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `/api/post-reactions?userId=${userId}&postId=${postId}`,
+      );
+      setReactionId(response.data.reaction_id ?? null);
+    } catch (error) {
+      console.error("Error get post reactions by user Id: ", error);
+      setIsError(true);
+    }
+  }, [postId, userId]);
+
+  const addPostReaction = async (id: ReactionsEnum): Promise<boolean> => {
+    try {
+      await axios.post("/api/post-reactions", {
+        user_id: userId,
+        post_id: postId,
+        reaction_id: id,
+      });
+      return true;
+    } catch (error) {
+      console.error("Error: ", error);
+      return false;
+    }
+  };
+
+  const deletePostReaction = async (): Promise<boolean> => {
+    try {
+      await axios.delete("/api/post-reactions", {
+        data: {
+          user_id: userId,
+          post_id: postId,
+        },
+      });
+      return true;
+    } catch (error) {
+      console.error("Error: ", error);
+      return false;
+    }
+  };
 
   useEffect(() => {
-    getTop3PostReactionsByPostIdModel();
-  }, [getTop3PostReactionsByPostIdModel]);
+    getTop3PostReactionsByPostId();
+  }, [getTop3PostReactionsByPostId]);
 
   useEffect(() => {
-    getPostReactionById();
-  }, [getPostReactionById]);
+    getPostReactionByUserId();
+  }, [getPostReactionByUserId]);
+
+  useEffect(() => {
+    const divRefCurrent = div1Ref.current;
+    const ulRefCurrent = ulRef.current;
+    let liElements: NodeListOf<HTMLLIElement> | undefined;
+
+    if (divRefCurrent) {
+      divRefCurrent.addEventListener("mouseenter", handleMouseEnterDiv1);
+      divRefCurrent.addEventListener("mouseleave", handleMouseLeave);
+    }
+
+    if (ulRefCurrent) {
+      ulRefCurrent.addEventListener("mouseleave", handleMouseLeave);
+
+      liElements = ulRefCurrent.querySelectorAll("li");
+      liElements.forEach((li) => {
+        li.addEventListener("click", handleLiClick);
+      });
+    }
+
+    return () => {
+      if (divRefCurrent) {
+        divRefCurrent.removeEventListener("mouseenter", handleMouseEnterDiv1);
+        divRefCurrent.removeEventListener("mouseleave", handleMouseLeave);
+      }
+      if (ulRefCurrent) {
+        ulRefCurrent.removeEventListener("mouseleave", handleMouseLeave);
+
+        if (liElements) {
+          liElements.forEach((li) => {
+            li.removeEventListener("click", handleLiClick);
+          });
+        }
+      }
+      if (enterTimeout.current) {
+        clearTimeout(enterTimeout.current);
+      }
+      if (leaveTimeout.current) {
+        clearTimeout(leaveTimeout.current);
+      }
+    };
+  }, [handleMouseEnterDiv1, handleMouseLeave, handleLiClick]);
 
   if (isLoading) {
     return <div className="w-full text-center text-blue-300">Loading...</div>;
@@ -366,7 +366,11 @@ export default function FooterPost({
             <div className="mr-1 flex items-center">
               {Array.from(top3Reactions.values()).map(
                 (data) =>
-                  data.total_count >= 1 && renderReaction(data.reaction_id),
+                  data.total_count >= 1 && (
+                    <span key={data.reaction_id}>
+                      {renderReaction(data.reaction_id)}
+                    </span>
+                  ),
               )}
             </div>
             {getReactionMessage()}
@@ -387,11 +391,12 @@ export default function FooterPost({
           </div>
         </div>
       )}
+
       <div className="relative mb-2 flex border-b border-b-gray-300 py-1 text-[15px]">
         <div
           ref={div1Ref}
           onClick={handleReactionToggle}
-          className="peer flex flex-1 cursor-pointer items-center justify-center rounded-md py-1 font-semibold text-gray-500 hover:bg-[#F2F2F2]"
+          className="peer flex flex-1 cursor-pointer select-none items-center justify-center rounded-md py-1 font-semibold text-gray-500 hover:bg-[#F2F2F2]"
         >
           {reactionId === null || reactionId === ReactionsEnum.LIKE ? (
             <HandThumbUpIcon
@@ -415,6 +420,7 @@ export default function FooterPost({
         />
         <ActionButtonPost Icon={PhoneIcon} label="Send" />
         <ActionButtonPost Icon={ArrowUturnRightIcon} label="Share" />
+
         {/* Reaction Options */}
         <ul
           ref={ulRef}

@@ -32,3 +32,8 @@ export type MediaImageVideoType = {
   url: string;
   urlObject: string;
 };
+
+export type UploadedImageVideoUrlType = {
+  url: string;
+  type: MediaImageVideoEnum;
+};
