@@ -7,7 +7,7 @@ import {
   UsersIcon,
   XMarkIcon,
 } from "@heroicons/react/24/solid";
-import { PostGetType } from "@/types/post";
+import { PostType } from "@/types/post";
 import { UserType } from "@/types/user";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { useLineClamp } from "@/utils/useLineClamp";
@@ -18,7 +18,7 @@ import Comments from "../comments/Comments";
 
 type PostProps = {
   authUser: UserType;
-  postParam: PostGetType;
+  postParam: PostType;
 };
 
 const Post = ({ authUser, postParam }: PostProps) => {
@@ -35,7 +35,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
   const inputRef = useRef<{ focus: () => void; scrollIntoView: () => void }>(
     null,
   );
-  const [post, setPost] = useState<PostGetType>(postParam);
+  const [post, setPost] = useState<PostType>(postParam);
   const refContentText = useRef<HTMLParagraphElement>(null);
   const isContentTextClamped = useLineClamp(refContentText, { lines: 4 });
   const [isExpandedContentText, setIsExpandedTextPost] = useState(false);
@@ -71,15 +71,15 @@ const Post = ({ authUser, postParam }: PostProps) => {
             width={35}
             height={35}
           />
-          <XMarkIcon
-            className="ml-2 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-[#F2F2F2]"
-            width={35}
-            height={35}
-          />
+          {post.user_id !== authUser.userId && (
+            <XMarkIcon
+              className="ml-2 cursor-pointer rounded-full p-1 text-gray-500 hover:bg-[#F2F2F2]"
+              width={35}
+              height={35}
+            />
+          )}
         </div>
       </div>
-
-      {/* Body */}
 
       {/* Text Post */}
       <div className="relative flex flex-col px-4 text-[15px]">
@@ -111,6 +111,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
 
       {/* Footer */}
       <FooterPost
+        isPostFromAuthUser={authUser.userId === post.user_id}
         userId={authUser.userId}
         postId={post.post_id}
         fullName={fullName}

@@ -1,18 +1,12 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
+import { ReactionsEnum, Top3ReactionsType } from "@/types/reactions";
 import ActionButtonsPost from "./ActionButtonsPost";
-import { convertTotalReactionsToWord } from "@/utils/convertTotalReactionsToWord";
-import {
-  ReactionsEnum,
-  Top3ReactionsType,
-  reactionEnumToText,
-} from "@/types/reactions";
-import ReactionIcon from "../ReactionIcon";
 import ReactionsPost from "./ReactionsPost";
 
 type FooterPostProps = {
+  isPostFromAuthUser: boolean;
   userId: number;
   postId: number;
   fullName: string;
@@ -22,7 +16,8 @@ type FooterPostProps = {
   handleFocusClick: () => void;
 };
 
-export default function FooterPost({
+const FooterPost = ({
+  isPostFromAuthUser,
   userId,
   postId,
   fullName,
@@ -30,7 +25,7 @@ export default function FooterPost({
   totalComments,
   totalShares,
   handleFocusClick,
-}: FooterPostProps) {
+}: FooterPostProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [reactionId, setReactionId] = useState<ReactionsEnum | null>(null);
@@ -184,6 +179,7 @@ export default function FooterPost({
         currentTotalReactions={currentTotalReactions}
       />
       <ActionButtonsPost
+        isPostFromAuthUser={isPostFromAuthUser}
         reactionId={reactionId}
         handleFocusClick={handleFocusClick}
         handleReactionToggle={handleReactionToggle}
@@ -191,4 +187,6 @@ export default function FooterPost({
       />
     </div>
   );
-}
+};
+
+export default FooterPost;

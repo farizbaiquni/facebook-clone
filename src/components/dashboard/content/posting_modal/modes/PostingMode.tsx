@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import IconButton from "../components/IconButton";
@@ -10,14 +10,12 @@ import { XMarkIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { FriendTagPeople } from "@/types/entityObjects";
 import { FeelingType } from "@/types/feelings";
 import { SubActivityType } from "@/types/activities";
-import MapComponent from "../components/MapComponent";
 import { LocationType } from "@/types/locations";
 import { GifType } from "@/types/gifs";
 import { UserType } from "@/types/user";
 import axios from "axios";
-import { PostCreateType } from "@/types/post";
+import { PostCreateType, PostType } from "@/types/post";
 import {
-  MediaImageUploadType,
   MediaImageVideoEnum,
   MediaImageVideoType,
   MediaPostEnum,
@@ -25,6 +23,7 @@ import {
   UploadedImageVideoUrlType,
 } from "@/types/mediaPost";
 import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
+import { SuccessResponseType } from "@/types/responses";
 
 const DynamicMapComponent = dynamic(
   () => import("../components/MapComponent"),
@@ -57,9 +56,10 @@ type PostingModeType = {
   setImagesVideos: (images: MediaImageVideoType[]) => void;
   setSelectedLocation: (param: LocationType | null) => void;
   setSelectedGif: (param: GifType | null) => void;
+  addNewAuthUserPosts: (param: PostType) => void;
 };
 
-export default function PostingMode({
+const PostingMode = ({
   user,
   contentText,
   imagesVideos,
@@ -83,7 +83,8 @@ export default function PostingMode({
   setIsUploadModeActive,
   setSelectedLocation,
   setSelectedGif,
-}: PostingModeType) {
+  addNewAuthUserPosts,
+}: PostingModeType) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoadingPosting, setIsLoadingPosting] = useState(false);
   const fullName = `${user.firstName} ${user.lastName}`;
@@ -195,14 +196,11 @@ export default function PostingMode({
         audience_include: selectedAudienceInclude,
         audience_exclude: selectedAudienceExclude,
       };
-      console.log("POST DATA : ", postData);
-      const response = await axios.post(
-        "http://localhost:4000/posts",
-        postData,
-      );
-      console.log("RESPONSE : ", response.data);
+
+      const response = await axios.post("/api/posts", postData);
+      const newAuthUserPost: PostType = response.data.data;
+      addNewAuthUserPosts(newAuthUserPost);
     } catch (error) {
-      console.log("ERROR : ", error);
     } finally {
       setIsLoadingPosting(false);
       handleClearAllInput();
@@ -244,7 +242,7 @@ export default function PostingMode({
       <div className="mx-2 flex items-center py-2">
         <div className="min-w-max">
           <Image
-            src="/profile.jpg"
+            src={user?.profilePicture ? user.profilePicture : "/icons/user.png"}
             width={100}
             height={100}
             alt="profile-picture"
@@ -509,4 +507,6 @@ export default function PostingMode({
       </div>
     </div>
   );
-}
+};
+
+export default PostingMode;

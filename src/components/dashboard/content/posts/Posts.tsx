@@ -1,26 +1,31 @@
 import { getPostsService } from "@/services/posts";
-import { PostGetType } from "@/types/post";
+import { PostType } from "@/types/post";
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
-import Post from "./post/Post";
+import { memo, useContext, useEffect, useState } from "react";
+import Post from "./Post";
 import { UserContext } from "@/hooks/useContext";
 import { UserType } from "@/types/user";
 
-export default function Posts() {
+type PostsProps = {
+  userId: number;
+};
+
+const Posts = ({ userId }: PostsProps) => {
   const [authUser, setAuthUser] = useState<UserType>(useContext(UserContext)!);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [posts, setPosts] = useState<PostGetType[]>([]);
+  const [posts, setPosts] = useState<PostType[]>([]);
 
-  const getPosts = async () => {
+  const getPosts = async (userId: number) => {
     try {
       setIsLoading(true);
-      const response = await getPostsService();
-      const postsData: PostGetType[] = response.data.results;
+      const response = await axios.get(
+        `/api/posts?offset=0&limit=5&userId=${userId}`,
+      );
+      const postsData: PostType[] = response.data.data;
       setPosts(postsData);
       setIsLoading(false);
     } catch (error) {
-      console.log("Error get posts : ", error);
       setIsError(true);
     } finally {
       setIsLoading(false);
@@ -28,15 +33,15 @@ export default function Posts() {
   };
 
   useEffect(() => {
-    getPosts();
-  }, []);
+    getPosts(userId);
+  }, [userId]);
 
   return (
     <div>
       {isLoading ? (
-        <p>Loading...</p>
+        <p className="my-5 text-lg text-gray-400">Loading posts...</p>
       ) : isError ? (
-        <p>Error</p>
+        <p className="my-5 text-lg text-red-400">Error load posts</p>
       ) : (
         posts.map((post, index) => (
           <Post key={post.post_id} authUser={authUser} postParam={post} />
@@ -44,4 +49,6 @@ export default function Posts() {
       )}
     </div>
   );
-}
+};
+
+export default memo(Posts);

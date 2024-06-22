@@ -1,3 +1,18 @@
+// SUCCESS RESPONSE
+export type Pagination = {
+  hasNextPage: boolean;
+  nextId: number | null;
+};
+
+export type SuccessResponseType<T> = {
+  status: string;
+  code: number;
+  message: string;
+  data: T;
+  pagination: Pagination | null;
+};
+
+// FAILED RESPONSE
 export enum ErrorStatusEnum {
   INVALID_PARAMETER = "Invalid Parameter",
   UNAUTHORIZED_ACCESS = "Unauthorized Access",

@@ -4,14 +4,16 @@ import React, { Fragment, useState } from "react";
 import Image from "next/image";
 import PostingModal from "./posting_modal/PostingModal";
 import { UserType } from "@/types/user";
+import { PostType } from "@/types/post";
 
 type PostingProps = {
   user: UserType;
+  addNewAuthUserPosts: (param: PostType) => void;
 };
 
-const Posting = ({ user }: PostingProps) => {
+const Posting = ({ user, addNewAuthUserPosts }: PostingProps) => {
   const [isPostingModalOpen, setIsPostingModalOpen] = useState(false);
-  const [firstName, setFirstName] = useState("Fariz");
+  const [firstName, setFirstName] = useState(user.firstName);
 
   const openPostingModal = () => setIsPostingModalOpen(true);
   const closePostingModal = () => setIsPostingModalOpen(false);
@@ -35,7 +37,7 @@ const Posting = ({ user }: PostingProps) => {
       <div className="mx-auto h-[122px] w-[500px] rounded-lg bg-white p-3 shadow-md">
         <div className="flex items-center">
           <Image
-            src="/profile.jpg"
+            src={user?.profilePicture ? user.profilePicture : "/icons/user.png"}
             width={40}
             height={40}
             alt="Profile picture"
@@ -74,6 +76,7 @@ const Posting = ({ user }: PostingProps) => {
         isPostingModalOpen={isPostingModalOpen}
         closePostingModal={closePostingModal}
         setIsPostingModalOpen={setIsPostingModalOpen}
+        addNewAuthUserPosts={addNewAuthUserPosts}
       />
     </Fragment>
   );

@@ -1,7 +1,5 @@
 import { MediaPostType } from "./mediaPost";
 
-export type PostType = {};
-
 export type PostCreateType = {
   user_id: string;
   content: string;
@@ -28,7 +26,7 @@ type ReactionsType = {
   total: number;
 };
 
-export type PostGetType = {
+export type PostType = {
   post_id: number;
   user_id: number;
   content: string;

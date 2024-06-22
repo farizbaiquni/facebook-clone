@@ -35,6 +35,7 @@ const renderActionButtonReaction = (
 };
 
 type ActionButtonsPostProps = {
+  isPostFromAuthUser: boolean;
   reactionId: ReactionsEnum | null;
   handleFocusClick: () => void;
   handleReactionToggle: () => void;
@@ -42,6 +43,7 @@ type ActionButtonsPostProps = {
 };
 
 const ActionButtonsPost = ({
+  isPostFromAuthUser,
   reactionId,
   handleFocusClick,
   handleReactionToggle,
@@ -194,7 +196,8 @@ const ActionButtonsPost = ({
 
         {renderActionButtonReaction(PhoneIcon, "Send")}
 
-        {renderActionButtonReaction(ArrowUturnRightIcon, "Share")}
+        {!isPostFromAuthUser &&
+          renderActionButtonReaction(ArrowUturnRightIcon, "Share")}
       </Fragment>
 
       {/* Reaction Options */}

@@ -17,12 +17,14 @@ import { LocationType } from "@/types/locations";
 import { ModeTypes } from "@/types/modes";
 import { GifType } from "@/types/gifs";
 import { UserType } from "@/types/user";
+import { PostType } from "@/types/post";
 
 type PostingModalProps = {
   user: UserType;
   isPostingModalOpen: boolean;
   closePostingModal: () => void;
   setIsPostingModalOpen: (param: boolean) => void;
+  addNewAuthUserPosts: (param: PostType) => void;
 };
 
 const PostingModal = ({
@@ -30,6 +32,7 @@ const PostingModal = ({
   isPostingModalOpen,
   closePostingModal,
   setIsPostingModalOpen,
+  addNewAuthUserPosts,
 }: PostingModalProps) => {
   const [selectedModeType, setSelectedModeType] = useState(
     ModeTypes.PostingMode,
@@ -187,6 +190,7 @@ const PostingModal = ({
           handleDrop={handleDrop}
           handleClickUploadModeActive={handleClickUploadModeActive}
           handleClearAllInput={handleClearAllInput}
+          addNewAuthUserPosts={addNewAuthUserPosts}
         />
       )}
 

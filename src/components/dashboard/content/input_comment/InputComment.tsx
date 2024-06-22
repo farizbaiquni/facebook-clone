@@ -6,6 +6,7 @@ import React, {
   useImperativeHandle,
   useEffect,
   Fragment,
+  useContext,
 } from "react";
 import {
   ChatBubbleOvalLeftIcon as ChatBubbleOvalLeftIconOutline,
@@ -30,6 +31,7 @@ import { GifType } from "@/types/gifs";
 import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
 import axios from "axios";
 import { CommentCreateType } from "@/types/comments";
+import { UserContext } from "@/hooks/useContext";
 
 const emojis = [
   "😀",
@@ -129,6 +131,8 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
     const [imageVideo, setImageVideo] = useState<MediaImageVideoType | null>(
       null,
     );
+
+    const user = useContext(UserContext);
 
     const [isTextareaEverFocus, setIsTextareaFocus] = useState(false);
     const [isShowEmojiSelector, setIsShowEmojiSelector] = useState(false);
@@ -283,7 +287,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       <div className={`flex px-4 py-5`}>
         <div className="mr-4 min-w-max">
           <Image
-            src="/profile.jpg"
+            src={user?.profilePicture ? user.profilePicture : "/icons/user.png"}
             width={30}
             height={30}
             alt="profile"
