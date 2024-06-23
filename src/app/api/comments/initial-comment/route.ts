@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, res: Response) {
 
   try {
     const response = await axios.get(
-      `http://localhost:4000/v1/comments/one-auth-comment?postId=${postId}&userId=${userId}`,
+      `http://localhost:4000/v1/comments/initial-comment?postId=${postId}&userId=${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token.value}`,
