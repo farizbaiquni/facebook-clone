@@ -51,10 +51,6 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    console.log("variabel newAuthPosts : ", newAuthPosts);
-  }, [newAuthPosts]);
-
-  useEffect(() => {
     getUserById();
   }, [newAuthPosts]);
 

@@ -1,9 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 
-import { ReactionsEnum, Top3ReactionsType } from "@/types/reactions";
+import {
+  PostReactionsType,
+  ReactionsEnum,
+  Top3ReactionsType,
+} from "@/types/reactions";
 import ActionButtonsPost from "./ActionButtonsPost";
 import ReactionsPost from "./ReactionsPost";
+import { SuccessResponseType } from "@/types/responses";
 
 type FooterPostProps = {
   isPostFromAuthUser: boolean;
@@ -34,23 +39,6 @@ const FooterPost = ({
   >(new Map());
   const [currentTotalReactions, setCurrentTotalReactions] =
     useState(totalReactions);
-
-  const getTop3PostReactions = useCallback(async () => {
-    try {
-      const res = await axios.get(
-        `/api/post-reactions/top-3-reactions?postId=${postId}`,
-      );
-      const reactions: Top3ReactionsType[] = res.data.data;
-      const reactionsMap: Map<ReactionsEnum, Top3ReactionsType> = new Map();
-      reactions.map((data) => {
-        reactionsMap.set(data.reaction_id, data);
-      });
-      setTop3Reactions(reactionsMap);
-    } catch (error) {
-      console.error("Error get top 3 reactions by post Id: ", error);
-      setIsError(true);
-    }
-  }, [postId]);
 
   const handleMinusOneTop3ReactionsByReactionId = (id: ReactionsEnum) => {
     if (top3Reactions.has(id)) {
@@ -106,12 +94,34 @@ const FooterPost = ({
     }
   };
 
+  const getTop3PostReactions = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        `/api/post-reactions/top-3-reactions?postId=${postId}`,
+      );
+      const reactions: Top3ReactionsType[] = res.data.data;
+      const reactionsMap: Map<ReactionsEnum, Top3ReactionsType> = new Map();
+      reactions.map((data) => {
+        reactionsMap.set(data.reaction_id, data);
+      });
+      console.log("setTop3Reactions", reactionsMap);
+      setTop3Reactions(reactionsMap);
+    } catch (error) {
+      console.error("Error get top 3 reactions by post Id: ", error);
+      setIsError(true);
+    }
+  }, [postId]);
+
   const getPostReaction = useCallback(async () => {
     try {
       const response = await axios.get(
         `/api/post-reactions?userId=${userId}&postId=${postId}`,
       );
-      setReactionId(response.data.reaction_id ?? null);
+      const successResponse: SuccessResponseType<PostReactionsType | null> =
+        response.data;
+      setReactionId(
+        successResponse.data !== null ? successResponse.data.reaction_id : null,
+      );
     } catch (error) {
       console.error("Error get post reactions by user Id: ", error);
       setIsError(true);

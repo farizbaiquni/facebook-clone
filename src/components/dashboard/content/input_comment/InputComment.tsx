@@ -30,7 +30,7 @@ import { createThumbnail } from "@/utils/createThumbnailFromVideo";
 import { GifType } from "@/types/gifs";
 import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
 import axios from "axios";
-import { CommentCreateType } from "@/types/comments";
+import { AddCommentType } from "@/types/comments";
 import { UserContext } from "@/hooks/useContext";
 
 const emojis = [
@@ -227,7 +227,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       mediaUrl: string | null,
     ) => {
       try {
-        const commentObject: CommentCreateType = {
+        const commentObject: AddCommentType = {
           user_id: userId,
           post_id: postId,
           parent_comment_id: null,

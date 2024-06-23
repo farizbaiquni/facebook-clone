@@ -31,3 +31,11 @@ export type Top3ReactionsType = {
   reaction_id: ReactionsEnum;
   total_count: number;
 };
+
+export type PostReactionsType = {
+  post_reaction_id: number;
+  user_id: number;
+  post_id: number;
+  reaction_id: ReactionsEnum;
+  reaction_name: string;
+};
