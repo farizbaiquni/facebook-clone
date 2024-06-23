@@ -11,7 +11,7 @@ import { PostType } from "@/types/post";
 import { UserType } from "@/types/user";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { useLineClamp } from "@/utils/useLineClamp";
-import ImagesGrid from "./ImagesGrid";
+import MediaPostGrid from "./MediaPostGrid";
 import InputComment from "../input_comment/InputComment";
 import FooterPost from "./footer_post/FooterPost";
 import Comments from "../comments/Comments";
@@ -39,6 +39,8 @@ const Post = ({ authUser, postParam }: PostProps) => {
   const refContentText = useRef<HTMLParagraphElement>(null);
   const isContentTextClamped = useLineClamp(refContentText, { lines: 4 });
   const [isExpandedContentText, setIsExpandedTextPost] = useState(false);
+
+  console.log(postParam);
 
   const handleFocusAndScrollClick = () => {
     if (inputRef.current) {
@@ -107,7 +109,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
       </div>
 
       {/* Images Post */}
-      {post.media.length > 0 && <ImagesGrid images={images} />}
+      {post.media.length > 0 && <MediaPostGrid mediaArr={post.media} />}
 
       {/* Footer */}
       <FooterPost

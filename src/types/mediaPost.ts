@@ -5,7 +5,7 @@ export enum MediaPostEnum {
 }
 
 export type MediaPostType = {
-  media_type_id: number;
+  media_type_id: MediaPostEnum;
   media_url: string;
 };
 

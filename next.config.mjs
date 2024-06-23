@@ -2,6 +2,7 @@
 const nextConfig = {
   images: {
     domains: ["media.tenor.com"],
+    domains: ["firebasestorage.googleapis.com"],
   },
   reactStrictMode: false,
 };
