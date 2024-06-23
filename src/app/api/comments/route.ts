@@ -7,6 +7,7 @@ export async function GET(req: NextRequest, res: Response) {
   const searchParams = req.nextUrl.searchParams;
 
   const postId = searchParams.get("postId");
+  const userId = searchParams.get("userId");
   const limit = searchParams.get("limit");
   const offset = searchParams.get("offset");
 
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest, res: Response) {
 
   try {
     const response = await axios.get(
-      `http://localhost:4000/v1/comments?postId=${postId}&limit=${limit}&offset=${offset}`,
+      `http://localhost:4000/v1/comments?postId=${postId}&userId=${userId}&limit=${limit}&offset=${offset}`,
       {
         headers: {
           Authorization: `Bearer ${token.value}`,

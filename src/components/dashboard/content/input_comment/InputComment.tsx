@@ -284,8 +284,8 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
     }, []);
 
     return (
-      <div className={`flex px-4 py-5`}>
-        <div className="mr-4 min-w-max">
+      <div className={`flex px-4 pb-5 pt-3`}>
+        <div className="mr-2 min-w-max">
           <Image
             src={user?.profilePicture ? user.profilePicture : "/icons/user.png"}
             width={30}

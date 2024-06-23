@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 * {
-  font-family: "Segoe UI Historic", "Segoe UI", Helvetica, Arial, sans-serif;
+  font-family: "Segoe UI", "Segoe UI Historic", Helvetica, Arial, sans-serif;
 }
 
 .capitalize-first-letter {

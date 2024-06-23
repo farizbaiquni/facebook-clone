@@ -104,7 +104,6 @@ const FooterPost = ({
       reactions.map((data) => {
         reactionsMap.set(data.reaction_id, data);
       });
-      console.log("setTop3Reactions", reactionsMap);
       setTop3Reactions(reactionsMap);
     } catch (error) {
       console.error("Error get top 3 reactions by post Id: ", error);

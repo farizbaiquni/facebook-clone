@@ -122,7 +122,9 @@ const Post = ({ authUser, postParam }: PostProps) => {
       />
 
       {/* Comment */}
-      {post.total_comments > 0 && <Comments postId={post.post_id} />}
+      {post.total_comments > 0 && (
+        <Comments authUser={authUser} postId={post.post_id} />
+      )}
 
       {/* Input Comment */}
       <InputComment
