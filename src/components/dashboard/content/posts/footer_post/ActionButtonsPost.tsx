@@ -74,7 +74,7 @@ const ActionButtonsPost = ({
     ) {
       leaveTimeout.current = setTimeout(() => {
         setIsUlVisible(false);
-      }, 300);
+      }, 500);
     }
   }, []);
 

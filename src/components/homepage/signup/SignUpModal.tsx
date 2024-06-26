@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
 import RadioGroup from "./RadioGroup";
+import { GenderNumberEnum, GenderTextEnum, UserCreateType } from "@/types/user";
 import {
   getDaysInMonth,
   generateYearOptions,
@@ -9,20 +12,24 @@ import {
   monthNameToIntMap,
 } from "../../../utils/dateUtils";
 import ExclamationCircleIcon from "../icons/ExclamationCircleIcon";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { UserCreateType } from "@/types/user";
+import { validateEmailFormat } from "@/utils/validations";
+import Image from "next/image";
+
+type ErrorValidationType = {
+  field: string;
+  isError: boolean;
+};
 
 type SignUpModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  setIsAlertSucessLogin: (param: boolean) => void;
+  showAlertStatusSignup: (param: boolean) => void;
 };
 
 const SignUpModal = ({
   isOpen,
   onClose,
-  setIsAlertSucessLogin,
+  showAlertStatusSignup,
 }: SignUpModalProps) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().toLocaleString("default", { month: "long" });
@@ -33,6 +40,7 @@ const SignUpModal = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [gender, setGender] = useState(GenderNumberEnum.MALE);
 
   const [dateOfBirthDay, setDateOfBirthDay] = useState(currentDay);
   const [dateOfBirthMonth, setDateOfBirthMonth] = useState(currentMonth);
@@ -47,6 +55,195 @@ const SignUpModal = ({
   const [incorrectEmail, setIncorrectEmail] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [incorrectGender, setIncorrectGender] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
+
+  const handleValidation =
+    (setter: (value: boolean) => void) => (isValid: boolean) => {
+      setter(!isValid);
+    };
+
+  const onChangeDateOfBirth = (year: number, month: number, day: number) => {
+    const date = `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day}`;
+    setDateOfBirth(date);
+  };
+
+  const transformNameInput = (input: string): string => {
+    return input.replace(/\b\w+\b/g, (word) => {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    });
+  };
+
+  const handleSignUpCallApi = async (
+    userData: UserCreateType,
+  ): Promise<void> => {
+    try {
+      const response = await axios.post("/api/auth/register", userData);
+      setIsLoading(false);
+      if (response.data.status === "success") {
+        showAlertStatusSignup(true);
+        onClose();
+      } else {
+        showAlertStatusSignup(false);
+      }
+    } catch (error) {
+      onClose();
+      setIsLoading(false);
+    }
+  };
+
+  const validateRegisterationData = (
+    firstName: string,
+    surname: string,
+    email: string,
+    password: string,
+    dateOfBirthDay: string,
+    dateOfBirthMonth: string,
+    dateOfBirthYear: string,
+  ): ErrorValidationType[] => {
+    const errors: ErrorValidationType[] = [];
+
+    if (firstName.trim().length === 0) {
+      errors.push({ field: "firstName", isError: true });
+    } else {
+      errors.push({ field: "firstName", isError: false });
+    }
+
+    if (surname.trim().length === 0) {
+      errors.push({ field: "surname", isError: true });
+    } else {
+      errors.push({ field: "surname", isError: false });
+    }
+
+    if (email.trim().length === 0 || !validateEmailFormat(email.trim())) {
+      errors.push({ field: "email", isError: true });
+    } else {
+      errors.push({ field: "email", isError: false });
+    }
+
+    if (password.trim().length === 0) {
+      errors.push({ field: "password", isError: true });
+    } else {
+      errors.push({ field: "password", isError: false });
+    }
+
+    if (!document.querySelector('input[name="gender"]:checked')) {
+      errors.push({ field: "gender", isError: true });
+    } else {
+      errors.push({ field: "gender", isError: false });
+    }
+
+    const birthDate = new Date(
+      `${dateOfBirthYear}-${dateOfBirthMonth}-${dateOfBirthDay}`,
+    );
+    const age = new Date().getFullYear() - birthDate.getFullYear();
+    const isAgeValid = age > 5 || (age === 5 && new Date() >= birthDate);
+
+    if (
+      !dateOfBirthDay ||
+      !dateOfBirthMonth ||
+      !dateOfBirthYear ||
+      !isAgeValid
+    ) {
+      errors.push({ field: "dateOfBirth", isError: true });
+    } else {
+      errors.push({ field: "dateOfBirth", isError: false });
+    }
+
+    return errors;
+  };
+
+  const handleSignUp = async (
+    firstName: string,
+    surname: string,
+    email: string,
+    password: string,
+    dateOfBirthDay: string,
+    dateOfBirthMonth: string,
+    dateOfBirthYear: string,
+    gender: GenderNumberEnum,
+  ) => {
+    let hasError = false;
+
+    const validationErrors: ErrorValidationType[] = validateRegisterationData(
+      firstName,
+      surname,
+      email,
+      password,
+      dateOfBirthDay,
+      dateOfBirthMonth,
+      dateOfBirthYear,
+    );
+
+    if (validationErrors.length > 0) {
+      validationErrors.forEach((error) => {
+        const { field, isError } = error;
+        if (isError) hasError = true;
+        switch (field) {
+          case "firstName":
+            setIncorrectFirstName(isError);
+            break;
+          case "surname":
+            setIncorrectSurname(isError);
+            break;
+          case "email":
+            setIncorrectEmail(isError);
+            break;
+          case "password":
+            setIncorrectPassword(isError);
+            break;
+          case "gender":
+            setIncorrectGender(isError);
+            break;
+          case "dateOfBirth":
+            if (isError) hasError = true;
+            setShowDateOfBirthError(isError);
+            break;
+          default:
+            break;
+        }
+      });
+    }
+
+    if (hasError) {
+      setIsLoading(false);
+      return;
+    }
+
+    const userCreateData: UserCreateType = {
+      first_name: transformNameInput(firstName),
+      last_name: transformNameInput(surname),
+      email: "aaaaa",
+      password: password,
+      profile_picture: null,
+      cover_photo: null,
+      bio: null,
+      birth_date: dateOfBirth,
+      gender_id: gender,
+    };
+
+    // Proceed with sign up logic
+    handleSignUpCallApi(userCreateData);
+  };
+
+  const handleOnClickSignUpButton = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    event.preventDefault();
+    setIsLoading(true);
+    handleSignUp(
+      firstName,
+      surname,
+      email,
+      password,
+      dateOfBirthDay,
+      dateOfBirthMonth,
+      dateOfBirthYear,
+      gender,
+    );
+  };
 
   useEffect(() => {
     setDays(getDaysInMonth(dateOfBirthYear, dateOfBirthMonth));
@@ -64,133 +261,11 @@ const SignUpModal = ({
     );
   }, [dateOfBirthDay, dateOfBirthMonth, dateOfBirthYear]);
 
-  const router = useRouter();
-
-  const handleSignUpNewUser = async (
-    userData: UserCreateType,
-  ): Promise<void> => {
-    try {
-      const response = await axios.post(
-        "http://localhost:4000/users/signUp",
-        userData,
-      );
-      setIsAlertSucessLogin(true);
-      setTimeout(() => {
-        setIsAlertSucessLogin(false);
-        router.replace("/login");
-      }, 3000);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const checkIsEmail = (email: string): boolean => {
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
-  };
-
-  const onChangeDateOfBirth = (year: number, month: number, day: number) => {
-    const date = `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day}`;
-    setDateOfBirth(date);
-  };
-
-  const handleValidation =
-    (setter: (value: boolean) => void) => (isValid: boolean) => {
-      setter(!isValid);
-    };
-
-  const handleSignUp = async (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) => {
-    event.preventDefault();
-
-    let hasError = false;
-    if (firstName.trim() === "") {
-      setIncorrectFirstName(true);
-      hasError = true;
-    } else {
-      setIncorrectFirstName(false);
-    }
-
-    if (surname.trim() === "") {
-      setIncorrectSurname(true);
-      hasError = true;
-    } else {
-      setIncorrectSurname(false);
-    }
-
-    if (email.trim() === "") {
-      setIncorrectEmail(true);
-      hasError = true;
-    } else {
-      const isEmail = checkIsEmail(email.trim());
-      if (isEmail) {
-        setIncorrectEmail(false);
-      } else {
-        setIncorrectEmail(true);
-        hasError = true;
-      }
-    }
-
-    if (password.trim() === "") {
-      setIncorrectPassword(true);
-      hasError = true;
-    } else {
-      setIncorrectPassword(false);
-    }
-
-    if (!document.querySelector('input[name="gender"]:checked')) {
-      setIncorrectGender(true);
-      hasError = true;
-    } else {
-      setIncorrectGender(false);
-    }
-
-    const birthDate = new Date(
-      `${dateOfBirthYear}-${dateOfBirthMonth}-${dateOfBirthDay}`,
-    );
-    const age = currentYear - birthDate.getFullYear();
-    const isAgeValid = age > 5 || (age === 5 && new Date() >= birthDate);
-
-    if (
-      !dateOfBirthDay ||
-      !dateOfBirthMonth ||
-      !dateOfBirthYear ||
-      !isAgeValid
-    ) {
-      setShowDateOfBirthError(true);
-      hasError = true;
-    } else {
-      setShowDateOfBirthError(false);
-    }
-
-    // If there is an error, prevent sign up
-    if (hasError) {
-      return;
-    }
-
-    const userData: UserCreateType = {
-      first_name: firstName,
-      last_name: surname,
-      email: email,
-      password: password,
-      profile_picture: null,
-      cover_photo: null,
-      bio: null,
-      birth_date: dateOfBirth,
-      gender_id: 1,
-    };
-
-    // Proceed with sign up logic
-    handleSignUpNewUser(userData);
-    onClose();
-  };
-
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-40 flex min-w-max items-center justify-center bg-black bg-opacity-50">
-      <div className="w-full max-w-md rounded-lg bg-white px-5 py-6">
+      <div className="relative w-full max-w-md rounded-lg bg-white px-5 py-6">
         <div className="mb-1 flex items-center justify-between">
           <h2 className="text-3xl font-bold text-gray-800">Sign Up</h2>
           <button onClick={onClose} className="text-4xl text-gray-500">
@@ -229,6 +304,7 @@ const SignUpModal = ({
           <InputField
             type="text"
             label="Email address"
+            autoComplete="on"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={incorrectEmail}
@@ -239,6 +315,7 @@ const SignUpModal = ({
           <InputField
             type="password"
             label="New password"
+            autoComplete="on"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             error={incorrectPassword}
@@ -284,11 +361,13 @@ const SignUpModal = ({
           </div>
           <RadioGroup
             options={[
-              { value: "Female", label: "Female" },
-              { value: "Male", label: "Male" },
+              { value: GenderTextEnum.MALE, label: GenderTextEnum.MALE },
+              { value: GenderTextEnum.FEMALE, label: GenderTextEnum.FEMALE },
             ]}
             name="gender"
-            error={incorrectGender} // Pass error state to RadioGroup
+            error={incorrectGender}
+            gender={gender}
+            setGender={setGender}
           />
 
           <p className="mb-3 text-justify text-xs text-gray-500">
@@ -317,13 +396,30 @@ const SignUpModal = ({
           </p>
           <div className="flex w-full justify-center">
             <button
-              onClick={handleSignUp}
+              onClick={handleOnClickSignUpButton}
               className="rounded bg-green-600 px-14 py-1 text-xl font-bold text-white hover:bg-green-500"
             >
               Sign Up
             </button>
           </div>
         </form>
+
+        {/* Loading resgistering... */}
+        {isLoading && (
+          <div
+            className={`absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center rounded-lg bg-black bg-opacity-45`}
+          >
+            <Image
+              alt="processing"
+              width={45}
+              height={45}
+              src={"/gifs/loading.gif"}
+            />
+            <p className="mt-3 font-semibold text-slate-300">
+              Process registering...
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,3 +1,13 @@
+export enum GenderNumberEnum {
+  MALE = 1,
+  FEMALE = 2,
+}
+
+export enum GenderTextEnum {
+  MALE = "Male",
+  FEMALE = "Female",
+}
+
 export type UserType = {
   userId: number;
   firstName: string;
@@ -19,5 +29,5 @@ export type UserCreateType = {
   cover_photo: string | null;
   bio: string | null;
   birth_date: string;
-  gender_id: number;
+  gender_id: GenderNumberEnum;
 };

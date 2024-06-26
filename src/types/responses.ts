@@ -45,16 +45,13 @@ export const DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND: ErrorResponseType = {
   ],
 };
 
-export const DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER = (): ErrorResponseType => {
-  const errorObject: ErrorResponseType = {
-    status: ErrorStatusEnum.INTERNAL_SERVER_ERROR,
-    code: 500,
-    errors: [
-      {
-        type: "server",
-        message: "An unexpected error occurred on the server",
-      },
-    ],
-  };
-  return errorObject;
+export const DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER: ErrorResponseType = {
+  status: ErrorStatusEnum.INTERNAL_SERVER_ERROR,
+  code: 500,
+  errors: [
+    {
+      type: "next server",
+      message: "An unexpected error occurred on the next server",
+    },
+  ],
 };

@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import axios from "axios";
-import { cookieName } from "./configs/config";
 
 export async function middleware(req: NextRequest) {
-  const TOKEN_NAME = cookieName;
-  const token = req.cookies.get(TOKEN_NAME)?.value;
+  const COOKIE_NAME = "auth_tokenn";
+  const token = req.cookies.get(COOKIE_NAME)?.value;
 
   if (req.nextUrl.pathname.startsWith("/dashboard")) {
     if (!token) {

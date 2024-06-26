@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import {
   EllipsisHorizontalIcon,
@@ -15,6 +15,9 @@ import MediaPostGrid from "./MediaPostGrid";
 import InputComment from "../input_comment/InputComment";
 import FooterPost from "./footer_post/FooterPost";
 import Comments from "../comments/Comments";
+import { GetCommentType } from "@/types/comments";
+import axios from "axios";
+import { SuccessResponseType } from "@/types/responses";
 
 type PostProps = {
   authUser: UserType;
@@ -40,7 +43,13 @@ const Post = ({ authUser, postParam }: PostProps) => {
   const isContentTextClamped = useLineClamp(refContentText, { lines: 4 });
   const [isExpandedContentText, setIsExpandedTextPost] = useState(false);
 
-  console.log(postParam);
+  const [initialComment, setInitialComment] = useState<
+    Map<number, GetCommentType>
+  >(new Map());
+  const [comments, setComments] = useState<Map<number, GetCommentType>>(
+    new Map(),
+  );
+  const [offset, setOffset] = useState<number | null>(0);
 
   const handleFocusAndScrollClick = () => {
     if (inputRef.current) {
@@ -48,6 +57,71 @@ const Post = ({ authUser, postParam }: PostProps) => {
       inputRef.current.focus();
     }
   };
+
+  const addNewComment = (comment: GetCommentType) => {
+    setInitialComment((prevState) => {
+      const newState = new Map(prevState);
+      newState.set(comment.comment_id, comment);
+      return newState;
+    });
+  };
+
+  const getInitialComment = async (postId: number, userId: number) => {
+    try {
+      let res: any = await axios.get(
+        `/api/comments/initial-comment?postId=${postId}&userId=${userId}`,
+      );
+      const response: SuccessResponseType<GetCommentType[]> = res.data;
+      if (response.data.length <= 0) return;
+      setInitialComment((prevState) => {
+        const newState = new Map(prevState);
+        newState.set(response.data[0].comment_id, response.data[0]);
+        return newState;
+      });
+    } catch (error) {}
+  };
+
+  const getComments = async (
+    postId: number,
+    userId: number,
+    offset: number,
+    limit: number,
+  ) => {
+    try {
+      const response = await axios.get(
+        `/api/comments?postId=${postId}&userId=${userId}&offset=${offset}&limit=${limit}`,
+      );
+      setComments((prevState) => {
+        const newState = new Map(prevState);
+        response.data.data.map((data: GetCommentType) => {
+          if (!initialComment.has(data.comment_id)) {
+            newState.set(data.comment_id, data);
+          }
+        });
+        return newState;
+      });
+      setOffset(
+        response.data.pagination === null
+          ? null
+          : response.data.pagination.nextId,
+      );
+    } catch (error) {}
+  };
+
+  const loadMoreComments = () => {
+    if (offset === null) return;
+    getComments(post.post_id, authUser.userId, offset, 5);
+  };
+
+  useEffect(() => {
+    if (post.post_id === 2) {
+      console.log(initialComment, initialComment.size);
+    }
+  }, [initialComment, post.post_id]);
+
+  useEffect(() => {
+    if (authUser !== null) getInitialComment(post.post_id, authUser.userId);
+  }, [authUser, post.post_id]);
 
   return (
     <div className="my-5 w-[500px] rounded-lg bg-white shadow-md">
@@ -117,22 +191,26 @@ const Post = ({ authUser, postParam }: PostProps) => {
         userId={authUser.userId}
         postId={post.post_id}
         fullName={fullName}
-        totalReactions={post.reactions.total}
+        totalReactions={post.reactions.total_reactions}
         totalComments={post.total_comments}
         totalShares={post.total_shares}
         handleFocusClick={handleFocusAndScrollClick}
       />
 
       {/* Comment */}
-      {post.total_comments > 0 && (
-        <Comments authUser={authUser} postId={post.post_id} />
-      )}
+      <Comments
+        offset={offset}
+        loadMoreComments={loadMoreComments}
+        initialComment={initialComment}
+        comments={comments}
+      />
 
       {/* Input Comment */}
       <InputComment
         userId={authUser.userId}
         postId={post.post_id}
         ref={inputRef}
+        addNewComment={addNewComment}
       />
     </div>
   );

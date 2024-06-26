@@ -16,14 +16,14 @@ export type PostCreateType = {
 };
 
 type ReactionsType = {
-  like: number;
-  love: number;
-  care: number;
-  haha: number;
-  wow: number;
-  sad: number;
-  angry: number;
-  total: number;
+  total_likes: number;
+  total_loves: number;
+  total_cares: number;
+  total_haha: number;
+  total_wows: number;
+  total_sads: number;
+  total_angries: number;
+  total_reactions: number;
 };
 
 export type PostType = {

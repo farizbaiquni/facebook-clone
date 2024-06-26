@@ -38,13 +38,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
 export async function POST(req: Request, res: NextResponse) {
   const token = cookies().get("facebook-clone");
 
-  const params = await req.json();
-
-  console.log("params : ", params);
-
   if (token === undefined) {
     return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND);
   }
+
+  const params = await req.json();
 
   try {
     const response = await axios.post(
@@ -58,7 +56,6 @@ export async function POST(req: Request, res: NextResponse) {
         withCredentials: true,
       },
     );
-    console.log("SUCCESS ADD POST FROM API SERVER : ", response);
     return NextResponse.json(response.data);
   } catch (error) {
     return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER);

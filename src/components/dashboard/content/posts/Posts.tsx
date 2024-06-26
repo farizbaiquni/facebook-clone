@@ -4,25 +4,32 @@ import Post from "./Post";
 import { PostType } from "@/types/post";
 import { UserContext } from "@/hooks/useContext";
 import { UserType } from "@/types/user";
+import { Pagination } from "@/types/responses";
 
 type PostsProps = {
   userId: number;
 };
 
 const Posts = ({ userId }: PostsProps) => {
+  const limit: number = 5;
   const [authUser, setAuthUser] = useState<UserType>(useContext(UserContext)!);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [posts, setPosts] = useState<PostType[]>([]);
+  const [offset, setoffset] = useState<number | null>(0);
 
   const getPosts = async (userId: number) => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `/api/posts?offset=0&limit=5&userId=${userId}`,
+        `/api/posts?offset=${offset}&limit=${limit}&userId=${userId}`,
       );
+
       const postsData: PostType[] = response.data.data;
+      const paginationData: Pagination | null = response.data.pagination;
+
       setPosts(postsData);
+      setoffset(paginationData?.nextId || null);
       setIsLoading(false);
     } catch (error) {
       setIsError(true);

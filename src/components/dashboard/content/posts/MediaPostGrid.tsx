@@ -29,7 +29,7 @@ const MediaPostGrid = ({ mediaArr }: ImagesGridType) => {
           <div className="relative flex">
             {mediaArr[0].media_type_id === MediaPostEnum.IMAGE
               ? renderImage(mediaArr[0].media_url, "max-h-[600px]")
-              : renderVideo(mediaArr[0].media_url, "max-h-[600px]")}
+              : renderVideo(mediaArr[0].media_url, "max-h-[600px] w-full")}
           </div>
         );
       case 2:

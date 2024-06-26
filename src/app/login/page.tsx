@@ -4,9 +4,10 @@ import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { loginService } from "@/services/login";
-import { authLogin } from "@/utils/authUtils";
-import InvalidCredential from "@/components/InvalidCredential";
+import InvalidCredentialLogin from "@/components/InvalidCredential";
+import axios from "axios";
+import { ErrorStatusEnum } from "@/types/responses";
+import AlertMessageTopRight from "@/components/alerts/AlertMessageTopRight";
 
 export default function Login() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [isInvalidCredential, setIsInvalidCredential] = useState(false);
+  const [isAlertFailedLogin, setIsAlertFailedLogin] = useState(false);
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -22,7 +24,23 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
-      const response = await authLogin(email, password);
+      setIsInvalidCredential(false);
+      const response: any = await axios.post("/api/auth/login", {
+        email: email,
+        password: password,
+      });
+      if (response.data.status === "success") {
+        router.replace("/dashboard");
+      } else {
+        if (response.data.status === ErrorStatusEnum.INVALID_PARAMETER) {
+          setIsInvalidCredential(true);
+        } else {
+          setIsAlertFailedLogin(true);
+          setTimeout(() => {
+            setIsAlertFailedLogin(false);
+          }, 1200);
+        }
+      }
     } catch (error) {
       setIsInvalidCredential(true);
     }
@@ -33,14 +51,14 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen justify-center bg-[#F0F2F5]">
+    <main className="h-screen justify-center bg-[#F0F2F5]">
       <div className="flex h-full flex-col items-center justify-center">
         <Image
           src="/facebook-text.svg"
           height={0}
           width={0}
           alt="facebook-text"
-          className="h-[79px] w-[240px] lg:ml-[-35px]"
+          className="bg-red-700] h-[79px] w-[240px]"
           priority
         />
 
@@ -49,7 +67,7 @@ export default function Login() {
           <div className="flex w-full flex-col items-center px-5 pt-5">
             <p className="pb-5 text-lg">Log in to Facebook</p>
 
-            {isInvalidCredential && <InvalidCredential />}
+            {isInvalidCredential && <InvalidCredentialLogin />}
 
             {/* Input Email*/}
             <input
@@ -107,6 +125,15 @@ export default function Login() {
           </button>
         </div>
       </div>
-    </div>
+      {isAlertFailedLogin && (
+        <AlertMessageTopRight
+          topic="Unable to login"
+          description="Please check your information and try again, if the problem continues please contact support for assistance."
+          widthInPixel={500}
+          bgTextBorderColor="border-red-600 bg-red-100 text-red-600"
+          setIsAlert={setIsAlertFailedLogin}
+        />
+      )}
+    </main>
   );
 }

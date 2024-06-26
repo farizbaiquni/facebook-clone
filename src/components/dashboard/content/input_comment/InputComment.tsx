@@ -30,7 +30,7 @@ import { createThumbnail } from "@/utils/createThumbnailFromVideo";
 import { GifType } from "@/types/gifs";
 import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
 import axios from "axios";
-import { AddCommentType } from "@/types/comments";
+import { AddCommentType, GetCommentType } from "@/types/comments";
 import { UserContext } from "@/hooks/useContext";
 
 const emojis = [
@@ -122,10 +122,11 @@ type InputCommentRef = {
 type InputCommentProps = {
   userId: number;
   postId: number;
+  addNewComment: (comment: GetCommentType) => void;
 };
 
 const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
-  ({ userId, postId }, ref) => {
+  ({ userId, postId, addNewComment }, ref) => {
     const [commentText, setCommentText] = useState<string>("");
     const [gif, setGif] = useState<GifType | null>(null);
     const [imageVideo, setImageVideo] = useState<MediaImageVideoType | null>(
@@ -222,7 +223,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       setImageVideo(newImageVideo);
     };
 
-    const createCommentInDatabase = async (
+    const addCommentInDatabase = async (
       mediaTypeId: number | null,
       mediaUrl: string | null,
     ) => {
@@ -236,6 +237,8 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
           media_url: mediaUrl,
         };
         const response = await axios.post("/api/comments", commentObject);
+        addNewComment(response.data.data);
+        console.log("Add Comment: ", response.data);
       } catch (error) {
       } finally {
         removeMedia();
@@ -249,7 +252,6 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
         imageVideo === null &&
         gif === null
       ) {
-        console.log("return");
         return;
       }
 
@@ -269,7 +271,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
         mediaUrl = gif.media_formats.gif.url;
       }
 
-      createCommentInDatabase(mediaTypeId, mediaUrl);
+      addCommentInDatabase(mediaTypeId, mediaUrl);
     };
 
     useEffect(() => {
