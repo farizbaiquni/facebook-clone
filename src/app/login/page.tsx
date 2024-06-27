@@ -1,12 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ErrorStatusEnum } from "@/types/responses";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import InvalidCredentialLogin from "@/components/InvalidCredential";
-import axios from "axios";
-import { ErrorStatusEnum } from "@/types/responses";
 import AlertMessageTopRight from "@/components/alerts/AlertMessageTopRight";
 
 export default function Login() {
@@ -31,18 +31,16 @@ export default function Login() {
       });
       if (response.data.status === "success") {
         router.replace("/dashboard");
-      } else {
-        if (response.data.status === ErrorStatusEnum.INVALID_PARAMETER) {
-          setIsInvalidCredential(true);
-        } else {
-          setIsAlertFailedLogin(true);
-          setTimeout(() => {
-            setIsAlertFailedLogin(false);
-          }, 1200);
-        }
       }
-    } catch (error) {
-      setIsInvalidCredential(true);
+    } catch (error: AxiosError | any) {
+      if (error.response?.data.status === ErrorStatusEnum.INVALID_PARAMETER) {
+        setIsInvalidCredential(true);
+      } else {
+        setIsAlertFailedLogin(true);
+        setTimeout(() => {
+          setIsAlertFailedLogin(false);
+        }, 1700);
+      }
     }
   };
 

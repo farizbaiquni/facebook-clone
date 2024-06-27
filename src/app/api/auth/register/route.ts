@@ -11,8 +11,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     );
     return NextResponse.json(response.data.data);
   } catch (error: AxiosError | any) {
-    return NextResponse.json(
-      error.response?.data || DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER,
-    );
+    if (error.response?.data.status !== undefined) {
+      return NextResponse.json(error.response?.data, {
+        status: error.response?.status,
+      });
+    }
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER, {
+      status: 500,
+    });
   }
 }

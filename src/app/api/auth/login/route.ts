@@ -11,7 +11,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       "http://localhost:4000/v1/auth/login",
       params,
     );
-    console.log(response.data);
     const ENV = process.env.ENVIRONMENT;
     const serializedCookie = cookie.serialize(
       "auth_token",
@@ -29,8 +28,13 @@ export async function POST(req: NextRequest, res: NextResponse) {
     nextResponse.headers.set("Set-Cookie", serializedCookie);
     return nextResponse;
   } catch (error: AxiosError | any) {
-    return NextResponse.json(
-      error.response?.data || DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER,
-    );
+    if (error.response?.data.status !== undefined) {
+      return NextResponse.json(error.response?.data, {
+        status: error.response?.status,
+      });
+    }
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER, {
+      status: 500,
+    });
   }
 }

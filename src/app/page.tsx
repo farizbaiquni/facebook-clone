@@ -4,12 +4,23 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import SignUpModal from "@/components/homepage/signup/SignUpModal";
 
 import AlertMessageTopRight from "@/components/alerts/AlertMessageTopRight";
 import LoginInputGroup from "./login/_components/LoginInputGroup";
 import { ErrorStatusEnum } from "@/types/responses";
+
+export enum AlertFailedSignupEnum {
+  INVALID_INPUT = "INVALID_INPUT",
+  EMAIL_ALREADY_EXIST = "EMAIL_ALREADY_EXIST",
+  SERVER_ERROR = "SERVER_ERROR",
+}
+
+export type ShowAlertSignupType = {
+  isAlertSuccess: boolean;
+  failedSignupEnum?: AlertFailedSignupEnum;
+};
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -19,7 +30,14 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isAlertFailedLogin, setIsAlertFailedLogin] = useState(false);
-  const [isAlertFailedSignup, setIsAlertFailedSignup] = useState(false);
+  const [isAlertFailedSignupServer, setIsAlertFailedSignupServer] =
+    useState(false);
+  const [isAlertFailedSignupInvalidInput, setIsAlertFailedSignupInvalidInput] =
+    useState(false);
+  const [
+    isAlertFailedSignupEmailAlreadyExist,
+    setIsAlertFailedSignupEmailAlreadyExist,
+  ] = useState(false);
   const [isAlertSucessSignup, setIsAlertSucessSignup] = useState(false);
   const [isInvalidCredential, setIsInvalidCredential] = useState(false);
 
@@ -29,21 +47,34 @@ export default function Home() {
     setPasswordVisible(!passwordVisible);
   };
 
-  const showAlertStatusSignup = (isAlertSuccess: boolean) => {
-    if (isAlertSuccess) {
-      setIsAlertFailedSignup(false);
-      setIsAlertSucessSignup(true);
+  const showAlertStatusSignup = (data: ShowAlertSignupType) => {
+    if (data.isAlertSuccess) {
       setIsAlertSucessSignup(true);
       setTimeout(() => {
         setIsAlertSucessSignup(false);
         router.replace("/login");
-      }, 1500);
+      }, 2000);
     } else {
-      setIsAlertSucessSignup(false);
-      setIsAlertFailedSignup(true);
-      setTimeout(() => {
-        setIsAlertFailedSignup(false);
-      }, 1200);
+      switch (data.failedSignupEnum) {
+        case AlertFailedSignupEnum.INVALID_INPUT:
+          setIsAlertFailedSignupInvalidInput(true);
+          setTimeout(() => {
+            setIsAlertFailedSignupInvalidInput(false);
+          }, 2000);
+          break;
+        case AlertFailedSignupEnum.EMAIL_ALREADY_EXIST:
+          setIsAlertFailedSignupEmailAlreadyExist(true);
+          setTimeout(() => {
+            setIsAlertFailedSignupEmailAlreadyExist(false);
+          }, 2000);
+          break;
+        case AlertFailedSignupEnum.SERVER_ERROR:
+          setIsAlertFailedSignupServer(true);
+          setTimeout(() => {
+            setIsAlertFailedSignupServer(false);
+          }, 2000);
+          break;
+      }
     }
   };
 
@@ -51,7 +82,7 @@ export default function Home() {
     try {
       setIsAlertFailedLogin(false);
       setIsAlertSucessSignup(false);
-      setIsAlertFailedSignup(false);
+      setIsAlertFailedSignupInvalidInput(false);
       setIsInvalidCredential(false);
       const response: any = await axios.post("/api/auth/login", {
         email: email,
@@ -59,18 +90,16 @@ export default function Home() {
       });
       if (response.data.status === "success") {
         router.replace("/dashboard");
-      } else {
-        if (response.data.status === ErrorStatusEnum.INVALID_PARAMETER) {
-          setIsInvalidCredential(true);
-        } else {
-          setIsAlertFailedLogin(true);
-          setTimeout(() => {
-            setIsAlertFailedLogin(false);
-          }, 1200);
-        }
       }
-    } catch (error) {
-      setIsInvalidCredential(true);
+    } catch (error: AxiosError | any) {
+      if (error.response?.data.status === ErrorStatusEnum.INVALID_PARAMETER) {
+        setIsInvalidCredential(true);
+      } else {
+        setIsAlertFailedLogin(true);
+        setTimeout(() => {
+          setIsAlertFailedLogin(false);
+        }, 1700);
+      }
     }
   };
 
@@ -128,6 +157,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Alert failed login because of invalid credential */}
       {isAlertFailedLogin && (
         <AlertMessageTopRight
           topic="Unable to login"
@@ -138,16 +168,40 @@ export default function Home() {
         />
       )}
 
-      {isAlertFailedSignup && (
+      {/* Alert failed signup because of invalid input */}
+      {isAlertFailedSignupInvalidInput && (
         <AlertMessageTopRight
           topic="Unable to create an account"
-          description="Please check your information and try again, if the problem continues please contact support for assistance."
+          description="We were unable to create an account because of incorrect input. Please review your entries and try again."
           widthInPixel={500}
           bgTextBorderColor="border-red-600 bg-red-100 text-red-600"
-          setIsAlert={setIsAlertFailedSignup}
+          setIsAlert={setIsAlertFailedSignupInvalidInput}
         />
       )}
 
+      {/* Alert failed signup because of email already exist */}
+      {isAlertFailedSignupEmailAlreadyExist && (
+        <AlertMessageTopRight
+          topic="Unable to create an account"
+          description="The email you entered is already registered. Please try again with a different email."
+          widthInPixel={500}
+          bgTextBorderColor="border-red-600 bg-red-100 text-red-600"
+          setIsAlert={setIsAlertFailedSignupEmailAlreadyExist}
+        />
+      )}
+
+      {/* Alert failed signup because of server error */}
+      {isAlertFailedSignupServer && (
+        <AlertMessageTopRight
+          topic="Unable to create an account"
+          description="An unexpected server error has occurred, causing signup to fail. Please try again later. If the issue persists, contact support."
+          widthInPixel={500}
+          bgTextBorderColor="border-red-600 bg-red-100 text-red-600"
+          setIsAlert={setIsAlertFailedSignupServer}
+        />
+      )}
+
+      {/* Alert success signup */}
       {isAlertSucessSignup && (
         <AlertMessageTopRight
           topic="You have been successfully registered"

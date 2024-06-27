@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
 import RadioGroup from "./RadioGroup";
@@ -18,6 +18,8 @@ import {
 import ExclamationCircleIcon from "../icons/ExclamationCircleIcon";
 import { validateEmailFormat } from "@/utils/validations";
 import Image from "next/image";
+import { ErrorStatusEnum } from "@/types/responses";
+import { AlertFailedSignupEnum, ShowAlertSignupType } from "@/app/page";
 
 type ErrorValidationType = {
   field: string;
@@ -27,7 +29,7 @@ type ErrorValidationType = {
 type SignUpModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  showAlertStatusSignup: (param: boolean) => void;
+  showAlertStatusSignup: (data: ShowAlertSignupType) => void;
 };
 
 const SignUpModal = ({
@@ -39,6 +41,7 @@ const SignUpModal = ({
   const currentMonth = new Date().toLocaleString("default", { month: "long" });
   const currentDay = new Date().getDate().toString();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [surname, setSurname] = useState("");
   const [email, setEmail] = useState("");
@@ -59,8 +62,6 @@ const SignUpModal = ({
   const [incorrectEmail, setIncorrectEmail] = useState(false);
   const [incorrectPassword, setIncorrectPassword] = useState(false);
   const [incorrectGender, setIncorrectGender] = useState(false);
-
-  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -87,13 +88,40 @@ const SignUpModal = ({
       const response = await axios.post("/api/auth/register", userData);
       setIsLoading(false);
       if (response.data.status === "success") {
-        showAlertStatusSignup(true);
+        const data: ShowAlertSignupType = {
+          isAlertSuccess: true,
+        };
+        showAlertStatusSignup(data);
         onClose();
-      } else {
-        showAlertStatusSignup(false);
+        setIsLoading(false);
       }
-    } catch (error) {
-      onClose();
+    } catch (error: AxiosError | any) {
+      if (
+        error.response?.data.status === undefined ||
+        error.response?.data.status === ErrorStatusEnum.INTERNAL_SERVER_ERROR
+      ) {
+        const data: ShowAlertSignupType = {
+          isAlertSuccess: false,
+          failedSignupEnum: AlertFailedSignupEnum.SERVER_ERROR,
+        };
+        showAlertStatusSignup(data);
+      } else if (
+        error.response?.data.status === ErrorStatusEnum.INVALID_PARAMETER
+      ) {
+        const data: ShowAlertSignupType = {
+          isAlertSuccess: false,
+          failedSignupEnum: AlertFailedSignupEnum.INVALID_INPUT,
+        };
+        showAlertStatusSignup(data);
+      } else if (
+        error.response?.data.status === ErrorStatusEnum.CONFLICT_DUPLICATE_ENTRY
+      ) {
+        const data: ShowAlertSignupType = {
+          isAlertSuccess: false,
+          failedSignupEnum: AlertFailedSignupEnum.EMAIL_ALREADY_EXIST,
+        };
+        showAlertStatusSignup(data);
+      }
       setIsLoading(false);
     }
   };
@@ -270,17 +298,21 @@ const SignUpModal = ({
   return (
     <div className="fixed inset-0 z-40 flex min-w-max items-center justify-center bg-black bg-opacity-50">
       <div className="relative w-full max-w-md rounded-lg bg-white px-5 py-6">
-        <div className="mb-1 flex items-center justify-between">
-          <h2 className="text-3xl font-bold text-gray-800">Sign Up</h2>
-          <button onClick={onClose} className="text-4xl text-gray-500">
-            &times;
-          </button>
-        </div>
+        {/* Header modal */}
+        <span>
+          <div className="mb-1 flex items-center justify-between">
+            <h2 className="text-3xl font-bold text-gray-800">Sign Up</h2>
+            <button onClick={onClose} className="text-4xl text-gray-500">
+              &times;
+            </button>
+          </div>
 
-        <p className="mb-4 text-gray-500">Its quick and easy.</p>
+          <p className="mb-4 text-gray-500">Its quick and easy.</p>
+        </span>
 
         <hr className="my-3" />
 
+        {/* Form register new account */}
         <form>
           <div className="flex space-x-3">
             {/* First name */}
