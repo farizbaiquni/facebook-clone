@@ -14,7 +14,7 @@ type FooterPostProps = {
   isPostFromAuthUser: boolean;
   userId: number;
   postId: number;
-  fullName: string;
+  authFullName: string;
   totalReactions: number;
   totalComments: number;
   totalShares: number;
@@ -25,7 +25,7 @@ const FooterPost = ({
   isPostFromAuthUser,
   userId,
   postId,
-  fullName,
+  authFullName,
   totalReactions,
   totalComments,
   totalShares,
@@ -39,6 +39,9 @@ const FooterPost = ({
   >(new Map());
   const [currentTotalReactions, setCurrentTotalReactions] =
     useState(totalReactions);
+  const [currentTotalComments, setCurrentTotalComments] =
+    useState(totalComments);
+  const [currentTotalShares, setCurrentTotalShares] = useState(totalShares);
 
   const handleMinusOneTop3ReactionsByReactionId = (id: ReactionsEnum) => {
     if (top3Reactions.has(id)) {
@@ -181,11 +184,11 @@ const FooterPost = ({
   return (
     <div className="flex flex-col px-4">
       <ReactionsPost
-        totalReactions={totalReactions}
-        totalComments={totalComments}
-        totalShares={totalShares}
+        totalReactions={currentTotalReactions}
+        totalComments={currentTotalComments}
+        totalShares={currentTotalShares}
         reactionId={reactionId}
-        fullName={fullName}
+        authFullName={authFullName}
         top3Reactions={top3Reactions}
         currentTotalReactions={currentTotalReactions}
       />

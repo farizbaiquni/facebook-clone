@@ -12,7 +12,7 @@ type ReactionsPostProps = {
   totalComments: number;
   totalShares: number;
   reactionId: ReactionsEnum | null;
-  fullName: string;
+  authFullName: string;
   top3Reactions: Map<ReactionsEnum, Top3ReactionsType>;
   currentTotalReactions: number;
 };
@@ -22,7 +22,7 @@ const ReactionsPost = ({
   totalComments,
   totalShares,
   reactionId,
-  fullName,
+  authFullName,
   top3Reactions,
   currentTotalReactions,
 }: ReactionsPostProps) => {
@@ -30,8 +30,8 @@ const ReactionsPost = ({
     const convertedReactions = convertTotalReactionsToWord(
       currentTotalReactions,
     );
-    if (currentTotalReactions === 0 && reactionId !== null) return fullName;
-    if (currentTotalReactions === 1 && reactionId !== null) return fullName;
+    if (currentTotalReactions === 0 && reactionId !== null) return authFullName;
+    if (currentTotalReactions === 1 && reactionId !== null) return authFullName;
     if (currentTotalReactions === 1 && reactionId === null) return "1";
     if (currentTotalReactions === 2 && reactionId !== null)
       return "You and 1 other";

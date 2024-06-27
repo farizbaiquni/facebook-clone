@@ -34,7 +34,8 @@ const Post = ({ authUser, postParam }: PostProps) => {
     "/images/posts/post (6).jpg",
   ]);
   const relativeTime = formatRelativeTime(postParam.created_at);
-  const fullName = `${postParam.first_name} ${postParam.last_name}`;
+  const postFullName = `${postParam.first_name} ${postParam.last_name}`;
+  const authFullName = `${authUser.firstName} ${authUser.lastName}`;
   const inputRef = useRef<{ focus: () => void; scrollIntoView: () => void }>(
     null,
   );
@@ -129,7 +130,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
           className="h-9 w-9 cursor-pointer rounded-full border border-gray-200 object-cover"
         />
         <div className="ml-3 flex flex-1 flex-col">
-          <p className="text-[15px] font-[600] text-gray-700">{fullName}</p>
+          <p className="text-[15px] font-[600] text-gray-700">{postFullName}</p>
           <div className="flex items-center text-[13px] text-sm text-gray-500">
             <p>{relativeTime}</p>
             <UsersIcon className="ml-1 h-4 w-4" />
@@ -184,7 +185,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
         isPostFromAuthUser={authUser.userId === post.user_id}
         userId={authUser.userId}
         postId={post.post_id}
-        fullName={fullName}
+        authFullName={authFullName}
         totalReactions={post.reactions.total_reactions}
         totalComments={post.total_comments}
         totalShares={post.total_shares}
