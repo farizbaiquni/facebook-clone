@@ -23,6 +23,7 @@ export type ShowAlertSignupType = {
 };
 
 export default function Home() {
+  const alertDuration = 3000;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -53,26 +54,26 @@ export default function Home() {
       setTimeout(() => {
         setIsAlertSucessSignup(false);
         router.replace("/login");
-      }, 2000);
+      }, alertDuration);
     } else {
       switch (data.failedSignupEnum) {
         case AlertFailedSignupEnum.INVALID_INPUT:
           setIsAlertFailedSignupInvalidInput(true);
           setTimeout(() => {
             setIsAlertFailedSignupInvalidInput(false);
-          }, 2000);
+          }, alertDuration);
           break;
         case AlertFailedSignupEnum.EMAIL_ALREADY_EXIST:
           setIsAlertFailedSignupEmailAlreadyExist(true);
           setTimeout(() => {
             setIsAlertFailedSignupEmailAlreadyExist(false);
-          }, 2000);
+          }, alertDuration);
           break;
         case AlertFailedSignupEnum.SERVER_ERROR:
           setIsAlertFailedSignupServer(true);
           setTimeout(() => {
             setIsAlertFailedSignupServer(false);
-          }, 2000);
+          }, alertDuration);
           break;
       }
     }

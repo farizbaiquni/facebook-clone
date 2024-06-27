@@ -9,7 +9,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       "http://localhost:4000/v1/auth/register",
       params,
     );
-    return NextResponse.json(response.data.data);
+    return NextResponse.json(response.data);
   } catch (error: AxiosError | any) {
     if (error.response?.data.status !== undefined) {
       return NextResponse.json(error.response?.data, {

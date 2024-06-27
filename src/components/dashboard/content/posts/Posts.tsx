@@ -36,7 +36,6 @@ const Posts = ({ userId }: PostsProps) => {
       setoffset(paginationData?.nextId || null);
       setIsLoading(false);
     } catch (error: AxiosError | any) {
-      console.log(error.response?.data);
       setIsError(true);
     } finally {
       setIsLoading(false);

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import InputField from "./InputField";
@@ -247,7 +247,7 @@ const SignUpModal = ({
     const userCreateData: UserCreateType = {
       first_name: transformNameInput(firstName),
       last_name: transformNameInput(surname),
-      email: "aaaaa",
+      email: email,
       password: password,
       profile_picture: null,
       cover_photo: null,
