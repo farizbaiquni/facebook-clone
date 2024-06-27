@@ -1,5 +1,5 @@
-import { memo, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import { memo, useCallback, useContext, useEffect, useState } from "react";
+import axios, { AxiosError } from "axios";
 import Post from "./Post";
 import { PostType } from "@/types/post";
 import { UserContext } from "@/hooks/useContext";
@@ -18,31 +18,32 @@ const Posts = ({ userId }: PostsProps) => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [offset, setoffset] = useState<number | null>(0);
 
-  const getPostsCallApi = async (userId: number) => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `/api/posts?offset=${offset}&limit=${limit}&userId=${userId}`,
-      );
+  const getPostsCallApi = useCallback(
+    async (userId: number) => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(
+          `/api/posts?offset=${offset}&limit=${limit}&userId=${userId}`,
+        );
 
-      console.log(response);
+        const postsData: PostType[] = response.data.data;
+        const paginationData: Pagination | null = response.data.pagination;
 
-      const postsData: PostType[] = response.data.data;
-      const paginationData: Pagination | null = response.data.pagination;
-
-      // setPosts(postsData);
-      setoffset(paginationData?.nextId || null);
-      setIsLoading(false);
-    } catch (error) {
-      setIsError(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        setPosts(postsData);
+        setoffset(paginationData?.nextId || null);
+        setIsLoading(false);
+      } catch (error: AxiosError | any) {
+        setIsError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [offset, limit],
+  );
 
   useEffect(() => {
     getPostsCallApi(userId);
-  }, [userId]);
+  }, [getPostsCallApi, userId]);
 
   return (
     <div>
