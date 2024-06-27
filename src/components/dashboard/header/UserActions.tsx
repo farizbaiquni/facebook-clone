@@ -5,7 +5,7 @@ import {
   Squares2X2Icon,
 } from "@heroicons/react/24/solid";
 import Image from "next/image";
-import { UserType } from "@/types/user";
+import { UserType } from "@/types/users";
 
 type UserActionsProps = {
   user: UserType | null;

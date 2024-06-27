@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import SearchBar from "./SearchBar";
+import { UserType } from "@/types/users";
 import NavigationIcons, { IconType } from "./NavigationIcons";
+import SearchBar from "./SearchBar";
 import UserActions from "./UserActions";
 import ProfileMenuOption from "./ProfileMenuOption";
-import { UserType } from "@/types/user";
 
 interface HeaderProps {
   isFocused: boolean;

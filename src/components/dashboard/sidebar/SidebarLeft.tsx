@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Fragment, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/solid";
 import "../../../app/./scrollbar.css";
-import { UserType } from "@/types/user";
+import { UserType } from "@/types/users";
 
 type SidebarLeftProps = {
   user: UserType;

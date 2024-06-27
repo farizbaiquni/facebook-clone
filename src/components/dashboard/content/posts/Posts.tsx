@@ -3,7 +3,7 @@ import axios from "axios";
 import Post from "./Post";
 import { PostType } from "@/types/post";
 import { UserContext } from "@/hooks/useContext";
-import { UserType } from "@/types/user";
+import { UserType } from "@/types/users";
 import { Pagination } from "@/types/responses";
 
 type PostsProps = {
@@ -18,17 +18,19 @@ const Posts = ({ userId }: PostsProps) => {
   const [posts, setPosts] = useState<PostType[]>([]);
   const [offset, setoffset] = useState<number | null>(0);
 
-  const getPosts = async (userId: number) => {
+  const getPostsCallApi = async (userId: number) => {
     try {
       setIsLoading(true);
       const response = await axios.get(
         `/api/posts?offset=${offset}&limit=${limit}&userId=${userId}`,
       );
 
+      console.log(response);
+
       const postsData: PostType[] = response.data.data;
       const paginationData: Pagination | null = response.data.pagination;
 
-      setPosts(postsData);
+      // setPosts(postsData);
       setoffset(paginationData?.nextId || null);
       setIsLoading(false);
     } catch (error) {
@@ -39,7 +41,7 @@ const Posts = ({ userId }: PostsProps) => {
   };
 
   useEffect(() => {
-    getPosts(userId);
+    getPostsCallApi(userId);
   }, [userId]);
 
   return (

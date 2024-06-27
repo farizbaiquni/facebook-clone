@@ -8,7 +8,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { PostType } from "@/types/post";
-import { UserType } from "@/types/user";
+import { UserType } from "@/types/users";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { useLineClamp } from "@/utils/useLineClamp";
 import MediaPostGrid from "./MediaPostGrid";

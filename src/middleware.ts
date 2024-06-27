@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import axios from "axios";
+import { cookieName } from "./app/configs/cookies";
 
 export async function middleware(req: NextRequest) {
-  const COOKIE_NAME = "auth_tokenn";
-  const token = req.cookies.get(COOKIE_NAME)?.value;
+  const token = req.cookies.get(cookieName)?.value;
 
   if (req.nextUrl.pathname.startsWith("/dashboard")) {
     if (!token) {
@@ -13,7 +13,7 @@ export async function middleware(req: NextRequest) {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/verifyTokenJWT",
+        "http://localhost:4000/v1/verifyTokenJWT",
         { token: token },
       );
       if (response.status !== 200) {

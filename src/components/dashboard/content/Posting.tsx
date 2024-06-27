@@ -3,7 +3,7 @@
 import React, { Fragment, useState } from "react";
 import Image from "next/image";
 import PostingModal from "./posting_modal/PostingModal";
-import { UserType } from "@/types/user";
+import { UserType } from "@/types/users";
 import { PostType } from "@/types/post";
 
 type PostingProps = {

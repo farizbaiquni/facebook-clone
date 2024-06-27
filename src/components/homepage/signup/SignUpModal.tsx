@@ -4,7 +4,11 @@ import axios from "axios";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
 import RadioGroup from "./RadioGroup";
-import { GenderNumberEnum, GenderTextEnum, UserCreateType } from "@/types/user";
+import {
+  GenderNumberEnum,
+  GenderTextEnum,
+  UserCreateType,
+} from "@/types/users";
 import {
   getDaysInMonth,
   generateYearOptions,

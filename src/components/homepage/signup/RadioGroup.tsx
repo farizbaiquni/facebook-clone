@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { GenderNumberEnum, GenderTextEnum } from "@/types/user";
+import { GenderNumberEnum, GenderTextEnum } from "@/types/users";
 
 type Option = {
   value: GenderTextEnum;

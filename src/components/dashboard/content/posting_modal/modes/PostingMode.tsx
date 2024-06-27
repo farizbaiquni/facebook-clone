@@ -12,7 +12,7 @@ import { FeelingType } from "@/types/feelings";
 import { SubActivityType } from "@/types/activities";
 import { LocationType } from "@/types/locations";
 import { GifType } from "@/types/gifs";
-import { UserType } from "@/types/user";
+import { UserType } from "@/types/users";
 import axios from "axios";
 import { PostCreateType, PostType } from "@/types/post";
 import {

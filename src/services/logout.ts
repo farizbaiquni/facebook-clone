@@ -1,7 +1,7 @@
 "use server";
 
-import { cookieName } from "@/configs/config";
 import { cookies } from "next/headers";
+import { cookieName } from "@/app/configs/cookies";
 
 export const logoutService = async () => {
   cookies().delete(cookieName);

@@ -7,7 +7,7 @@ import {
   ChevronRightIcon,
   PlusIcon,
 } from "@heroicons/react/24/solid";
-import { UserType } from "@/types/user";
+import { UserType } from "@/types/users";
 
 type StoryProps = {
   user: UserType;

@@ -16,7 +16,7 @@ import { SubActivityType } from "@/types/activities";
 import { LocationType } from "@/types/locations";
 import { ModeTypes } from "@/types/modes";
 import { GifType } from "@/types/gifs";
-import { UserType } from "@/types/user";
+import { UserType } from "@/types/users";
 import { PostType } from "@/types/post";
 
 type PostingModalProps = {
