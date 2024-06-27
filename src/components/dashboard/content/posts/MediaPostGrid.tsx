@@ -17,7 +17,7 @@ const MediaPostGrid = ({ mediaArr }: ImagesGridType) => {
     />
   );
   const renderVideo = (src: string, height: string) => (
-    <video className={`object-cover ${height}`} controls>
+    <video className={`w-full object-cover ${height}`} controls>
       <source src={src} type="video/mp4" />
     </video>
   );
@@ -29,7 +29,7 @@ const MediaPostGrid = ({ mediaArr }: ImagesGridType) => {
           <div className="relative flex">
             {mediaArr[0].media_type_id === MediaPostEnum.IMAGE
               ? renderImage(mediaArr[0].media_url, "max-h-[600px]")
-              : renderVideo(mediaArr[0].media_url, "max-h-[600px] w-full")}
+              : renderVideo(mediaArr[0].media_url, "max-h-[600px]")}
           </div>
         );
       case 2:

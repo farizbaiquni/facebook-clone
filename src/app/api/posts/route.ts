@@ -46,10 +46,12 @@ export async function GET(req: NextRequest, res: NextResponse) {
 }
 
 export async function POST(req: Request, res: NextResponse) {
-  const token = cookies().get("facebook-clone");
+  const token = cookies().get(cookieName);
 
   if (token === undefined) {
-    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND);
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND, {
+      status: 400,
+    });
   }
 
   const params = await req.json();
@@ -67,7 +69,15 @@ export async function POST(req: Request, res: NextResponse) {
       },
     );
     return NextResponse.json(response.data);
-  } catch (error) {
-    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER);
+  } catch (error: AxiosError | any) {
+    console.log("ERROR");
+    if (error.response?.data.status !== undefined) {
+      return NextResponse.json(error.response?.data, {
+        status: error.response?.status,
+      });
+    }
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER, {
+      status: 500,
+    });
   }
 }

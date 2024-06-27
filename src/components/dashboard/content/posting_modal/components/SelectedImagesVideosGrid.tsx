@@ -4,19 +4,19 @@ import Image from "next/image";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { MediaImageVideoEnum, MediaImageVideoType } from "@/types/mediaPost";
 
-type UploadImageGridType = {
+type SelectedImagesVideosGridType = {
   imagesVideos: MediaImageVideoType[];
   clearImages: () => void;
   handleModeType: (value: ModeTypes) => void;
   handleFilesUpload: (files: FileList) => void;
 };
 
-const UploadImageGrid = ({
+const SelectedImagesVideosGrid = ({
   imagesVideos,
   clearImages,
   handleModeType,
   handleFilesUpload,
-}: UploadImageGridType) => {
+}: SelectedImagesVideosGridType) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClickInputUploadImages = () => {
@@ -64,7 +64,7 @@ const UploadImageGrid = ({
         </button>
         <input
           type="file"
-          accept="image/*"
+          accept="image/*,video/*"
           multiple
           ref={fileInputRef}
           onChange={handleFileChange}
@@ -246,4 +246,4 @@ const UploadImageGrid = ({
   return renderImageGrid();
 };
 
-export default UploadImageGrid;
+export default SelectedImagesVideosGrid;

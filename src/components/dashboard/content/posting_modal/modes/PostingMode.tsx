@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import IconButton from "../components/IconButton";
 import { ModeTypes } from "@/types/modes";
-import UploadImageGrid from "../components/UploadImageGrid";
+import SelectedImagesVideosGrid from "../components/SelectedImagesVideosGrid";
 import AudienceLabel from "../components/AudienceLabel";
 import { AudienceOptions } from "@/types/audiences";
 import { XMarkIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
@@ -13,7 +13,7 @@ import { SubActivityType } from "@/types/activities";
 import { LocationType } from "@/types/locations";
 import { GifType } from "@/types/gifs";
 import { UserType } from "@/types/users";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { PostCreateType, PostType } from "@/types/post";
 import {
   MediaImageVideoEnum,
@@ -23,7 +23,7 @@ import {
   UploadedImageVideoUrlType,
 } from "@/types/mediaPost";
 import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
-import { SuccessResponseType } from "@/types/responses";
+import AlertMessageTopRight from "@/components/alerts/AlertMessageTopRight";
 
 const DynamicMapComponent = dynamic(
   () => import("../components/MapComponent"),
@@ -88,6 +88,7 @@ const PostingMode = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoadingPosting, setIsLoadingPosting] = useState(false);
   const fullName = `${user.firstName} ${user.lastName}`;
+  const [isAlertFailedAddPost, setIsAlertFailedAddPost] = useState(false);
 
   const checkSelectedFeelingActivityType = (
     selectedFeelingActivity: FeelingType | SubActivityType | null,
@@ -152,7 +153,23 @@ const PostingMode = ({
     return mediaPost;
   };
 
-  const handleClickPost = async () => {
+  const addPostCallApi = async (postData: PostCreateType) => {
+    try {
+      const response = await axios.post("/api/posts", postData);
+      const newAuthUserPost: PostType = response.data.data;
+      addNewAuthUserPosts(newAuthUserPost);
+      handleClearAllInput();
+    } catch (error: AxiosError | any) {
+      setIsAlertFailedAddPost(true);
+      setTimeout(() => {
+        setIsAlertFailedAddPost(false);
+      }, 3000);
+    } finally {
+      setIsLoadingPosting(false);
+    }
+  };
+
+  const handleClickPostButton = async () => {
     if (
       contentText.length <= 0 &&
       imagesVideos.length <= 0 &&
@@ -176,43 +193,36 @@ const PostingMode = ({
     const activity = feelingAndActivity[1];
     const mediaPost = handleMediaPost(uploadedImageVideoUrls);
 
-    try {
-      const postData: PostCreateType = {
-        user_id: String(user.userId),
-        content: contentText,
-        emoji: feeling,
-        activity_icon_url: activity,
-        gif_url: selectedGif?.url === undefined ? null : selectedGif.url,
-        latitude:
-          selectedLocation?.lat === undefined ? null : selectedLocation.lat,
-        longitude:
-          selectedLocation?.lon === undefined ? null : selectedLocation.lon,
-        location_name:
-          selectedLocation?.display_name === undefined
-            ? null
-            : selectedLocation.display_name,
-        audience_type_id: audienceType,
-        media: mediaPost,
-        audience_include: selectedAudienceInclude,
-        audience_exclude: selectedAudienceExclude,
-      };
+    const postData: PostCreateType = {
+      user_id: String(user.userId),
+      content: contentText,
+      emoji: feeling,
+      activity_icon_url: activity,
+      gif_url: selectedGif?.url === undefined ? null : selectedGif.url,
+      latitude:
+        selectedLocation?.lat === undefined ? null : selectedLocation.lat,
+      longitude:
+        selectedLocation?.lon === undefined ? null : selectedLocation.lon,
+      location_name:
+        selectedLocation?.display_name === undefined
+          ? null
+          : selectedLocation.display_name,
+      audience_type_id: audienceType,
+      media: mediaPost,
+      audience_include: selectedAudienceInclude,
+      audience_exclude: selectedAudienceExclude,
+    };
 
-      const response = await axios.post("/api/posts", postData);
-      const newAuthUserPost: PostType = response.data.data;
-      addNewAuthUserPosts(newAuthUserPost);
-    } catch (error) {
-    } finally {
-      setIsLoadingPosting(false);
-      handleClearAllInput();
-    }
+    addPostCallApi(postData);
   };
 
   return (
     <div
       className={`relative flex h-auto w-[500px] flex-col rounded-lg bg-white p-4`}
     >
+      {/* Loading progress posting */}
       {isLoadingPosting && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-gray-300 bg-opacity-70">
+        <div className="absolute inset-0 z-30 flex items-center justify-center rounded-lg bg-gray-300 bg-opacity-70">
           <span className="flex flex-col">
             <Image
               alt="loading-posting"
@@ -323,6 +333,7 @@ const PostingMode = ({
 
       {/* Content */}
       <div className="custom-scrollbar flex max-h-[350px] w-full flex-col overflow-y-auto">
+        {/* Input content text */}
         <div className="h-full w-full">
           <textarea
             className={`h-full w-full rounded-lg p-3 ${isUploadModeActive || selectedLocation !== null || selectedGif !== null ? "text-md" : "text-2xl"} outline-none`}
@@ -342,7 +353,7 @@ const PostingMode = ({
         {isUploadModeActive && (
           <div className="my-2 items-center justify-center border-2 border-gray-200 p-2">
             {imagesVideos.length > 0 ? (
-              <UploadImageGrid
+              <SelectedImagesVideosGrid
                 imagesVideos={imagesVideos}
                 clearImages={() => setImagesVideos([])}
                 handleModeType={handleModeType}
@@ -375,6 +386,7 @@ const PostingMode = ({
                       id="file-upload"
                       name="file-upload"
                       type="file"
+                      accept="image/*,video/*"
                       ref={fileInputRef}
                       className="hidden"
                       multiple
@@ -499,12 +511,23 @@ const PostingMode = ({
           </div>
         </div>
         <button
-          onClick={handleClickPost}
+          onClick={handleClickPostButton}
           className={`mt-2 rounded bg-[#0861F2] px-4 py-2 text-sm font-semibold text-white ${contentText.length <= 0 && imagesVideos.length <= 0 && selectedGif === null && "bg-[#E4E6EB] text-[#BDC1C5]"}`}
         >
           Post
         </button>
       </div>
+
+      {/* Alert failed add post */}
+      {isAlertFailedAddPost && (
+        <AlertMessageTopRight
+          topic="Failed to create post"
+          description="We encountered an unexpected issue while processing your post. Please try again later or contact support."
+          widthInPixel={500}
+          bgTextBorderColor="border-red-600 bg-red-100 text-red-600"
+          setIsAlert={setIsAlertFailedAddPost}
+        />
+      )}
     </div>
   );
 };

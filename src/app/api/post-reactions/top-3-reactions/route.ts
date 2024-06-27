@@ -1,16 +1,23 @@
-import axios from "axios";
+import { cookieName } from "@/app/configs/cookies";
+import {
+  DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND,
+  DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER,
+} from "@/types/responses";
+import axios, { AxiosError } from "axios";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: NextResponse) {
-  const token = cookies().get("facebook-clone");
+  const token = cookies().get(cookieName);
 
   const searchParams = req.nextUrl.searchParams;
   const userId = searchParams.get("userId");
   const postId = searchParams.get("postId");
 
   if (token === undefined) {
-    return NextResponse.json({ error: 400, message: "Cookie not found" });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND, {
+      status: 400,
+    });
   }
 
   try {
@@ -25,11 +32,14 @@ export async function GET(req: NextRequest, res: NextResponse) {
       },
     );
     return NextResponse.json(response.data);
-  } catch (error) {
-    return NextResponse.json({
-      error: 500,
-      message: "Internal server error",
-      detail: error,
+  } catch (error: AxiosError | any) {
+    if (error.response?.data.status !== undefined) {
+      return NextResponse.json(error.response?.data, {
+        status: error.response?.status,
+      });
+    }
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER, {
+      status: 500,
     });
   }
 }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 import {
   PostReactionsType,
@@ -67,13 +67,13 @@ const FooterPost = ({
 
   const handleReactionToggle = async () => {
     if (reactionId !== null) {
-      if (await deletePostReaction()) {
+      if (await deletePostReactionCallApi()) {
         handleMinusOneTop3ReactionsByReactionId(reactionId);
         setReactionId(null);
         setCurrentTotalReactions((prevTotal) => prevTotal - 1);
       }
     } else {
-      if (await addPostReaction(ReactionsEnum.LIKE)) {
+      if (await addPostReactionCallAPI(ReactionsEnum.LIKE)) {
         handleAddOneTop3ReactionsByReactionId(ReactionsEnum.LIKE);
         setReactionId(ReactionsEnum.LIKE);
         setCurrentTotalReactions((prevTotal) => prevTotal + 1);
@@ -82,7 +82,7 @@ const FooterPost = ({
   };
 
   const handleOnClickReactionOption = async (id: ReactionsEnum) => {
-    if (await addPostReaction(id)) {
+    if (await addPostReactionCallAPI(id)) {
       if (reactionId !== null) {
         handleMinusOneTop3ReactionsByReactionId(reactionId);
         setCurrentTotalReactions((prevTotal) => prevTotal);
@@ -94,24 +94,24 @@ const FooterPost = ({
     }
   };
 
-  const getTop3PostReactions = useCallback(async () => {
+  const getTop3PostReactionsCallAPI = useCallback(async () => {
     try {
-      const res = await axios.get(
+      const response = await axios.get(
         `/api/post-reactions/top-3-reactions?postId=${postId}`,
       );
-      const reactions: Top3ReactionsType[] = res.data.data;
+      const reactions: Top3ReactionsType[] = response.data.data;
       const reactionsMap: Map<ReactionsEnum, Top3ReactionsType> = new Map();
       reactions.map((data) => {
         reactionsMap.set(data.reaction_id, data);
       });
       setTop3Reactions(reactionsMap);
-    } catch (error) {
-      console.error("Error get top 3 reactions by post Id: ", error);
+    } catch (error: AxiosError | any) {
+      console.error("Error get top 3 reactions: ", error.response?.data);
       setIsError(true);
     }
   }, [postId]);
 
-  const getPostReaction = useCallback(async () => {
+  const getPostReactionCallAPI = useCallback(async () => {
     try {
       const response = await axios.get(
         `/api/post-reactions?userId=${userId}&postId=${postId}`,
@@ -121,13 +121,15 @@ const FooterPost = ({
       setReactionId(
         successResponse.data !== null ? successResponse.data.reaction_id : null,
       );
-    } catch (error) {
-      console.error("Error get post reactions by user Id: ", error);
+    } catch (error: AxiosError | any) {
+      console.error("Error get post reactions: ", error.response?.data);
       setIsError(true);
     }
   }, [postId, userId]);
 
-  const addPostReaction = async (id: ReactionsEnum): Promise<boolean> => {
+  const addPostReactionCallAPI = async (
+    id: ReactionsEnum,
+  ): Promise<boolean> => {
     try {
       await axios.post("/api/post-reactions", {
         user_id: userId,
@@ -135,13 +137,13 @@ const FooterPost = ({
         reaction_id: id,
       });
       return true;
-    } catch (error) {
-      console.error("Error: ", error);
+    } catch (error: AxiosError | any) {
+      console.error("Error add post reaction: ", error.response?.data);
       return false;
     }
   };
 
-  const deletePostReaction = async (): Promise<boolean> => {
+  const deletePostReactionCallApi = async (): Promise<boolean> => {
     try {
       await axios.delete("/api/post-reactions", {
         data: {
@@ -150,19 +152,19 @@ const FooterPost = ({
         },
       });
       return true;
-    } catch (error) {
-      console.error("Error: ", error);
+    } catch (error: AxiosError | any) {
+      console.error("Error delete post reaction: ", error.response?.data);
       return false;
     }
   };
 
   useEffect(() => {
-    getTop3PostReactions();
-  }, [getTop3PostReactions]);
+    getTop3PostReactionsCallAPI();
+  }, [getTop3PostReactionsCallAPI]);
 
   useEffect(() => {
-    getPostReaction();
-  }, [getPostReaction]);
+    getPostReactionCallAPI();
+  }, [getPostReactionCallAPI]);
 
   if (isLoading) {
     return <div className="w-full text-center text-blue-300">Loading...</div>;

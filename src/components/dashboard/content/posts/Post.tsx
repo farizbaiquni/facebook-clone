@@ -114,12 +114,6 @@ const Post = ({ authUser, postParam }: PostProps) => {
   };
 
   useEffect(() => {
-    if (post.post_id === 2) {
-      console.log(initialComment, initialComment.size);
-    }
-  }, [initialComment, post.post_id]);
-
-  useEffect(() => {
     if (authUser !== null) getInitialComment(post.post_id, authUser.userId);
   }, [authUser, post.post_id]);
 

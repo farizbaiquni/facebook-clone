@@ -9,51 +9,19 @@ import {
   MoonIcon,
   QuestionMarkCircleIcon,
 } from "@heroicons/react/24/solid";
-
-const menuItems = [
-  {
-    icon: Cog8ToothIcon,
-    label: "Setting & privacy",
-    onClick: () => {},
-  },
-  {
-    icon: QuestionMarkCircleIcon,
-    label: "Help & support",
-    onClick: () => {},
-  },
-  {
-    icon: MoonIcon,
-    label: "Display & accessibility",
-    onClick: () => {},
-  },
-  {
-    icon: ChatBubbleLeftIcon,
-    label: "Give feedback",
-    onClick: () => {},
-  },
-  {
-    icon: ArrowRightEndOnRectangleIcon,
-    label: "Log out",
-    onClick: async () => {
-      const response = await logoutService();
-      if (response) {
-        window.location.href = "/";
-      }
-    },
-  },
-];
+import { useRouter } from "next/navigation";
 
 const MenuItem = ({
   icon: Icon,
   label,
-  onClick,
+  menuFunction,
 }: {
   icon: any;
   label: string;
-  onClick: () => void;
+  menuFunction: () => void;
 }) => (
   <div
-    onClick={onClick}
+    onClick={menuFunction}
     className="flex w-full cursor-pointer items-center rounded-lg px-2 py-3 hover:bg-[#F2F2F2]"
   >
     <Icon
@@ -71,6 +39,39 @@ type ProfileMenuOptionProps = {
 
 const ProfileMenuOption = forwardRef<HTMLDivElement, ProfileMenuOptionProps>(
   ({ setIsShowProfileMenuOption }, ref) => {
+    const router = useRouter();
+    const menuItems = [
+      {
+        icon: Cog8ToothIcon,
+        label: "Setting & privacy",
+        menuFunction: () => {},
+      },
+      {
+        icon: QuestionMarkCircleIcon,
+        label: "Help & support",
+        menuFunction: () => {},
+      },
+      {
+        icon: MoonIcon,
+        label: "Display & accessibility",
+        menuFunction: () => {},
+      },
+      {
+        icon: ChatBubbleLeftIcon,
+        label: "Give feedback",
+        menuFunction: () => {},
+      },
+      {
+        icon: ArrowRightEndOnRectangleIcon,
+        label: "Log out",
+        menuFunction: () => {
+          const response = logoutService();
+          if (response) {
+            router.replace("/");
+          }
+        },
+      },
+    ];
     return (
       <div
         ref={ref}
@@ -103,7 +104,7 @@ const ProfileMenuOption = forwardRef<HTMLDivElement, ProfileMenuOptionProps>(
               key={index}
               icon={item.icon}
               label={item.label}
-              onClick={item.onClick}
+              menuFunction={item.menuFunction}
             />
           ))}
         </div>

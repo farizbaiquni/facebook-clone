@@ -18,6 +18,7 @@ import { ModeTypes } from "@/types/modes";
 import { GifType } from "@/types/gifs";
 import { UserType } from "@/types/users";
 import { PostType } from "@/types/post";
+import AlertMessageTopRight from "@/components/alerts/AlertMessageTopRight";
 
 type PostingModalProps = {
   user: UserType;
@@ -45,6 +46,7 @@ const PostingModal = ({
   const [selectedAudienceOption, setSelectedAudienceOption] = useState(
     AudienceOptions.Public,
   );
+
   const [selectedAudienceInclude, setSelectedAudienceInclude] = useState<
     Map<number, AudienceFriendType>
   >(new Map());
