@@ -11,7 +11,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
   const token = cookies().get(cookieName);
 
   if (token === undefined) {
-    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND);
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND, {
+      status: 400,
+    });
   }
 
   try {
@@ -24,8 +26,13 @@ export async function GET(req: NextRequest, res: NextResponse) {
     });
     return NextResponse.json(response.data);
   } catch (error: AxiosError | any) {
-    return NextResponse.json(
-      error.response?.data || DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER,
-    );
+    if (error.response?.data.status !== undefined) {
+      return NextResponse.json(error.response?.data, {
+        status: error.response?.status,
+      });
+    }
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER, {
+      status: 500,
+    });
   }
 }

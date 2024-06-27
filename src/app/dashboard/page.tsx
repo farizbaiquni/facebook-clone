@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, createContext, useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { UserContext } from "@/hooks/useContext";
 import { IconType } from "@/components/dashboard/header/NavigationIcons";
 import { UserType } from "@/types/users";
@@ -13,6 +13,7 @@ import Story from "@/components/dashboard/content/Story";
 import Posting from "@/components/dashboard/content/Posting";
 import Posts from "@/components/dashboard/content/posts/Posts";
 import Post from "@/components/dashboard/content/posts/Post";
+import { ErrorStatusEnum } from "@/types/responses";
 
 export default function Dashboard() {
   const [isFocused, setIsFocused] = useState(false);
@@ -44,8 +45,12 @@ export default function Dashboard() {
       setUser(userData);
       setIsError(false);
       setIsLoading(false);
-    } catch (error) {
-      setIsError(true);
+    } catch (error: AxiosError | any) {
+      if (error.response.status === 404) {
+        setUser(null);
+      } else {
+        setIsError(true);
+      }
       setIsLoading(false);
     } finally {
       setIsLoading(false);
@@ -67,7 +72,9 @@ export default function Dashboard() {
           <p>Something went wrong...</p>
         </div>
       ) : user === null || user === undefined ? (
-        <p>No user</p>
+        <p className="flex h-screen items-center justify-center">
+          Data user not found...
+        </p>
       ) : (
         <UserContext.Provider value={user}>
           <Fragment>
