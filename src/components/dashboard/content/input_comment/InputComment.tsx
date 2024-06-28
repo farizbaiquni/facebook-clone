@@ -8,6 +8,22 @@ import React, {
   Fragment,
   useContext,
 } from "react";
+import axios, { AxiosError } from "axios";
+import Image from "next/image";
+import { v4 as uuidv4 } from "uuid";
+import { createThumbnail } from "@/utils/createThumbnailFromVideo";
+import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
+import ActionButtonInputComment from "./ActionButtonInputComment";
+import GifCommentSelector from "../comments/GifCommentSelector";
+import {
+  MediaImageVideoEnum,
+  MediaImageVideoType,
+  MediaPostEnum,
+} from "@/types/mediaPost";
+import { GifType } from "@/types/gifs";
+import { AddCommentType, GetCommentType } from "@/types/comments";
+import { UserContext } from "@/hooks/useContext";
+import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import {
   ChatBubbleOvalLeftIcon as ChatBubbleOvalLeftIconOutline,
   FaceSmileIcon,
@@ -16,22 +32,6 @@ import {
   StopIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
-import Image from "next/image";
-import { v4 as uuidv4 } from "uuid";
-import ActionButtonInputComment from "./ActionButtonInputComment";
-import GifCommentSelector from "../comments/GifCommentSelector";
-import {
-  MediaImageVideoEnum,
-  MediaImageVideoType,
-  MediaPostEnum,
-} from "@/types/mediaPost";
-import { createThumbnail } from "@/utils/createThumbnailFromVideo";
-import { GifType } from "@/types/gifs";
-import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
-import axios from "axios";
-import { AddCommentType, GetCommentType } from "@/types/comments";
-import { UserContext } from "@/hooks/useContext";
 
 const emojis = [
   "😀",
@@ -127,13 +127,13 @@ type InputCommentProps = {
 
 const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
   ({ userId, postId, addNewComment }, ref) => {
+    const user = useContext(UserContext);
+
     const [commentText, setCommentText] = useState<string>("");
     const [gif, setGif] = useState<GifType | null>(null);
     const [imageVideo, setImageVideo] = useState<MediaImageVideoType | null>(
       null,
     );
-
-    const user = useContext(UserContext);
 
     const [isTextareaEverFocus, setIsTextareaFocus] = useState(false);
     const [isShowEmojiSelector, setIsShowEmojiSelector] = useState(false);
@@ -223,7 +223,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       setImageVideo(newImageVideo);
     };
 
-    const addCommentInDatabase = async (
+    const addCommentCallAPI = async (
       mediaTypeId: number | null,
       mediaUrl: string | null,
     ) => {
@@ -239,7 +239,8 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
         const response = await axios.post("/api/comments", commentObject);
         addNewComment(response.data.data);
         console.log("Add Comment: ", response.data);
-      } catch (error) {
+      } catch (error: AxiosError | any) {
+        console.log("Add Comment Error: ", error.response?.data);
       } finally {
         removeMedia();
         setCommentText("");
@@ -271,7 +272,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
         mediaUrl = gif.media_formats.gif.url;
       }
 
-      addCommentInDatabase(mediaTypeId, mediaUrl);
+      addCommentCallAPI(mediaTypeId, mediaUrl);
     };
 
     useEffect(() => {
@@ -363,6 +364,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
                         id="file-upload"
                         name="file-upload"
                         type="file"
+                        accept="image/*, video/*"
                         ref={fileInputRef}
                         className="hidden"
                         onChange={(e) =>

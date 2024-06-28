@@ -1,9 +1,8 @@
 import useDebounce from "@/hooks/useDebounceRef";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { GifType, GifsAPIType } from "@/types/gifs";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import GifItem from "../../posting_modal/components/GifItem";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 
@@ -19,11 +18,11 @@ const GifCommentSelector = ({
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [gifs, setGifs] = useState<GifsAPIType>({
     results: [],
-    next: null,
+    next: 0,
   });
   const [filteredGifs, setFilteredGifs] = useState<GifsAPIType>({
     results: [],
-    next: null,
+    next: 0,
   });
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -32,38 +31,40 @@ const GifCommentSelector = ({
     setIsShowGifSelector(false);
   };
 
-  const loadGifs = useCallback(async (myGifs: GifsAPIType) => {
+  const loadGifsCallApi = async (gifs: GifsAPIType) => {
+    if (gifs.next === null) return;
     try {
       const response = await axios.get("/api/gifs", {
-        params: { next: myGifs.next },
+        params: { next: gifs.next },
       });
       const data: GifsAPIType = response.data;
       setGifs((prevGifs) => ({
         results: [...prevGifs.results, ...data.results],
         next: data.next,
       }));
+    } catch (error: AxiosError | any) {
+      console.error("Failed to load GIFs", error);
+    }
+  };
+
+  const loadGifsByKeyword = async (
+    filteredGifs: GifsAPIType,
+    keyword: string,
+  ) => {
+    try {
+      const response = await axios.get("/api/gifs", {
+        params: { q: keyword, next: filteredGifs.next },
+      });
+      const data: GifsAPIType = response.data;
+      console.log("data : ", data);
+      setFilteredGifs((prevGifs) => ({
+        results: [...prevGifs.results, ...data.results],
+        next: data.next,
+      }));
     } catch (error) {
       console.error("Failed to load GIFs", error);
     }
-  }, []);
-
-  const loadGifsByKeyword = useCallback(
-    async (filteredGifs: GifsAPIType, keyword: string) => {
-      try {
-        const response = await axios.get("/api/gifs", {
-          params: { q: keyword, next: filteredGifs.next },
-        });
-        const data: GifsAPIType = response.data;
-        setFilteredGifs((prevGifs) => ({
-          results: [...prevGifs.results, ...data.results],
-          next: data.next,
-        }));
-      } catch (error) {
-        console.error("Failed to load GIFs", error);
-      }
-    },
-    [],
-  );
+  };
 
   const debouncedSearch = useDebounce(async (keyword: string) => {
     if (keyword.trim()) {
@@ -86,20 +87,16 @@ const GifCommentSelector = ({
   };
 
   useEffect(() => {
-    console.log("Panjang gifs : ", gifs.results.length);
-  }, [gifs]);
-
-  useEffect(() => {
-    loadGifs(gifs);
+    loadGifsCallApi(gifs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadGifs]);
+  }, []);
 
   useInfiniteScroll(
     () => {
       if (searchKeyword.trim().length > 0) {
         loadGifsByKeyword(filteredGifs, searchKeyword);
       } else {
-        loadGifs(gifs);
+        loadGifsCallApi(gifs);
       }
     },
     scrollRef,

@@ -1,9 +1,14 @@
-import axios from "axios";
+import { cookieName } from "@/app/configs/cookies";
+import {
+  DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND,
+  DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER,
+} from "@/types/responses";
+import axios, { AxiosError } from "axios";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: Response) {
-  const token = cookies().get("facebook-clone");
+  const token = cookies().get(cookieName);
   const searchParams = req.nextUrl.searchParams;
 
   const postId = searchParams.get("postId");
@@ -12,7 +17,9 @@ export async function GET(req: NextRequest, res: Response) {
   const offset = searchParams.get("offset");
 
   if (token === undefined) {
-    return NextResponse.json({ error: 400, message: "Cookie not found" });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND, {
+      status: 400,
+    });
   }
 
   try {
@@ -27,18 +34,28 @@ export async function GET(req: NextRequest, res: Response) {
       },
     );
     return NextResponse.json(response.data);
-  } catch (error) {
-    throw error;
+  } catch (error: AxiosError | any) {
+    if (error.response?.data.status !== undefined) {
+      return NextResponse.json(error.response?.data, {
+        status: error.response?.status,
+      });
+    }
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER, {
+      status: 500,
+    });
   }
 }
 
 export async function POST(req: Request, res: Response) {
-  const token = cookies().get("facebook-clone");
+  const token = cookies().get(cookieName);
   const params = await req.json();
 
   if (token === undefined) {
-    return NextResponse.json({ error: 400, message: "Cookie not found" });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND, {
+      status: 400,
+    });
   }
+
   try {
     const response = await axios.post(
       "http://localhost:4000/v1/comments",
@@ -52,5 +69,14 @@ export async function POST(req: Request, res: Response) {
       },
     );
     return NextResponse.json(response.data);
-  } catch (error) {}
+  } catch (error: AxiosError | any) {
+    if (error.response?.data.status !== undefined) {
+      return NextResponse.json(error.response?.data, {
+        status: error.response?.status,
+      });
+    }
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER, {
+      status: 500,
+    });
+  }
 }

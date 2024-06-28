@@ -1,4 +1,8 @@
-import axios from "axios";
+import {
+  DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND,
+  DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER,
+} from "@/types/responses";
+import axios, { AxiosError } from "axios";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,7 +14,9 @@ export async function GET(req: NextRequest, res: Response) {
   const userId = searchParams.get("userId");
 
   if (token === undefined) {
-    return NextResponse.json({ error: 400, message: "Cookie not found" });
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND, {
+      status: 400,
+    });
   }
 
   try {
@@ -25,7 +31,14 @@ export async function GET(req: NextRequest, res: Response) {
       },
     );
     return NextResponse.json(response.data);
-  } catch (error) {
-    throw error;
+  } catch (error: AxiosError | any) {
+    if (error.response?.data.status !== undefined) {
+      return NextResponse.json(error.response?.data, {
+        status: error.response?.status,
+      });
+    }
+    return NextResponse.json(DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER, {
+      status: 500,
+    });
   }
 }

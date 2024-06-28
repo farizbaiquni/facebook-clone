@@ -16,7 +16,7 @@ import InputComment from "../input_comment/InputComment";
 import FooterPost from "./footer_post/FooterPost";
 import Comments from "../comments/Comments";
 import { GetCommentType } from "@/types/comments";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { SuccessResponseType } from "@/types/responses";
 
 type PostProps = {
@@ -33,15 +33,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
     "/images/posts/post (5).jpg",
     "/images/posts/post (6).jpg",
   ]);
-  const relativeTime = formatRelativeTime(postParam.created_at);
-  const postFullName = `${postParam.first_name} ${postParam.last_name}`;
-  const authFullName = `${authUser.firstName} ${authUser.lastName}`;
-  const inputRef = useRef<{ focus: () => void; scrollIntoView: () => void }>(
-    null,
-  );
   const [post, setPost] = useState<PostType>(postParam);
-  const refContentText = useRef<HTMLParagraphElement>(null);
-  const isContentTextClamped = useLineClamp(refContentText, { lines: 4 });
   const [isExpandedContentText, setIsExpandedTextPost] = useState(false);
 
   const [initialComment, setInitialComment] = useState<
@@ -51,6 +43,15 @@ const Post = ({ authUser, postParam }: PostProps) => {
     new Map(),
   );
   const [offset, setOffset] = useState<number | null>(0);
+
+  const relativeTime = formatRelativeTime(postParam.created_at);
+  const postFullName = `${postParam.first_name} ${postParam.last_name}`;
+  const authFullName = `${authUser.firstName} ${authUser.lastName}`;
+  const inputRef = useRef<{ focus: () => void; scrollIntoView: () => void }>(
+    null,
+  );
+  const refContentText = useRef<HTMLParagraphElement>(null);
+  const isContentTextClamped = useLineClamp(refContentText, { lines: 4 });
 
   const handleFocusAndScrollClick = () => {
     if (inputRef.current) {
@@ -67,7 +68,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
     });
   };
 
-  const getInitialComment = async (postId: number, userId: number) => {
+  const getInitialCommentCallApi = async (postId: number, userId: number) => {
     try {
       let res: any = await axios.get(
         `/api/comments/initial-comment?postId=${postId}&userId=${userId}`,
@@ -79,7 +80,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
         newState.set(response.data[0].comment_id, response.data[0]);
         return newState;
       });
-    } catch (error) {}
+    } catch (error: AxiosError | any) {}
   };
 
   const getComments = async (
@@ -115,7 +116,8 @@ const Post = ({ authUser, postParam }: PostProps) => {
   };
 
   useEffect(() => {
-    if (authUser !== null) getInitialComment(post.post_id, authUser.userId);
+    if (authUser !== null)
+      getInitialCommentCallApi(post.post_id, authUser.userId);
   }, [authUser, post.post_id]);
 
   return (

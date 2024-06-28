@@ -1,9 +1,5 @@
-import axios from "axios";
 import { GetCommentType } from "@/types/comments";
-import { useEffect, useState } from "react";
 import Comment from "./Comment";
-import { UserType } from "@/types/users";
-import { SuccessResponseType } from "@/types/responses";
 
 type CommentsType = {
   offset: number | null;
