@@ -1,11 +1,11 @@
-export enum MediaPostEnum {
+export enum MediaTypeEnum {
   IMAGE = 1,
   VIDEO = 2,
   GIF = 3,
 }
 
 export type MediaPostType = {
-  media_type_id: MediaPostEnum;
+  media_type_id: MediaTypeEnum;
   media_url: string;
 };
 

@@ -1,3 +1,4 @@
+import { cookieName } from "@/app/configs/cookies";
 import {
   DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND,
   DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER,
@@ -7,7 +8,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, res: Response) {
-  const token = cookies().get("facebook-clone");
+  const token = cookies().get(cookieName);
   const searchParams = req.nextUrl.searchParams;
 
   const postId = searchParams.get("postId");

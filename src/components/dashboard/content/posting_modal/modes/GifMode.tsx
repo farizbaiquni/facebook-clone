@@ -17,11 +17,11 @@ const GifMode = ({ handleModeType, setSelectedGif }: GifModeProps) => {
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [gifs, setGifs] = useState<GifsAPIType>({
     results: [],
-    next: null,
+    next: 0,
   });
   const [filteredGifs, setFilteredGifs] = useState<GifsAPIType>({
     results: [],
-    next: null,
+    next: 0,
   });
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -30,12 +30,14 @@ const GifMode = ({ handleModeType, setSelectedGif }: GifModeProps) => {
     setSelectedGif(gif);
   };
 
-  const loadGifs = useCallback(async (myGifs: GifsAPIType) => {
+  const loadGifsCallApi = useCallback(async (gifs: GifsAPIType) => {
+    if (gifs.next === null) return;
     try {
       const response = await axios.get("/api/gifs", {
-        params: { next: myGifs.next },
+        params: { next: gifs.next },
       });
       const data: GifsAPIType = response.data;
+      console.log("data", data);
       setGifs((prevGifs) => ({
         results: [...prevGifs.results, ...data.results],
         next: data.next,
@@ -45,7 +47,7 @@ const GifMode = ({ handleModeType, setSelectedGif }: GifModeProps) => {
     }
   }, []);
 
-  const loadGifsByKeyword = useCallback(
+  const loadGifsByKeywordCallApi = useCallback(
     async (filteredGifs: GifsAPIType, keyword: string) => {
       try {
         const response = await axios.get("/api/gifs", {
@@ -68,7 +70,7 @@ const GifMode = ({ handleModeType, setSelectedGif }: GifModeProps) => {
       setFilteredGifs({ results: [], next: null });
       setGifs({ results: [], next: null });
       const filtered: GifsAPIType = { results: [], next: null };
-      loadGifsByKeyword(filtered, keyword);
+      loadGifsByKeywordCallApi(filtered, keyword);
     } else {
       setFilteredGifs({
         results: [],
@@ -84,16 +86,16 @@ const GifMode = ({ handleModeType, setSelectedGif }: GifModeProps) => {
   };
 
   useEffect(() => {
-    loadGifs(gifs);
+    loadGifsCallApi(gifs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadGifs]);
+  }, []);
 
   useInfiniteScroll(
     () => {
       if (searchKeyword.trim().length > 0) {
-        loadGifsByKeyword(filteredGifs, searchKeyword);
+        loadGifsByKeywordCallApi(filteredGifs, searchKeyword);
       } else {
-        loadGifs(gifs);
+        loadGifsCallApi(gifs);
       }
     },
     scrollRef,

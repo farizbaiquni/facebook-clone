@@ -1,18 +1,18 @@
 import { GetCommentType } from "@/types/comments";
 import Comment from "./Comment";
 
-type CommentsType = {
+type CommentsPropsType = {
   offset: number | null;
-  loadMoreComments: () => void;
-  initialComment: Map<number, GetCommentType>;
   comments: Map<number, GetCommentType>;
+  loadMoreComments: () => void;
+  handleDeleteCommentCallApi: (commentId: number, userId: number) => void;
 };
 const Comments = ({
-  loadMoreComments,
   offset,
-  initialComment,
   comments,
-}: CommentsType) => {
+  loadMoreComments,
+  handleDeleteCommentCallApi,
+}: CommentsPropsType) => {
   return (
     <div>
       {offset !== null && (
@@ -24,13 +24,17 @@ const Comments = ({
         </p>
       )}
 
-      {Array.from(initialComment.values()).map((comment) => (
-        <Comment key={comment.comment_id} comment={comment} />
-      ))}
-
-      {Array.from(comments.values()).map((comment) => (
-        <Comment key={comment.comment_id} comment={comment} />
-      ))}
+      {Array.from(comments.values()).map((comment) => {
+        if (!comment.is_deleted) {
+          return (
+            <Comment
+              key={comment.comment_id}
+              comment={comment}
+              handleDeleteCommentCallApi={handleDeleteCommentCallApi}
+            />
+          );
+        }
+      })}
     </div>
   );
 };

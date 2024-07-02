@@ -1,8 +1,5 @@
 import { ReactionsEnum, Top3ReactionsType } from "@/types/reactions";
-import {
-  ArrowUturnRightIcon,
-  ChatBubbleOvalLeftIcon,
-} from "@heroicons/react/24/solid";
+import { ArrowUturnRightIcon, ChatBubbleOvalLeftIcon } from "@heroicons/react/24/solid";
 import React, { Fragment, memo } from "react";
 import ReactionIcon from "../../ReactionIcon";
 import { convertTotalReactionsToWord } from "@/utils/convertTotalReactionsToWord";
@@ -27,20 +24,14 @@ const ReactionsPost = ({
   currentTotalReactions,
 }: ReactionsPostProps) => {
   const getReactionMessage = (): string => {
-    const convertedReactions = convertTotalReactionsToWord(
-      currentTotalReactions,
-    );
+    const convertedReactions = convertTotalReactionsToWord(currentTotalReactions);
     if (currentTotalReactions === 0 && reactionId !== null) return authFullName;
     if (currentTotalReactions === 1 && reactionId !== null) return authFullName;
     if (currentTotalReactions === 1 && reactionId === null) return "1";
-    if (currentTotalReactions === 2 && reactionId !== null)
-      return "You and 1 other";
-    if (currentTotalReactions === 2 && reactionId === null)
-      return "1 and 1 other";
-    if (currentTotalReactions > 2 && reactionId !== null)
-      return `You and ${convertedReactions}`;
-    if (currentTotalReactions > 2 && reactionId === null)
-      return convertedReactions;
+    if (currentTotalReactions === 2 && reactionId !== null) return "You and 1 other";
+    if (currentTotalReactions === 2 && reactionId === null) return "1 and 1 other";
+    if (currentTotalReactions > 2 && reactionId !== null) return `You and ${convertedReactions}`;
+    if (currentTotalReactions > 2 && reactionId === null) return convertedReactions;
     return "";
   };
 
@@ -53,10 +44,7 @@ const ReactionsPost = ({
               {Array.from(top3Reactions.values()).map(
                 (data) =>
                   data.total_count >= 1 && (
-                    <ReactionIcon
-                      key={data.reaction_id}
-                      id={data.reaction_id}
-                    />
+                    <ReactionIcon key={data.reaction_id} id={data.reaction_id} />
                   ),
               )}
             </div>

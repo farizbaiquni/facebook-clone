@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 
-import {
-  PostReactionsType,
-  ReactionsEnum,
-  Top3ReactionsType,
-} from "@/types/reactions";
+import { PostReactionsType, ReactionsEnum, Top3ReactionsType } from "@/types/reactions";
 import ActionButtonsPost from "./ActionButtonsPost";
 import ReactionsPost from "./ReactionsPost";
 import { SuccessResponseType } from "@/types/responses";
@@ -34,13 +30,11 @@ const FooterPost = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [reactionId, setReactionId] = useState<ReactionsEnum | null>(null);
-  const [top3Reactions, setTop3Reactions] = useState<
-    Map<ReactionsEnum, Top3ReactionsType>
-  >(new Map());
-  const [currentTotalReactions, setCurrentTotalReactions] =
-    useState(totalReactions);
-  const [currentTotalComments, setCurrentTotalComments] =
-    useState(totalComments);
+  const [top3Reactions, setTop3Reactions] = useState<Map<ReactionsEnum, Top3ReactionsType>>(
+    new Map(),
+  );
+  const [currentTotalReactions, setCurrentTotalReactions] = useState(totalReactions);
+  const [currentTotalComments, setCurrentTotalComments] = useState(totalComments);
   const [currentTotalShares, setCurrentTotalShares] = useState(totalShares);
 
   const handleMinusOneTop3ReactionsByReactionId = (id: ReactionsEnum) => {
@@ -99,9 +93,7 @@ const FooterPost = ({
 
   const getTop3PostReactionsCallAPI = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `/api/post-reactions/top-3-reactions?postId=${postId}`,
-      );
+      const response = await axios.get(`/api/post-reactions/top-3-reactions?postId=${postId}`);
       const reactions: Top3ReactionsType[] = response.data.data;
       const reactionsMap: Map<ReactionsEnum, Top3ReactionsType> = new Map();
       reactions.map((data) => {
@@ -116,23 +108,16 @@ const FooterPost = ({
 
   const getPostReactionCallAPI = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `/api/post-reactions?userId=${userId}&postId=${postId}`,
-      );
-      const successResponse: SuccessResponseType<PostReactionsType | null> =
-        response.data;
-      setReactionId(
-        successResponse.data !== null ? successResponse.data.reaction_id : null,
-      );
+      const response = await axios.get(`/api/post-reactions?userId=${userId}&postId=${postId}`);
+      const successResponse: SuccessResponseType<PostReactionsType | null> = response.data;
+      setReactionId(successResponse.data !== null ? successResponse.data.reaction_id : null);
     } catch (error: AxiosError | any) {
       console.error("Error get post reactions: ", error.response?.data);
       setIsError(true);
     }
   }, [postId, userId]);
 
-  const addPostReactionCallAPI = async (
-    id: ReactionsEnum,
-  ): Promise<boolean> => {
+  const addPostReactionCallAPI = async (id: ReactionsEnum): Promise<boolean> => {
     try {
       await axios.post("/api/post-reactions", {
         user_id: userId,
@@ -174,11 +159,7 @@ const FooterPost = ({
   }
 
   if (isError) {
-    return (
-      <div className="w-full text-center text-red-300">
-        Error loading reactions
-      </div>
-    );
+    return <div className="w-full text-center text-red-300">Error loading reactions</div>;
   }
 
   return (

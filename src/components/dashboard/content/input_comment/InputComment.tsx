@@ -18,7 +18,7 @@ import GifCommentSelector from "../comments/GifCommentSelector";
 import {
   MediaImageVideoEnum,
   MediaImageVideoType,
-  MediaPostEnum,
+  MediaTypeEnum,
 } from "@/types/mediaPost";
 import { GifType } from "@/types/gifs";
 import { AddCommentType, GetCommentType } from "@/types/comments";
@@ -149,7 +149,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
     const gifSelectorRef = useRef<HTMLDivElement>(null);
     const gifOptionRef = useRef<HTMLDivElement>(null);
 
-    const removeMedia = () => {
+    const handleRemoveMedia = () => {
       setImageVideo(null);
       setGif(null);
     };
@@ -180,17 +180,9 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       }
     };
 
-    useImperativeHandle(ref, () => ({
-      focus: () => textareaRef.current?.focus(),
-      scrollIntoView: () =>
-        textareaRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        }),
-    }));
-
-    const handleClickEmoji = (emoji: string) =>
+    const handleClickEmoji = (emoji: string) => {
       setCommentText((prevState) => prevState + emoji);
+    };
 
     const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
       const textarea = event.target;
@@ -238,11 +230,9 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
         };
         const response = await axios.post("/api/comments", commentObject);
         addNewComment(response.data.data);
-        console.log("Add Comment: ", response.data);
       } catch (error: AxiosError | any) {
-        console.log("Add Comment Error: ", error.response?.data);
       } finally {
-        removeMedia();
+        handleRemoveMedia();
         setCommentText("");
       }
     };
@@ -264,11 +254,11 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
         const url = await uploadFileImagesVideos([imageVideo]);
         mediaTypeId =
           imageVideo.type === MediaImageVideoEnum.VIDEO
-            ? MediaPostEnum.VIDEO
-            : MediaPostEnum.IMAGE;
+            ? MediaTypeEnum.VIDEO
+            : MediaTypeEnum.IMAGE;
         mediaUrl = url[0].url;
       } else if (gif !== null) {
-        mediaTypeId = MediaPostEnum.GIF;
+        mediaTypeId = MediaTypeEnum.GIF;
         mediaUrl = gif.media_formats.gif.url;
       }
 
@@ -286,8 +276,18 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       };
     }, []);
 
+    useImperativeHandle(ref, () => ({
+      focus: () => textareaRef.current?.focus(),
+      scrollIntoView: () =>
+        textareaRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        }),
+    }));
+
     return (
       <div className={`flex px-4 pb-5 pt-3`}>
+        {/* Photo profile */}
         <div className="mr-2 min-w-max">
           <Image
             src={user?.profilePicture ? user.profilePicture : "/icons/user.png"}
@@ -297,6 +297,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
             className="h-8 w-8 rounded-full object-cover"
           />
         </div>
+        {/* Input Comment */}
         <div className="flex flex-1 flex-col gap-y-2">
           <div
             className={`flex flex-1 rounded-md bg-[#F0F2F5] ${isTextareaEverFocus ? "flex-col py-2" : "items-center"}`}
@@ -410,6 +411,8 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
               </div>
             </div>
           </div>
+
+          {/* Display selected image or video */}
           {imageVideo !== null && (
             <div className="flex">
               <div className="relative h-[80px] w-[80px]">
@@ -432,24 +435,26 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
                 </div>
               </div>
               <XMarkIcon
-                onClick={() => removeMedia()}
+                onClick={() => handleRemoveMedia()}
                 className="ml-3 h-6 w-6 cursor-pointer rounded-full bg-gray-200 p-1 text-gray-800"
               />
             </div>
           )}
+
+          {/* Display selected GIF */}
           {gif !== null && (
             <div className="flex">
               <div className="relative h-[80px] w-[80px]">
                 <Image
-                  width={100}
-                  height={100}
+                  width={70}
+                  height={70}
                   src={gif.media_formats.gif.url}
                   alt={gif.content_description}
                   className="h-full w-full object-cover"
                 />
               </div>
               <XMarkIcon
-                onClick={() => removeMedia()}
+                onClick={() => handleRemoveMedia()}
                 className="ml-3 h-6 w-6 cursor-pointer rounded-full bg-gray-200 p-1 text-gray-800"
               />
             </div>

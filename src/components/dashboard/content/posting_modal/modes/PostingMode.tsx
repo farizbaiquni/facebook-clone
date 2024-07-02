@@ -18,7 +18,7 @@ import { PostCreateType, PostType } from "@/types/post";
 import {
   MediaImageVideoEnum,
   MediaImageVideoType,
-  MediaPostEnum,
+  MediaTypeEnum,
   MediaPostType,
   UploadedImageVideoUrlType,
 } from "@/types/mediaPost";
@@ -85,9 +85,9 @@ const PostingMode = ({
   setSelectedGif,
   addNewAuthUserPosts,
 }: PostingModeType) => {
+  const fullName = `${user.firstName} ${user.lastName}`;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isLoadingPosting, setIsLoadingPosting] = useState(false);
-  const fullName = `${user.firstName} ${user.lastName}`;
   const [isAlertFailedAddPost, setIsAlertFailedAddPost] = useState(false);
 
   const checkSelectedFeelingActivityType = (
@@ -136,15 +136,15 @@ const PostingMode = ({
         const media: MediaPostType = {
           media_type_id:
             uploadedImageVideoUrls.type === MediaImageVideoEnum.IMAGE
-              ? MediaPostEnum.IMAGE
-              : MediaPostEnum.VIDEO,
+              ? MediaTypeEnum.IMAGE
+              : MediaTypeEnum.VIDEO,
           media_url: uploadedImageVideoUrls.url,
         };
         return media;
       });
     } else if (selectedGif !== null) {
       const media: MediaPostType = {
-        media_type_id: MediaPostEnum.GIF,
+        media_type_id: MediaTypeEnum.GIF,
         media_url: selectedGif.url,
       };
       mediaPost.push(media);
