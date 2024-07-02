@@ -11,7 +11,6 @@ type ReactionsPostProps = {
   reactionId: ReactionsEnum | null;
   authFullName: string;
   top3Reactions: Map<ReactionsEnum, Top3ReactionsType>;
-  currentTotalReactions: number;
 };
 
 const ReactionsPost = ({
@@ -21,17 +20,16 @@ const ReactionsPost = ({
   reactionId,
   authFullName,
   top3Reactions,
-  currentTotalReactions,
 }: ReactionsPostProps) => {
   const getReactionMessage = (): string => {
-    const convertedReactions = convertTotalReactionsToWord(currentTotalReactions);
-    if (currentTotalReactions === 0 && reactionId !== null) return authFullName;
-    if (currentTotalReactions === 1 && reactionId !== null) return authFullName;
-    if (currentTotalReactions === 1 && reactionId === null) return "1";
-    if (currentTotalReactions === 2 && reactionId !== null) return "You and 1 other";
-    if (currentTotalReactions === 2 && reactionId === null) return "1 and 1 other";
-    if (currentTotalReactions > 2 && reactionId !== null) return `You and ${convertedReactions}`;
-    if (currentTotalReactions > 2 && reactionId === null) return convertedReactions;
+    const convertedReactions = convertTotalReactionsToWord(totalReactions);
+    if (totalReactions === 0 && reactionId !== null) return authFullName;
+    if (totalReactions === 1 && reactionId !== null) return authFullName;
+    if (totalReactions === 1 && reactionId === null) return "1";
+    if (totalReactions === 2 && reactionId !== null) return "You and 1 other";
+    if (totalReactions === 2 && reactionId === null) return "1 and 1 other";
+    if (totalReactions > 2 && reactionId !== null) return `You and ${convertedReactions}`;
+    if (totalReactions > 2 && reactionId === null) return convertedReactions;
     return "";
   };
 

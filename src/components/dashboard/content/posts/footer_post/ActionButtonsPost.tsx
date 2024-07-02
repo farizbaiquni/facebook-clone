@@ -1,22 +1,9 @@
 import { ReactionsEnum, reactionEnumToText } from "@/types/reactions";
-import {
-  Fragment,
-  memo,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Fragment, memo, useCallback, useEffect, useRef, useState } from "react";
 import ReactionIcon from "../../ReactionIcon";
 import { ChatBubbleOvalLeftIcon as ChatBubbleOvalLeftIconOutline } from "@heroicons/react/24/outline";
-import {
-  HandThumbUpIcon,
-  ChatBubbleOvalLeftIcon,
-  PhoneIcon,
-  ArrowUturnRightIcon,
-} from "@heroicons/react/24/solid";
-import Image from "next/image";
-import IconReaction from "./IconReaction";
+import { HandThumbUpIcon, PhoneIcon, ArrowUturnRightIcon } from "@heroicons/react/24/solid";
+import ReactionOptionsIcon from "../../ReactionOptionsIcon";
 
 const renderActionButtonReaction = (
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>,
@@ -62,6 +49,11 @@ const ActionButtonsPost = ({
     }, 300);
   }, []);
 
+  const handleMouseEnterUl = useCallback(() => {
+    leaveTimeout.current && clearTimeout(leaveTimeout.current);
+    setIsUlVisible(true);
+  }, []);
+
   const handleMouseLeave = useCallback((event: MouseEvent) => {
     const divRefCurrent = div1Ref.current;
     const ulRefCurrent = ulRef.current;
@@ -74,51 +66,13 @@ const ActionButtonsPost = ({
     ) {
       leaveTimeout.current = setTimeout(() => {
         setIsUlVisible(false);
-      }, 500);
+      }, 700);
     }
   }, []);
 
   const handleLiClick = useCallback(() => {
     setIsUlVisible(false);
   }, []);
-
-  const reactionOptions = [
-    {
-      src: "/icons/posts/like.svg",
-      alt: "like",
-      action: () => handleOnClickReactionOption(ReactionsEnum.LIKE),
-    },
-    {
-      src: "/icons/posts/love.svg",
-      alt: "love",
-      action: () => handleOnClickReactionOption(ReactionsEnum.LOVE),
-    },
-    {
-      src: "/icons/posts/care.svg",
-      alt: "care",
-      action: () => handleOnClickReactionOption(ReactionsEnum.CARE),
-    },
-    {
-      src: "/icons/posts/haha.svg",
-      alt: "haha",
-      action: () => handleOnClickReactionOption(ReactionsEnum.HAHA),
-    },
-    {
-      src: "/icons/posts/wow.svg",
-      alt: "wow",
-      action: () => handleOnClickReactionOption(ReactionsEnum.WOW),
-    },
-    {
-      src: "/icons/posts/sad.svg",
-      alt: "sad",
-      action: () => handleOnClickReactionOption(ReactionsEnum.SAD),
-    },
-    {
-      src: "/icons/posts/angry.svg",
-      alt: "angry",
-      action: () => handleOnClickReactionOption(ReactionsEnum.ANGRY),
-    },
-  ];
 
   useEffect(() => {
     const divRefCurrent = div1Ref.current;
@@ -131,6 +85,7 @@ const ActionButtonsPost = ({
     }
 
     if (ulRefCurrent) {
+      ulRefCurrent.addEventListener("mouseenter", handleMouseEnterUl);
       ulRefCurrent.addEventListener("mouseleave", handleMouseLeave);
 
       liElements = ulRefCurrent.querySelectorAll("li");
@@ -160,7 +115,7 @@ const ActionButtonsPost = ({
         clearTimeout(leaveTimeout.current);
       }
     };
-  }, [handleMouseEnterDiv1, handleMouseLeave, handleLiClick]);
+  }, [handleMouseEnterUl, handleMouseEnterDiv1, handleMouseLeave, handleLiClick]);
 
   return (
     <div className="relative mb-2 flex border-b border-b-gray-300 py-1 text-[15px]">
@@ -188,34 +143,19 @@ const ActionButtonsPost = ({
         </div>
 
         {/* Comment */}
-        {renderActionButtonReaction(
-          ChatBubbleOvalLeftIconOutline,
-          "Comment",
-          handleFocusClick,
-        )}
+        {renderActionButtonReaction(ChatBubbleOvalLeftIconOutline, "Comment", handleFocusClick)}
 
         {renderActionButtonReaction(PhoneIcon, "Send")}
 
-        {!isPostFromAuthUser &&
-          renderActionButtonReaction(ArrowUturnRightIcon, "Share")}
+        {!isPostFromAuthUser && renderActionButtonReaction(ArrowUturnRightIcon, "Share")}
       </Fragment>
 
       {/* Reaction Options */}
-      <ul
+      <ReactionOptionsIcon
+        isUlVisible={isUlVisible}
         ref={ulRef}
-        className={`absolute bottom-8 rounded-full border border-gray-200 bg-white p-2 shadow-md ${isUlVisible ? "" : "hidden"}`}
-      >
-        <div className="flex h-full w-full">
-          {reactionOptions.map((reaction, index) => (
-            <IconReaction
-              key={index}
-              src={reaction.src}
-              alt={reaction.alt}
-              onClick={reaction.action}
-            />
-          ))}
-        </div>
-      </ul>
+        handleOnClickReactionOption={handleOnClickReactionOption}
+      />
     </div>
   );
 };

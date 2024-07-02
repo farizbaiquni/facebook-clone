@@ -15,6 +15,7 @@ type FooterPostProps = {
   totalComments: number;
   totalShares: number;
   handleFocusClick: () => void;
+  setTotalReactions: React.Dispatch<React.SetStateAction<number>>;
 };
 
 const FooterPost = ({
@@ -26,6 +27,7 @@ const FooterPost = ({
   totalComments,
   totalShares,
   handleFocusClick,
+  setTotalReactions,
 }: FooterPostProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -33,9 +35,6 @@ const FooterPost = ({
   const [top3Reactions, setTop3Reactions] = useState<Map<ReactionsEnum, Top3ReactionsType>>(
     new Map(),
   );
-  const [currentTotalReactions, setCurrentTotalReactions] = useState(totalReactions);
-  const [currentTotalComments, setCurrentTotalComments] = useState(totalComments);
-  const [currentTotalShares, setCurrentTotalShares] = useState(totalShares);
 
   const handleMinusOneTop3ReactionsByReactionId = (id: ReactionsEnum) => {
     if (top3Reactions.has(id)) {
@@ -67,13 +66,13 @@ const FooterPost = ({
       if (await deletePostReactionCallApi()) {
         handleMinusOneTop3ReactionsByReactionId(reactionId);
         setReactionId(null);
-        setCurrentTotalReactions((prevTotal) => prevTotal - 1);
+        setTotalReactions((prevTotal) => prevTotal - 1);
       }
     } else {
       if (await addPostReactionCallAPI(ReactionsEnum.LIKE)) {
         handleAddOneTop3ReactionsByReactionId(ReactionsEnum.LIKE);
         setReactionId(ReactionsEnum.LIKE);
-        setCurrentTotalReactions((prevTotal) => prevTotal + 1);
+        setTotalReactions((prevTotal) => prevTotal + 1);
       }
     }
   };
@@ -82,9 +81,9 @@ const FooterPost = ({
     if (await addPostReactionCallAPI(id)) {
       if (reactionId !== null) {
         handleMinusOneTop3ReactionsByReactionId(reactionId);
-        setCurrentTotalReactions((prevTotal) => prevTotal);
+        setTotalReactions((prevTotal) => prevTotal);
       } else {
-        setCurrentTotalReactions((prevTotal) => prevTotal + 1);
+        setTotalReactions((prevTotal) => prevTotal + 1);
       }
       handleAddOneTop3ReactionsByReactionId(id);
       setReactionId(id);
@@ -165,13 +164,12 @@ const FooterPost = ({
   return (
     <div className="flex flex-col px-4">
       <ReactionsPost
-        totalReactions={currentTotalReactions}
-        totalComments={currentTotalComments}
-        totalShares={currentTotalShares}
+        totalReactions={totalReactions}
+        totalComments={totalComments}
+        totalShares={totalShares}
         reactionId={reactionId}
         authFullName={authFullName}
         top3Reactions={top3Reactions}
-        currentTotalReactions={currentTotalReactions}
       />
       <ActionButtonsPost
         isPostFromAuthUser={isPostFromAuthUser}

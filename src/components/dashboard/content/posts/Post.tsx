@@ -129,6 +129,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
         newState.delete(commentId);
         return newState;
       });
+      setTotalComments(totalComments - 1);
     } catch (error: AxiosError | any) {}
   };
 
@@ -161,10 +162,11 @@ const Post = ({ authUser, postParam }: PostProps) => {
         userId={authUser.userId}
         postId={post.post_id}
         authFullName={authFullName}
-        totalReactions={post.reactions.total_reactions}
-        totalComments={post.total_comments}
-        totalShares={post.total_shares}
+        totalReactions={totalReactions}
+        totalComments={totalComments}
+        totalShares={totalShares}
         handleFocusClick={handleFocusAndScrollClick}
+        setTotalReactions={setTotalReactions}
       />
 
       {/* Comment */}

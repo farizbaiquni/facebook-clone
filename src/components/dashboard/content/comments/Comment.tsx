@@ -165,14 +165,10 @@ const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
         {/* Below Action Comment */}
         <div className="flex items-center justify-between py-1">
           <div className="flex items-center gap-x-4 px-2 text-xs text-gray-600">
-            {[relativeTime, "Like", "Reply", "Share"].map((text, index) => (
-              <p
-                key={index}
-                className={`cursor-pointer ${index > 0 && "font-semibold"} hover:underline`}
-              >
-                {text}
-              </p>
-            ))}
+            <p className={`cursor-pointer hover:underline`}>{relativeTime}</p>
+            <p className={`cursor-pointer font-semibold hover:underline`}>Like</p>
+            <p className={`cursor-pointer font-semibold hover:underline`}>Reply</p>
+            <p className={`cursor-pointer font-semibold hover:underline`}>Share</p>
           </div>
 
           <div className="flex items-center gap-x-1 text-xs">
