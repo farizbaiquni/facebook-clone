@@ -72,9 +72,7 @@ export default function Dashboard() {
           <p>Something went wrong...</p>
         </div>
       ) : user === null || user === undefined ? (
-        <p className="flex h-screen items-center justify-center">
-          Data user not found...
-        </p>
+        <p className="flex h-screen items-center justify-center">Data user not found...</p>
       ) : (
         <UserContext.Provider value={user}>
           <Fragment>
@@ -93,10 +91,7 @@ export default function Dashboard() {
               {/* Center Content */}
               <div className="ml-72 flex flex-1 flex-col items-center max-[1100px]:ml-0">
                 <Story user={user} />
-                <Posting
-                  user={user}
-                  addNewAuthUserPosts={addNewAuthUserPosts}
-                />
+                <Posting user={user} addNewAuthUserPosts={addNewAuthUserPosts} />
                 {newAuthPosts.map((post, index) => (
                   <Post key={post.post_id} authUser={user} postParam={post} />
                 ))}

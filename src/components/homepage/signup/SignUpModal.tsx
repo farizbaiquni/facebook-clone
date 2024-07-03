@@ -4,11 +4,7 @@ import axios, { AxiosError } from "axios";
 import InputField from "./InputField";
 import SelectField from "./SelectField";
 import RadioGroup from "./RadioGroup";
-import {
-  GenderNumberEnum,
-  GenderTextEnum,
-  UserCreateType,
-} from "@/types/users";
+import { GenderNumberEnum, GenderTextEnum, UserCreateType } from "@/types/users";
 import {
   getDaysInMonth,
   generateYearOptions,
@@ -32,11 +28,7 @@ type SignUpModalProps = {
   showAlertStatusSignup: (data: ShowAlertSignupType) => void;
 };
 
-const SignUpModal = ({
-  isOpen,
-  onClose,
-  showAlertStatusSignup,
-}: SignUpModalProps) => {
+const SignUpModal = ({ isOpen, onClose, showAlertStatusSignup }: SignUpModalProps) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().toLocaleString("default", { month: "long" });
   const currentDay = new Date().getDate().toString();
@@ -51,9 +43,7 @@ const SignUpModal = ({
 
   const [dateOfBirthDay, setDateOfBirthDay] = useState(currentDay);
   const [dateOfBirthMonth, setDateOfBirthMonth] = useState(currentMonth);
-  const [dateOfBirthYear, setDateOfBirthYear] = useState(
-    currentYear.toString(),
-  );
+  const [dateOfBirthYear, setDateOfBirthYear] = useState(currentYear.toString());
   const [days, setDays] = useState<string[]>([]);
   const [showDateOfBirthError, setShowDateOfBirthError] = useState(false);
 
@@ -65,10 +55,9 @@ const SignUpModal = ({
 
   const router = useRouter();
 
-  const handleValidation =
-    (setter: (value: boolean) => void) => (isValid: boolean) => {
-      setter(!isValid);
-    };
+  const handleValidation = (setter: (value: boolean) => void) => (isValid: boolean) => {
+    setter(!isValid);
+  };
 
   const onChangeDateOfBirth = (year: number, month: number, day: number) => {
     const date = `${year}-${month < 10 ? "0" + month : month}-${day < 10 ? "0" + day : day}`;
@@ -81,9 +70,7 @@ const SignUpModal = ({
     });
   };
 
-  const handleSignUpCallApi = async (
-    userData: UserCreateType,
-  ): Promise<void> => {
+  const handleSignUpCallApi = async (userData: UserCreateType): Promise<void> => {
     try {
       const response = await axios.post("/api/auth/register", userData);
       setIsLoading(false);
@@ -105,17 +92,13 @@ const SignUpModal = ({
           failedSignupEnum: AlertFailedSignupEnum.SERVER_ERROR,
         };
         showAlertStatusSignup(data);
-      } else if (
-        error.response?.data.status === ErrorStatusEnum.INVALID_PARAMETER
-      ) {
+      } else if (error.response?.data.status === ErrorStatusEnum.INVALID_PARAMETER) {
         const data: ShowAlertSignupType = {
           isAlertSuccess: false,
           failedSignupEnum: AlertFailedSignupEnum.INVALID_INPUT,
         };
         showAlertStatusSignup(data);
-      } else if (
-        error.response?.data.status === ErrorStatusEnum.CONFLICT_DUPLICATE_ENTRY
-      ) {
+      } else if (error.response?.data.status === ErrorStatusEnum.CONFLICT_DUPLICATE_ENTRY) {
         const data: ShowAlertSignupType = {
           isAlertSuccess: false,
           failedSignupEnum: AlertFailedSignupEnum.EMAIL_ALREADY_EXIST,
@@ -167,18 +150,11 @@ const SignUpModal = ({
       errors.push({ field: "gender", isError: false });
     }
 
-    const birthDate = new Date(
-      `${dateOfBirthYear}-${dateOfBirthMonth}-${dateOfBirthDay}`,
-    );
+    const birthDate = new Date(`${dateOfBirthYear}-${dateOfBirthMonth}-${dateOfBirthDay}`);
     const age = new Date().getFullYear() - birthDate.getFullYear();
     const isAgeValid = age > 5 || (age === 5 && new Date() >= birthDate);
 
-    if (
-      !dateOfBirthDay ||
-      !dateOfBirthMonth ||
-      !dateOfBirthYear ||
-      !isAgeValid
-    ) {
+    if (!dateOfBirthDay || !dateOfBirthMonth || !dateOfBirthYear || !isAgeValid) {
       errors.push({ field: "dateOfBirth", isError: true });
     } else {
       errors.push({ field: "dateOfBirth", isError: false });
@@ -260,9 +236,7 @@ const SignUpModal = ({
     handleSignUpCallApi(userCreateData);
   };
 
-  const handleOnClickSignUpButton = (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) => {
+  const handleOnClickSignUpButton = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
     setIsLoading(true);
     handleSignUp(
@@ -407,8 +381,7 @@ const SignUpModal = ({
           />
 
           <p className="mb-3 text-justify text-xs text-gray-500">
-            People who use our service may have uploaded your contact
-            information to Facebook.{" "}
+            People who use our service may have uploaded your contact information to Facebook.{" "}
             <a href="#" className="text-blue-500 hover:underline">
               Learn more
             </a>
@@ -427,8 +400,7 @@ const SignUpModal = ({
             <a href="#" className="text-blue-500 hover:underline">
               Cookies Policy
             </a>
-            . You may receive SMS notifications from us and can opt out at any
-            time.
+            . You may receive SMS notifications from us and can opt out at any time.
           </p>
           <div className="flex w-full justify-center">
             <button
@@ -445,15 +417,8 @@ const SignUpModal = ({
           <div
             className={`absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center rounded-lg bg-black bg-opacity-45`}
           >
-            <Image
-              alt="processing"
-              width={45}
-              height={45}
-              src={"/gifs/loading.gif"}
-            />
-            <p className="mt-3 font-semibold text-slate-300">
-              Process registering...
-            </p>
+            <Image alt="processing" width={45} height={45} src={"/gifs/loading.gif"} />
+            <p className="mt-3 font-semibold text-slate-300">Process registering...</p>
           </div>
         )}
       </div>

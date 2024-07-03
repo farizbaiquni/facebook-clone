@@ -23,14 +23,11 @@ import {
   UploadedImageVideoUrlType,
 } from "@/types/mediaPost";
 import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
-import AlertMessageTopRight from "@/components/alerts/AlertMessageTopRight";
+import AlertMessageTopRight from "@/components/AlertMessageTopRight";
 
-const DynamicMapComponent = dynamic(
-  () => import("../components/MapComponent"),
-  {
-    ssr: false,
-  },
-);
+const DynamicMapComponent = dynamic(() => import("../components/MapComponent"), {
+  ssr: false,
+});
 
 type PostingModeType = {
   user: UserType;
@@ -123,9 +120,7 @@ const PostingMode = ({
     setSelectedGif(null);
   };
 
-  const handleMediaPost = (
-    uploadedImageVideoUrls: UploadedImageVideoUrlType[],
-  ) => {
+  const handleMediaPost = (uploadedImageVideoUrls: UploadedImageVideoUrlType[]) => {
     let mediaPost: MediaPostType[] = [];
     if (imagesVideos.length <= 0 && selectedGif === null) {
       return mediaPost;
@@ -170,11 +165,7 @@ const PostingMode = ({
   };
 
   const handleClickPostButton = async () => {
-    if (
-      contentText.length <= 0 &&
-      imagesVideos.length <= 0 &&
-      selectedGif === null
-    ) {
+    if (contentText.length <= 0 && imagesVideos.length <= 0 && selectedGif === null) {
       return;
     }
 
@@ -186,9 +177,7 @@ const PostingMode = ({
       uploadedImageVideoUrls = await uploadFileImagesVideos(imagesVideos);
     }
 
-    const feelingAndActivity = checkSelectedFeelingActivityType(
-      selectedFeelingActivity,
-    );
+    const feelingAndActivity = checkSelectedFeelingActivityType(selectedFeelingActivity);
     const feeling = feelingAndActivity[0];
     const activity = feelingAndActivity[1];
     const mediaPost = handleMediaPost(uploadedImageVideoUrls);
@@ -199,14 +188,10 @@ const PostingMode = ({
       emoji: feeling,
       activity_icon_url: activity,
       gif_url: selectedGif?.url === undefined ? null : selectedGif.url,
-      latitude:
-        selectedLocation?.lat === undefined ? null : selectedLocation.lat,
-      longitude:
-        selectedLocation?.lon === undefined ? null : selectedLocation.lon,
+      latitude: selectedLocation?.lat === undefined ? null : selectedLocation.lat,
+      longitude: selectedLocation?.lon === undefined ? null : selectedLocation.lon,
       location_name:
-        selectedLocation?.display_name === undefined
-          ? null
-          : selectedLocation.display_name,
+        selectedLocation?.display_name === undefined ? null : selectedLocation.display_name,
       audience_type_id: audienceType,
       media: mediaPost,
       audience_include: selectedAudienceInclude,
@@ -217,19 +202,12 @@ const PostingMode = ({
   };
 
   return (
-    <div
-      className={`relative flex h-auto w-[500px] flex-col rounded-lg bg-white p-4`}
-    >
+    <div className={`relative flex h-auto w-[500px] flex-col rounded-lg bg-white p-4`}>
       {/* Loading progress posting */}
       {isLoadingPosting && (
         <div className="absolute inset-0 z-30 flex items-center justify-center rounded-lg bg-gray-300 bg-opacity-70">
           <span className="flex flex-col">
-            <Image
-              alt="loading-posting"
-              src="/gifs/loading-posting.gif"
-              width={50}
-              height={50}
-            />
+            <Image alt="loading-posting" src="/gifs/loading-posting.gif" width={50} height={50} />
             <p className="mt-1 font-semibold text-gray-700">Posting</p>
           </span>
         </div>
@@ -237,9 +215,7 @@ const PostingMode = ({
 
       {/* Header */}
       <div className="flex justify-between">
-        <h3 className="flex flex-1 items-center justify-center text-lg font-bold">
-          Create Post
-        </h3>
+        <h3 className="flex flex-1 items-center justify-center text-lg font-bold">Create Post</h3>
         <XMarkIcon
           onClick={closePostingModal}
           className="h-10 w-10 cursor-pointer rounded-full bg-gray-200 p-2 text-gray-500 hover:bg-gray-300"
@@ -296,10 +272,7 @@ const PostingMode = ({
                 {Array.from(taggedFriends)
                   .slice(0, 3)
                   .map(([id, taggedFriend], index) => (
-                    <p
-                      key={taggedFriend.id}
-                      className="cursor-pointer hover:underline"
-                    >
+                    <p key={taggedFriend.id} className="cursor-pointer hover:underline">
                       {taggedFriend.name},{" "}
                     </p>
                   ))}
@@ -309,16 +282,13 @@ const PostingMode = ({
             {selectedLocation !== null && (
               <Fragment>
                 <p>{selectedFeelingActivity !== null ? "at" : "in"}</p>
-                <p className="cursor-pointer hover:underline">
-                  {selectedLocation.display_name}
-                </p>
+                <p className="cursor-pointer hover:underline">{selectedLocation.display_name}</p>
               </Fragment>
             )}
 
             {taggedFriends.size > 3 && (
               <p className="cursor-pointer hover:underline">
-                and {taggedFriends.size - 3}{" "}
-                {taggedFriends.size > 4 ? "others" : "other"}
+                and {taggedFriends.size - 3} {taggedFriends.size > 4 ? "others" : "other"}
               </p>
             )}
           </div>
@@ -337,13 +307,7 @@ const PostingMode = ({
         <div className="h-full w-full">
           <textarea
             className={`h-full w-full rounded-lg p-3 ${isUploadModeActive || selectedLocation !== null || selectedGif !== null ? "text-md" : "text-2xl"} outline-none`}
-            rows={
-              isUploadModeActive ||
-              selectedLocation !== null ||
-              selectedGif !== null
-                ? 2
-                : 4
-            }
+            rows={isUploadModeActive || selectedLocation !== null || selectedGif !== null ? 2 : 4}
             value={contentText}
             onChange={(e) => setcontentText(e.target.value)}
             placeholder={`What's on your mind, ${user.firstName}?`}
@@ -376,12 +340,8 @@ const PostingMode = ({
                         alt="Add Photos/Videos"
                       />
                     </div>
-                    <span className="mt-2 font-semibold text-gray-800">
-                      Add Photos/Videos
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      or drag and drop
-                    </span>
+                    <span className="mt-2 font-semibold text-gray-800">Add Photos/Videos</span>
+                    <span className="text-xs text-gray-500">or drag and drop</span>
                     <input
                       id="file-upload"
                       name="file-upload"
@@ -402,19 +362,14 @@ const PostingMode = ({
                         alt="Add Photos/Videos"
                       />
                     </div>
-                    <p className="px-4 text-xs">
-                      Add photos and videos from your mobile device.
-                    </p>
+                    <p className="px-4 text-xs">Add photos and videos from your mobile device.</p>
                     <div className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-gray-200 px-5 py-1 hover:bg-gray-300 ">
                       <p className="text-sm">Add</p>
                     </div>
                   </div>
                 </label>
                 <div className="absolute right-2 top-2 h-8 w-8 cursor-pointer rounded-full bg-gray-100 p-1 text-gray-500 hover:bg-gray-200">
-                  <XMarkIcon
-                    onClick={() => setIsUploadModeActive(false)}
-                    className=""
-                  />
+                  <XMarkIcon onClick={() => setIsUploadModeActive(false)} className="" />
                 </div>
               </div>
             )}
@@ -431,30 +386,23 @@ const PostingMode = ({
               className="mb-3 h-auto w-full rounded-lg"
             />
             <div className="absolute right-2 top-2 h-8 w-8 cursor-pointer rounded-full bg-gray-100 p-1 text-gray-500 hover:bg-gray-200">
-              <XMarkIcon
-                onClick={() => setIsUploadModeActive(false)}
-                className=""
-              />
+              <XMarkIcon onClick={() => setIsUploadModeActive(false)} className="" />
             </div>
           </div>
         )}
 
-        {selectedLocation !== null &&
-          !isUploadModeActive &&
-          imagesVideos.length <= 0 && (
-            <DynamicMapComponent
-              selectedLocation={selectedLocation}
-              setSelectedLocation={setSelectedLocation}
-            />
-          )}
+        {selectedLocation !== null && !isUploadModeActive && imagesVideos.length <= 0 && (
+          <DynamicMapComponent
+            selectedLocation={selectedLocation}
+            setSelectedLocation={setSelectedLocation}
+          />
+        )}
       </div>
 
       {/* Footer */}
       <div className="flex flex-col">
         <div className="my-2 flex items-center justify-between rounded-md border-2 border-gray-200 px-4 py-2">
-          <p className="cursor-pointer text-sm font-semibold">
-            Add to your post
-          </p>
+          <p className="cursor-pointer text-sm font-semibold">Add to your post</p>
           <div className="flex items-center">
             <IconButton
               src="/icons/postings/add-photo-video.png"

@@ -39,3 +39,11 @@ export type PostReactionsType = {
   reaction_id: ReactionsEnum;
   reaction_name: string;
 };
+
+export type CommentReactionsType = {
+  post_reaction_id: number;
+  user_id: number;
+  post_id: number;
+  reaction_id: ReactionsEnum;
+  reaction_name: string;
+};

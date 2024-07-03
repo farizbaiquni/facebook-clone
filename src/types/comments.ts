@@ -31,6 +31,7 @@ export type GetCommentType = {
   first_name: string;
   last_name: string;
   profile_picture: string;
+  total_reactions: number;
   total_replies: number;
   total_like: number;
   total_love: number;

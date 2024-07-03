@@ -1,6 +1,6 @@
 import { ReactionsEnum } from "@/types/reactions";
 import { forwardRef } from "react";
-import IconReaction from "./posts/footer_post/IconReaction";
+import IconReaction from "../../IconReaction";
 
 type ReactionOptionsIconPropsType = {
   isUlVisible: boolean;

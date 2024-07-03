@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
 
 import { PostReactionsType, ReactionsEnum, Top3ReactionsType } from "@/types/reactions";
-import ActionButtonsPost from "./ActionButtonsPost";
-import ReactionsPost from "./ReactionsPost";
+import ActionButtonsPost from "./footer_post/ActionButtonsPost";
+import ReactionsPost from "./footer_post/ReactionsPost";
 import { SuccessResponseType } from "@/types/responses";
 
 type FooterPostProps = {

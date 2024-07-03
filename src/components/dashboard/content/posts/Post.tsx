@@ -2,9 +2,8 @@
 
 import { useState, useRef, useEffect, Fragment } from "react";
 import axios, { AxiosError } from "axios";
-import MediaPostGrid from "./MediaPostGrid";
 import InputComment from "../input_comment/InputComment";
-import FooterPost from "./footer_post/FooterPost";
+import FooterPost from "./FooterPost";
 import Comments from "../comments/Comments";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { useLineClamp } from "@/utils/useLineClamp";
@@ -21,14 +20,6 @@ type PostProps = {
 };
 
 const Post = ({ authUser, postParam }: PostProps) => {
-  const [images, setImages] = useState<string[]>([
-    "/images/posts/post (1).jpg",
-    "/images/posts/post (2).jpg",
-    "/images/posts/post (3).jpg",
-    "/images/posts/post (4).jpg",
-    "/images/posts/post (5).jpg",
-    "/images/posts/post (6).jpg",
-  ]);
   const [post, setPost] = useState<PostType>(postParam);
   const [isExpandedContentText, setIsExpandedTextPost] = useState(false);
 
@@ -65,15 +56,9 @@ const Post = ({ authUser, postParam }: PostProps) => {
     });
   };
 
-  const getInitialCommentCallApi = async (
-    postId: number,
-    userId: number,
-    offset: number | null,
-  ) => {
+  const getInitialCommentCallApi = async (postId: number, offset: number) => {
     try {
-      let res: any = await axios.get(
-        `/api/comments?postId=${postId}&userId=${userId}&offset=${offset}&limit=${1}`,
-      );
+      let res: any = await axios.get(`/api/comments?postId=${postId}&offset=${offset}&limit=${1}`);
       const response: SuccessResponseType<GetCommentType[]> = res.data;
       if (response.data.length <= 0) return;
       const updatedComment: GetCommentType = {
@@ -134,7 +119,8 @@ const Post = ({ authUser, postParam }: PostProps) => {
   };
 
   useEffect(() => {
-    if (authUser !== null) getInitialCommentCallApi(post.post_id, authUser.userId, offset);
+    if (offset === null) return;
+    getInitialCommentCallApi(post.post_id, offset);
   }, [authUser, offset, post.post_id]);
 
   return (

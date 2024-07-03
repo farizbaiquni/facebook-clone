@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { ErrorStatusEnum } from "@/types/responses";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import InvalidCredentialLogin from "@/components/InvalidCredential";
-import AlertMessageTopRight from "@/components/alerts/AlertMessageTopRight";
+import AlertMessageTopRight from "@/components/AlertMessageTopRight";
 
 export default function Login() {
   const router = useRouter();

@@ -18,7 +18,7 @@ import { ModeTypes } from "@/types/modes";
 import { GifType } from "@/types/gifs";
 import { UserType } from "@/types/users";
 import { PostType } from "@/types/post";
-import AlertMessageTopRight from "@/components/alerts/AlertMessageTopRight";
+import AlertMessageTopRight from "@/components/AlertMessageTopRight";
 
 type PostingModalProps = {
   user: UserType;
@@ -35,17 +35,13 @@ const PostingModal = ({
   setIsPostingModalOpen,
   addNewAuthUserPosts,
 }: PostingModalProps) => {
-  const [selectedModeType, setSelectedModeType] = useState(
-    ModeTypes.PostingMode,
-  );
+  const [selectedModeType, setSelectedModeType] = useState(ModeTypes.PostingMode);
 
   const [contentText, setcontentText] = useState("");
   const [isUploadModeActive, setIsUploadModeActive] = useState(false);
   const [imagesVideos, setImagesVideos] = useState<MediaImageVideoType[]>([]);
   const [selectedGif, setSelectedGif] = useState<GifType | null>(null);
-  const [selectedAudienceOption, setSelectedAudienceOption] = useState(
-    AudienceOptions.Public,
-  );
+  const [selectedAudienceOption, setSelectedAudienceOption] = useState(AudienceOptions.Public);
 
   const [selectedAudienceInclude, setSelectedAudienceInclude] = useState<
     Map<number, AudienceFriendType>
@@ -54,15 +50,11 @@ const PostingModal = ({
     Map<number, AudienceFriendType>
   >(new Map());
 
-  const [taggedFriends, setTaggedFriends] = useState<
-    Map<number, FriendTagPeople>
-  >(new Map());
+  const [taggedFriends, setTaggedFriends] = useState<Map<number, FriendTagPeople>>(new Map());
   const [selectedFeelingActivity, setSelectedFeelingActivity] = useState<
     FeelingType | SubActivityType | null
   >(null);
-  const [selectedLocation, setSelectedLocation] = useState<LocationType | null>(
-    null,
-  );
+  const [selectedLocation, setSelectedLocation] = useState<LocationType | null>(null);
 
   const handleClearAllInput = () => {
     setImagesVideos([]);
@@ -133,9 +125,7 @@ const PostingModal = ({
         id: id,
         file: file,
         downloadUrl: null,
-        type: isVideoFile(file)
-          ? MediaImageVideoEnum.VIDEO
-          : MediaImageVideoEnum.IMAGE,
+        type: isVideoFile(file) ? MediaImageVideoEnum.VIDEO : MediaImageVideoEnum.IMAGE,
         url: URL.createObjectURL(file),
         urlObject: URL.createObjectURL(file),
       };
@@ -247,10 +237,7 @@ const PostingModal = ({
 
       {/* Gif */}
       {selectedModeType === ModeTypes.GIFMode && (
-        <GifMode
-          handleModeType={handleModeType}
-          setSelectedGif={setSelectedGif}
-        />
+        <GifMode handleModeType={handleModeType} setSelectedGif={setSelectedGif} />
       )}
     </div>
   );

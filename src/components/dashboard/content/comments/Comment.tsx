@@ -5,8 +5,9 @@ import { MediaTypeEnum } from "@/types/mediaPost";
 import { ReactionsEnum, Top3ReactionsType } from "@/types/reactions";
 import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
-import Image from "next/image";
 import { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import FooterComment from "./FooterComment";
+import Image from "next/image";
 
 type CommentsProps = {
   comment: GetCommentType;
@@ -14,16 +15,6 @@ type CommentsProps = {
 };
 
 const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
-  const icons = new Map([
-    [ReactionsEnum.LIKE, "/icons/posts/like.svg"],
-    [ReactionsEnum.LOVE, "/icons/posts/love.svg"],
-    [ReactionsEnum.CARE, "/icons/posts/care.svg"],
-    [ReactionsEnum.HAHA, "/icons/posts/haha.svg"],
-    [ReactionsEnum.WOW, "/icons/posts/wow.svg"],
-    [ReactionsEnum.SAD, "/icons/posts/sad.svg"],
-    [ReactionsEnum.ANGRY, "/icons/posts/angry.svg"],
-  ]);
-
   const authUser = useContext(UserContext);
   const isCurrentCommentFromAuthUser = comment.user_id === authUser?.userId;
   const relativeTime = formatRelativeTime(comment.updated_at);
@@ -35,16 +26,6 @@ const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [isShowModalConfirmationDeleteComment, setIsShowModalConfirmationDeleteComment] =
     useState(false);
-  const totalReactions = useMemo(() => {
-    return (
-      comment.total_like +
-      comment.total_love +
-      comment.total_haha +
-      comment.total_wow +
-      comment.total_sad +
-      comment.total_angry
-    );
-  }, [comment]);
 
   const handleClickOutside = (event: MouseEvent) => {
     if (menuCommentRef.current && !menuCommentRef.current.contains(event.target as Node)) {
@@ -60,23 +41,6 @@ const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
   const toggleMenuComment = () => {
     setIsShowMenuComment(!isShowMenuComment);
   };
-
-  const getTopReactions = useCallback((comment: GetCommentType): Top3ReactionsType[] => {
-    const reactions: Top3ReactionsType[] = [
-      { reaction_id: ReactionsEnum.LIKE, total_count: comment.total_like },
-      { reaction_id: ReactionsEnum.LOVE, total_count: comment.total_love },
-      { reaction_id: ReactionsEnum.HAHA, total_count: comment.total_haha },
-      { reaction_id: ReactionsEnum.WOW, total_count: comment.total_wow },
-      { reaction_id: ReactionsEnum.SAD, total_count: comment.total_sad },
-      { reaction_id: ReactionsEnum.ANGRY, total_count: comment.total_angry },
-    ].filter((reaction) => reaction.total_count >= 1);
-
-    return reactions.sort((a, b) => b.total_count - a.total_count).slice(0, 3);
-  }, []);
-
-  const top3Reactions = useMemo(() => {
-    return getTopReactions(comment);
-  }, [comment, getTopReactions]);
 
   const handleClickConfirmDeleteCommentButton = () => {
     if (comment.user_id !== authUser?.userId) return;
@@ -163,31 +127,12 @@ const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
         )}
 
         {/* Below Action Comment */}
-        <div className="flex items-center justify-between py-1">
-          <div className="flex items-center gap-x-4 px-2 text-xs text-gray-600">
-            <p className={`cursor-pointer hover:underline`}>{relativeTime}</p>
-            <p className={`cursor-pointer font-semibold hover:underline`}>Like</p>
-            <p className={`cursor-pointer font-semibold hover:underline`}>Reply</p>
-            <p className={`cursor-pointer font-semibold hover:underline`}>Share</p>
-          </div>
-
-          <div className="flex items-center gap-x-1 text-xs">
-            {totalReactions > 0 && (
-              <Fragment>
-                <p>{totalReactions}</p>
-                {top3Reactions.map((reaction, index) => (
-                  <Image
-                    key={index}
-                    width={20}
-                    height={20}
-                    alt="like"
-                    src={icons.get(reaction.reaction_id)!}
-                  />
-                ))}
-              </Fragment>
-            )}
-          </div>
-        </div>
+        <FooterComment
+          authUserId={authUser!.userId}
+          comment={comment}
+          relativeTime={relativeTime}
+          totalReactions={comment.total_reactions}
+        />
 
         {comment.total_replies > 0 && (
           <p className="cursor-pointer pl-2 text-[15px] font-semibold text-gray-500 hover:underline">

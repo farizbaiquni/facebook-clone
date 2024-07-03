@@ -1,19 +1,18 @@
-import axios, { AxiosError } from "axios";
-import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { cookieName } from "@/app/configs/cookies";
 import {
   DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND,
   DEFAULT_ERROR_RESPONSE_INTERNAL_SERVER,
 } from "@/types/responses";
+import axios, { AxiosError } from "axios";
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, res: Response) {
+export async function GET(req: NextRequest, res: NextResponse) {
   const token = cookies().get(cookieName);
-  const searchParams = req.nextUrl.searchParams;
 
-  const postId = searchParams.get("postId");
-  const offset = searchParams.get("offset");
-  const limit = searchParams.get("limit");
+  const searchParams = req.nextUrl.searchParams;
+  const userId = searchParams.get("userId");
+  const commentId = searchParams.get("commentId");
 
   if (token === undefined) {
     return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND, {
@@ -23,7 +22,7 @@ export async function GET(req: NextRequest, res: Response) {
 
   try {
     const response = await axios.get(
-      `http://localhost:4000/v1/comments?postId=${postId}&offset=${offset}&limit=${limit}`,
+      `http://localhost:4000/v1/comment-reactions?userId=${userId}&commentId=${commentId}`,
       {
         headers: {
           Authorization: `Bearer ${token.value}`,
@@ -34,6 +33,7 @@ export async function GET(req: NextRequest, res: Response) {
     );
     return NextResponse.json(response.data);
   } catch (error: AxiosError | any) {
+    console.log(error.response);
     if (error.response?.data.status !== undefined) {
       return NextResponse.json(error.response?.data, {
         status: error.response?.status,
@@ -56,7 +56,7 @@ export async function POST(req: Request, res: Response) {
   }
 
   try {
-    const response = await axios.post("http://localhost:4000/v1/comments", params, {
+    const response = await axios.post("http://localhost:4000/v1/comment-reactions", params, {
       headers: {
         Authorization: `Bearer ${token.value}`,
         Cookie: `facebook-clone=${token.value}`,
@@ -76,12 +76,9 @@ export async function POST(req: Request, res: Response) {
   }
 }
 
-export async function DELETE(req: NextRequest, res: Response) {
+export async function DELETE(req: Request, res: Response) {
   const token = cookies().get(cookieName);
-  const searchParams = req.nextUrl.searchParams;
-  const postId = searchParams.get("postId");
-  const commentId = searchParams.get("commentId");
-  const userId = searchParams.get("userId");
+  const params = await req.json();
 
   if (token === undefined) {
     return NextResponse.json(DEFAULT_ERROR_RESPONSE_COOKIE_NOT_FOUND, {
@@ -90,19 +87,16 @@ export async function DELETE(req: NextRequest, res: Response) {
   }
 
   try {
-    const response = await axios.delete(
-      `http://localhost:4000/v1/comments?postId=${postId}&commentId=${commentId}&userId=${userId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token.value}`,
-          Cookie: `facebook-clone=${token.value}`,
-        },
-        withCredentials: true,
+    const response = await axios.delete("http://localhost:4000/v1/comment-reactions", {
+      headers: {
+        Authorization: `Bearer ${token.value}`,
+        Cookie: `facebook-clone=${token.value}`,
       },
-    );
+      data: params,
+      withCredentials: true,
+    });
     return NextResponse.json(response.data);
   } catch (error: AxiosError | any) {
-    console.log(error.response?.data);
     if (error.response?.data.status !== undefined) {
       return NextResponse.json(error.response?.data, {
         status: error.response?.status,

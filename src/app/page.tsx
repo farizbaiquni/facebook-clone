@@ -7,7 +7,7 @@ import Image from "next/image";
 import axios, { AxiosError } from "axios";
 import SignUpModal from "@/components/homepage/signup/SignUpModal";
 
-import AlertMessageTopRight from "@/components/alerts/AlertMessageTopRight";
+import AlertMessageTopRight from "@/components/AlertMessageTopRight";
 import LoginInputGroup from "./login/_components/LoginInputGroup";
 import { ErrorStatusEnum } from "@/types/responses";
 
@@ -31,14 +31,10 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isAlertFailedLogin, setIsAlertFailedLogin] = useState(false);
-  const [isAlertFailedSignupServer, setIsAlertFailedSignupServer] =
+  const [isAlertFailedSignupServer, setIsAlertFailedSignupServer] = useState(false);
+  const [isAlertFailedSignupInvalidInput, setIsAlertFailedSignupInvalidInput] = useState(false);
+  const [isAlertFailedSignupEmailAlreadyExist, setIsAlertFailedSignupEmailAlreadyExist] =
     useState(false);
-  const [isAlertFailedSignupInvalidInput, setIsAlertFailedSignupInvalidInput] =
-    useState(false);
-  const [
-    isAlertFailedSignupEmailAlreadyExist,
-    setIsAlertFailedSignupEmailAlreadyExist,
-  ] = useState(false);
   const [isAlertSucessSignup, setIsAlertSucessSignup] = useState(false);
   const [isInvalidCredential, setIsInvalidCredential] = useState(false);
 
@@ -152,8 +148,8 @@ export default function Home() {
             handleLogin={handleLogin}
           />
           <p className="mt-5 text-center">
-            <b className=" cursor-pointer hover:underline">Create a Page</b> for
-            a celebrity, brand or business.
+            <b className=" cursor-pointer hover:underline">Create a Page</b> for a celebrity, brand
+            or business.
           </p>
         </div>
       </div>
