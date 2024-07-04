@@ -8,20 +8,14 @@ import React, {
   Fragment,
   useContext,
 } from "react";
-import axios, { AxiosError } from "axios";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
 import { createThumbnail } from "@/utils/createThumbnailFromVideo";
 import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
 import ActionButtonInputComment from "./ActionButtonInputComment";
 import GifCommentSelector from "../comments/GifCommentSelector";
-import {
-  MediaImageVideoEnum,
-  MediaImageVideoType,
-  MediaTypeEnum,
-} from "@/types/mediaPost";
+import { MediaImageVideoEnum, MediaImageVideoType, MediaTypeEnum } from "@/types/mediaPost";
 import { GifType } from "@/types/gifs";
-import { AddCommentType, GetCommentType } from "@/types/comments";
 import { UserContext } from "@/hooks/useContext";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 import {
@@ -122,18 +116,21 @@ type InputCommentRef = {
 type InputCommentProps = {
   userId: number;
   postId: number;
-  addNewComment: (comment: GetCommentType) => void;
+  handleAddComment: (
+    commentText: string,
+    imageVideo: MediaImageVideoType | null,
+    gif: GifType | null,
+    parentCommentId?: number,
+  ) => void;
 };
 
 const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
-  ({ userId, postId, addNewComment }, ref) => {
+  ({ userId, postId, handleAddComment }, ref) => {
     const user = useContext(UserContext);
 
     const [commentText, setCommentText] = useState<string>("");
     const [gif, setGif] = useState<GifType | null>(null);
-    const [imageVideo, setImageVideo] = useState<MediaImageVideoType | null>(
-      null,
-    );
+    const [imageVideo, setImageVideo] = useState<MediaImageVideoType | null>(null);
 
     const [isTextareaEverFocus, setIsTextareaFocus] = useState(false);
     const [isShowEmojiSelector, setIsShowEmojiSelector] = useState(false);
@@ -201,9 +198,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
         id: id,
         file: file,
         downloadUrl: null,
-        type: isVideoFile(file)
-          ? MediaImageVideoEnum.VIDEO
-          : MediaImageVideoEnum.IMAGE,
+        type: isVideoFile(file) ? MediaImageVideoEnum.VIDEO : MediaImageVideoEnum.IMAGE,
         url: URL.createObjectURL(file),
         urlObject: URL.createObjectURL(file),
       };
@@ -215,54 +210,18 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       setImageVideo(newImageVideo);
     };
 
-    const addCommentCallAPI = async (
-      mediaTypeId: number | null,
-      mediaUrl: string | null,
-    ) => {
-      try {
-        const commentObject: AddCommentType = {
-          user_id: userId,
-          post_id: postId,
-          parent_comment_id: null,
-          content: commentText,
-          media_type_id: mediaTypeId,
-          media_url: mediaUrl,
-        };
-        const response = await axios.post("/api/comments", commentObject);
-        addNewComment(response.data.data);
-      } catch (error: AxiosError | any) {
-      } finally {
-        handleRemoveMedia();
-        setCommentText("");
-      }
+    const clearAllInput = () => {
+      setCommentText("");
+      setImageVideo(null);
+      setGif(null);
     };
 
     const onClickSubmitComment = async () => {
-      if (
-        commentText.trim().length <= 0 &&
-        imageVideo === null &&
-        gif === null
-      ) {
+      if (commentText.trim().length <= 0 && imageVideo === null && gif === null) {
         return;
       }
-
-      let mediaTypeId: number | null = null;
-      let mediaUrl: string | null = null;
-
-      // handle upload image / video
-      if (imageVideo !== null) {
-        const url = await uploadFileImagesVideos([imageVideo]);
-        mediaTypeId =
-          imageVideo.type === MediaImageVideoEnum.VIDEO
-            ? MediaTypeEnum.VIDEO
-            : MediaTypeEnum.IMAGE;
-        mediaUrl = url[0].url;
-      } else if (gif !== null) {
-        mediaTypeId = MediaTypeEnum.GIF;
-        mediaUrl = gif.media_formats.gif.url;
-      }
-
-      addCommentCallAPI(mediaTypeId, mediaUrl);
+      const isSuccess = await handleAddComment(commentText, imageVideo, gif);
+      clearAllInput();
     };
 
     useEffect(() => {
@@ -368,9 +327,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
                         accept="image/*, video/*"
                         ref={fileInputRef}
                         className="hidden"
-                        onChange={(e) =>
-                          handleAddFileFromInput(e.target.files!)
-                        }
+                        onChange={(e) => handleAddFileFromInput(e.target.files!)}
                       />
                     </div>
                     <div className="relative">

@@ -113,9 +113,7 @@ const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
 
         {/* Media of comment */}
         {comment.media_url !== null && comment.media_url !== undefined && (
-          <div
-            className={`mt-2 ${comment.comment_media_id !== MediaTypeEnum.GIF ? "w-[210px]" : "w-[250px]"}`}
-          >
+          <div className={`mt-2 w-[190px] bg-red-500`}>
             <Image
               src={comment.media_url}
               width={200}

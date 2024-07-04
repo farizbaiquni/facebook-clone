@@ -9,10 +9,13 @@ import { formatRelativeTime } from "@/utils/formatRelativeTime";
 import { useLineClamp } from "@/utils/useLineClamp";
 import { PostType } from "@/types/post";
 import { UserType } from "@/types/users";
-import { GetCommentType } from "@/types/comments";
+import { AddCommentType, GetCommentType } from "@/types/comments";
 import { SuccessResponseType } from "@/types/responses";
 import HeaderPost from "./header_post/HeaderPost";
 import BodyPost from "./body_post/BodyPost";
+import { MediaImageVideoEnum, MediaImageVideoType, MediaTypeEnum } from "@/types/mediaPost";
+import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
+import { GifType } from "@/types/gifs";
 
 type PostProps = {
   authUser: UserType;
@@ -56,9 +59,48 @@ const Post = ({ authUser, postParam }: PostProps) => {
     });
   };
 
-  const getInitialCommentCallApi = async (postId: number, offset: number) => {
+  const addCommentPostCallAPI = async (
+    commentText: string,
+    imageVideo: MediaImageVideoType | null,
+    gif: GifType | null,
+    parentCommentId?: number,
+  ) => {
     try {
-      let res: any = await axios.get(`/api/comments?postId=${postId}&offset=${offset}&limit=${1}`);
+      let mediaTypeId: number | null = null;
+      let mediaUrl: string | null = null;
+
+      // handle upload image / video
+      if (imageVideo !== null) {
+        const url = await uploadFileImagesVideos([imageVideo]);
+        mediaTypeId =
+          imageVideo.type === MediaImageVideoEnum.VIDEO ? MediaTypeEnum.VIDEO : MediaTypeEnum.IMAGE;
+        mediaUrl = url[0].url;
+      } else if (gif !== null) {
+        mediaTypeId = MediaTypeEnum.GIF;
+        mediaUrl = gif.media_formats.gif.url;
+      }
+
+      const commentObject: AddCommentType = {
+        user_id: authUser.userId,
+        post_id: post.post_id,
+        parent_comment_id: null,
+        content: commentText,
+        media_type_id: mediaTypeId,
+        media_url: mediaUrl,
+      };
+      const response = await axios.post("/api/comments", commentObject);
+      addNewComment(response.data.data);
+      return true;
+    } catch (error: AxiosError | any) {
+      return false;
+    }
+  };
+
+  const getCommentsCallApi = async (postId: number, offset: number, limit: number) => {
+    try {
+      let res: any = await axios.get(
+        `/api/comments?postId=${postId}&offset=${offset}&limit=${limit}`,
+      );
       console.log(res.data);
       const response: SuccessResponseType<GetCommentType[]> = res.data;
       if (response.data.length <= 0) return;
@@ -73,36 +115,8 @@ const Post = ({ authUser, postParam }: PostProps) => {
       });
       setOffset(res.data.pagination === null ? null : res.data.pagination.nextId);
     } catch (error: AxiosError | any) {
-      console.log("Get Initial Comment Error: ", error.response?.data);
+      console.log("Get Comments Error: ", error.response?.data);
     }
-  };
-
-  const getCommentsCallApi = async (
-    postId: number,
-    userId: number,
-    offset: number,
-    limit: number,
-  ) => {
-    try {
-      const response = await axios.get(
-        `/api/comments?postId=${postId}&userId=${userId}&offset=${offset}&limit=${limit}`,
-      );
-      setComments((prevState) => {
-        const newState = new Map(prevState);
-        response.data.data.map((data: GetCommentType) => {
-          if (!comments.has(data.comment_id)) {
-            newState.set(data.comment_id, data);
-          }
-        });
-        return newState;
-      });
-      setOffset(response.data.pagination === null ? null : response.data.pagination.nextId);
-    } catch (error) {}
-  };
-
-  const loadMoreCommentsCallApi = () => {
-    if (offset === null) return;
-    getCommentsCallApi(post.post_id, authUser.userId, offset, 5);
   };
 
   const handleDeleteCommentCallApi = async (commentId: number, userId: number) => {
@@ -119,10 +133,20 @@ const Post = ({ authUser, postParam }: PostProps) => {
     } catch (error: AxiosError | any) {}
   };
 
-  useEffect(() => {
+  const getInitialComment = () => {
     if (offset === null) return;
-    getInitialCommentCallApi(post.post_id, offset);
-  }, [authUser, offset, post.post_id]);
+    getCommentsCallApi(post.post_id, offset, 1);
+  };
+
+  const loadMoreComments = () => {
+    if (offset === null) return;
+    getCommentsCallApi(post.post_id, offset, 5);
+  };
+
+  useEffect(() => {
+    getInitialComment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="my-5 w-[500px] rounded-lg bg-white shadow-md">
@@ -160,7 +184,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
       <Comments
         offset={offset}
         comments={comments}
-        loadMoreComments={loadMoreCommentsCallApi}
+        loadMoreComments={loadMoreComments}
         handleDeleteCommentCallApi={handleDeleteCommentCallApi}
       />
 
@@ -169,7 +193,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
         userId={authUser.userId}
         postId={post.post_id}
         ref={inputRef}
-        addNewComment={addNewComment}
+        handleAddComment={addCommentPostCallAPI}
       />
     </div>
   );
