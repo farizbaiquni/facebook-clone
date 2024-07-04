@@ -59,6 +59,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
   const getInitialCommentCallApi = async (postId: number, offset: number) => {
     try {
       let res: any = await axios.get(`/api/comments?postId=${postId}&offset=${offset}&limit=${1}`);
+      console.log(res.data);
       const response: SuccessResponseType<GetCommentType[]> = res.data;
       if (response.data.length <= 0) return;
       const updatedComment: GetCommentType = {

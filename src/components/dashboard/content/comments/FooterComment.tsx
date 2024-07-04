@@ -31,12 +31,12 @@ const FooterComment = ({
 
   const getTopReactions = useCallback((): Map<ReactionsEnum, Top3ReactionsType> => {
     const reactions: Top3ReactionsType[] = [
-      { reaction_id: ReactionsEnum.LIKE, total_count: comment.total_like },
-      { reaction_id: ReactionsEnum.LOVE, total_count: comment.total_love },
+      { reaction_id: ReactionsEnum.LIKE, total_count: comment.total_likes },
+      { reaction_id: ReactionsEnum.LOVE, total_count: comment.total_loves },
       { reaction_id: ReactionsEnum.HAHA, total_count: comment.total_haha },
-      { reaction_id: ReactionsEnum.WOW, total_count: comment.total_wow },
-      { reaction_id: ReactionsEnum.SAD, total_count: comment.total_sad },
-      { reaction_id: ReactionsEnum.ANGRY, total_count: comment.total_angry },
+      { reaction_id: ReactionsEnum.WOW, total_count: comment.total_wows },
+      { reaction_id: ReactionsEnum.SAD, total_count: comment.total_sads },
+      { reaction_id: ReactionsEnum.ANGRY, total_count: comment.total_angries },
     ].filter((reaction) => reaction.total_count >= 1);
     const top3Reactions = reactions.sort((a, b) => b.total_count - a.total_count).slice(0, 3);
     const top3ReactionsMap = new Map<ReactionsEnum, Top3ReactionsType>();
@@ -46,17 +46,22 @@ const FooterComment = ({
 
   const [isLoadingOnChangeReaction, setIsLoadingOnChangeReaction] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [currentTotalReactions, setCurrentTotalReactions] = useState(comment.total_reactions);
+  const [currentTotalReactions, setCurrentTotalReactions] = useState<number>(
+    comment.total_reactions ?? 0,
+  );
   const [reactionId, setReactionId] = useState<ReactionsEnum | null>(null);
   const [top3Reactions, setTop3Reactions] =
     useState<Map<ReactionsEnum, Top3ReactionsType>>(getTopReactions());
 
   const handleMinusOneTop3ReactionsByReactionId = (id: ReactionsEnum) => {
     if (top3Reactions.has(id)) {
-      const currentCount = top3Reactions.get(id)?.total_count || 0;
-      top3Reactions.set(id, {
-        ...top3Reactions.get(id)!,
-        total_count: currentCount - 1,
+      setTop3Reactions((prevState) => {
+        const newTop3Reactions = new Map(prevState);
+        newTop3Reactions.set(id, {
+          ...newTop3Reactions.get(id)!,
+          total_count: newTop3Reactions.get(id)!.total_count - 1,
+        });
+        return newTop3Reactions;
       });
     }
   };
@@ -64,14 +69,22 @@ const FooterComment = ({
   const handleAddOneTop3ReactionsByReactionId = (id: ReactionsEnum) => {
     if (top3Reactions.has(id)) {
       const currentCount = top3Reactions.get(id)?.total_count || 0;
-      top3Reactions.set(id, {
-        ...top3Reactions.get(id)!,
-        total_count: currentCount + 1,
+      setTop3Reactions((prevState) => {
+        const newTop3Reactions = new Map(prevState);
+        newTop3Reactions.set(id, {
+          reaction_id: id,
+          total_count: newTop3Reactions.get(id)!.total_count + 1,
+        });
+        return newTop3Reactions;
       });
     } else {
-      top3Reactions.set(id, {
-        reaction_id: id,
-        total_count: 1,
+      setTop3Reactions((prevState) => {
+        const newTop3Reactions = new Map(prevState);
+        newTop3Reactions.set(id, {
+          reaction_id: id,
+          total_count: 1,
+        });
+        return newTop3Reactions;
       });
     }
   };
@@ -159,10 +172,6 @@ const FooterComment = ({
     getPostReactionCallAPI();
   }, [getPostReactionCallAPI]);
 
-  useEffect(() => {
-    console.log(reactionId);
-  }, [reactionId]);
-
   return (
     <div className="relative flex items-center justify-between py-1">
       <div className="flex items-center gap-x-4 px-2 text-xs text-gray-600">
@@ -172,23 +181,26 @@ const FooterComment = ({
           handleReactionToggle={handleReactionToggle}
           handleOnClickReactionOption={handleOnClickReactionOption}
         />
-        <p className={`cursor-pointer font-semibold hover:underline`}>Reply</p>
-        <p className={`cursor-pointer font-semibold hover:underline`}>Share</p>
+        <p className={`cursor-pointer font-[700] hover:underline`}>Reply</p>
+        <p className={`cursor-pointer font-[700] hover:underline`}>Share</p>
       </div>
 
-      <div className="flex items-center gap-x-1 text-xs">
-        {totalReactions > 0 && (
+      <div className="flex min-h-6 items-center gap-x-1">
+        {currentTotalReactions > 0 && (
           <Fragment>
-            <p>{totalReactions}</p>
-            {Array.from(top3Reactions.values()).map((reaction, index) => (
-              <Image
-                key={index}
-                width={20}
-                height={20}
-                alt="like"
-                src={icons.get(reaction.reaction_id)!}
-              />
-            ))}
+            <p className=" text-xs text-gray-600">{currentTotalReactions}</p>
+            {Array.from(top3Reactions.values()).map(
+              (reaction, index) =>
+                reaction.total_count > 0 && (
+                  <Image
+                    key={index}
+                    width={18}
+                    height={18}
+                    alt="like"
+                    src={icons.get(reaction.reaction_id)!}
+                  />
+                ),
+            )}
           </Fragment>
         )}
       </div>

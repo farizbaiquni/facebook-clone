@@ -23,6 +23,15 @@ export type GetCommentType = {
   content: string | null;
   is_deleted: boolean;
   deleted_at: string;
+  total_reactions: number;
+  total_replies: number;
+  total_shares: number;
+  total_likes: number;
+  total_loves: number;
+  total_haha: number;
+  total_wows: number;
+  total_sads: number;
+  total_angries: number;
   created_at: string;
   updated_at: string;
   comment_media_id: MediaTypeEnum;
@@ -31,12 +40,4 @@ export type GetCommentType = {
   first_name: string;
   last_name: string;
   profile_picture: string;
-  total_reactions: number;
-  total_replies: number;
-  total_like: number;
-  total_love: number;
-  total_haha: number;
-  total_wow: number;
-  total_sad: number;
-  total_angry: number;
 };

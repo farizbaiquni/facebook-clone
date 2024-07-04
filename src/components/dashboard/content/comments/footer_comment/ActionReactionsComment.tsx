@@ -118,7 +118,7 @@ const ActionReactionsComment = ({
       <div className="relative" ref={div1Ref}>
         <p
           onClick={handleReactionToggle}
-          className={`cursor-pointer font-semibold hover:underline 
+          className={`cursor-pointer font-[700] hover:underline 
             ${
               reactionId === null
                 ? "text-[#65676b]"
