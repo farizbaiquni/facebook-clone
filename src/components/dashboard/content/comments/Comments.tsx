@@ -2,12 +2,14 @@ import { GetCommentType } from "@/types/comments";
 import Comment from "./Comment";
 
 type CommentsPropsType = {
+  postId: number;
   offset: number | null;
   comments: Map<number, GetCommentType>;
   loadMoreComments: () => void;
   handleDeleteCommentCallApi: (commentId: number, userId: number) => void;
 };
 const Comments = ({
+  postId,
   offset,
   comments,
   loadMoreComments,
@@ -28,6 +30,7 @@ const Comments = ({
         if (!comment.is_deleted) {
           return (
             <Comment
+              postId={postId}
               key={comment.comment_id}
               comment={comment}
               handleDeleteCommentCallApi={handleDeleteCommentCallApi}

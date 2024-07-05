@@ -116,6 +116,10 @@ type InputCommentRef = {
 type InputCommentProps = {
   userId: number;
   postId: number;
+  isCommentReply?: boolean;
+  firstName: string;
+  lastName: string;
+
   handleAddComment: (
     commentText: string,
     imageVideo: MediaImageVideoType | null,
@@ -125,14 +129,17 @@ type InputCommentProps = {
 };
 
 const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
-  ({ userId, postId, handleAddComment }, ref) => {
+  ({ userId, postId, isCommentReply, firstName, lastName, handleAddComment }, ref) => {
     const user = useContext(UserContext);
 
+    const [tagParentCommentUser, setTagParentCommentUser] = useState<string[]>(
+      isCommentReply ? [...firstName.trim().split(" "), ...lastName.trim().split(" ")] : [],
+    );
     const [commentText, setCommentText] = useState<string>("");
     const [gif, setGif] = useState<GifType | null>(null);
     const [imageVideo, setImageVideo] = useState<MediaImageVideoType | null>(null);
 
-    const [isTextareaEverFocus, setIsTextareaFocus] = useState(false);
+    const [isTextareaEverFocus, setIsTextareaFocus] = useState(isCommentReply || false);
     const [isShowEmojiSelector, setIsShowEmojiSelector] = useState(false);
     const [isShowGifSelector, setIsShowGifSelector] = useState(false);
 
@@ -181,13 +188,6 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       setCommentText((prevState) => prevState + emoji);
     };
 
-    const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-      const textarea = event.target;
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
-      setCommentText(textarea.value);
-    };
-
     const handleAddFileFromInput = async (files: FileList) => {
       const isVideoFile = (file: File) => {
         return file.type.startsWith("video/");
@@ -224,6 +224,37 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       clearAllInput();
     };
 
+    const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setCommentText(event.target.value.slice(tagParentCommentUser.join(" ").length + 1));
+      autoResizeTextarea();
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (commentText === "" && event.key === "Backspace" && tagParentCommentUser.length > 0) {
+        event.preventDefault();
+
+        const updatedTags = [...tagParentCommentUser];
+        updatedTags.pop();
+        setTagParentCommentUser(updatedTags);
+      }
+    };
+
+    const autoResizeTextarea = () => {
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+        textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+      }
+    };
+
+    useImperativeHandle(ref, () => ({
+      focus: () => textareaRef.current?.focus(),
+      scrollIntoView: () =>
+        textareaRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        }),
+    }));
+
     useEffect(() => {
       document.addEventListener("mousedown", onClickOutsideEmoji);
       document.addEventListener("mousedown", onClickOutsideGif);
@@ -235,17 +266,23 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       };
     }, []);
 
-    useImperativeHandle(ref, () => ({
-      focus: () => textareaRef.current?.focus(),
-      scrollIntoView: () =>
-        textareaRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        }),
-    }));
+    useEffect(() => {
+      if (isCommentReply) {
+        textareaRef.current?.focus();
+      }
+    }, [isCommentReply]);
+
+    useEffect(() => {
+      if (textareaRef.current) {
+        const length = (tagParentCommentUser.join(" ") + " " + commentText).length;
+        textareaRef.current.selectionStart = length;
+        textareaRef.current.selectionEnd = length;
+      }
+      autoResizeTextarea();
+    }, [tagParentCommentUser, commentText]);
 
     return (
-      <div className={`flex px-4 pb-5 pt-3`}>
+      <div className={`mt-1 flex pb-4`}>
         {/* Photo profile */}
         <div className="mr-2 min-w-max">
           <Image
@@ -261,17 +298,27 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
           <div
             className={`flex flex-1 rounded-md bg-[#F0F2F5] ${isTextareaEverFocus ? "flex-col py-2" : "items-center"}`}
           >
-            <textarea
-              ref={textareaRef}
-              value={commentText}
-              onChange={handleChange}
-              style={{ height: `${!isTextareaEverFocus ? "28px" : ""}` }}
-              placeholder="Write an answer..."
-              className={`mx-2 resize-none overflow-hidden bg-[#F0F2F5] outline-none ${!isTextareaEverFocus && "h-7 flex-1"}`}
-              onFocus={() => setIsTextareaFocus(true)}
-            />
+            <div className={`relative mx-2 flex ${!isTextareaEverFocus && "h-full items-center"}`}>
+              <div className="absolute z-10 flex flex-wrap bg-blue-200">
+                {tagParentCommentUser.map((item, index) => (
+                  <span key={index} className={`${index !== 0 && "ml-1"}`}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+              <textarea
+                className={`w-full resize-none overflow-hidden bg-[#F0F2F5] outline-none ${!isTextareaEverFocus && "flex-1"}`}
+                ref={textareaRef}
+                value={tagParentCommentUser.join(" ") + " " + commentText}
+                onChange={handleInputChange}
+                onFocus={() => setIsTextareaFocus(true)}
+                placeholder="Write an answer..."
+                rows={1}
+                onKeyDown={handleKeyDown}
+              />
+            </div>
             <div
-              className={`mx-1 flex select-none items-center justify-between ${isTextareaEverFocus && "py-2"}`}
+              className={`mx-1 flex select-none items-center justify-between ${isTextareaEverFocus && "py-1"}`}
             >
               <div className="flex">
                 {imageVideo === null && gif === null && (
@@ -357,12 +404,15 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
                   </Fragment>
                 )}
               </div>
-              <div className="group relative cursor-pointer">
+              <div className="group/tooltip relative cursor-pointer">
                 <PaperAirplaneIcon
                   onClick={onClickSubmitComment}
                   className={`ml-1 h-7 w-7 cursor-pointer rounded-full p-1 ${commentText.trim().length > 0 ? "text-[#005DC6]" : "text-gray-500"} hover:bg-gray-200 ${isTextareaEverFocus || commentText.length > 0 ? "" : "hidden"}`}
                 />
-                <p className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 transform whitespace-nowrap rounded-md bg-gray-800 p-2 text-xs text-gray-200 opacity-90 group-hover:block">
+                <p
+                  className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 transform whitespace-nowrap 
+                rounded-md bg-gray-800 p-2 text-xs text-gray-200 opacity-90 group-hover/tooltip:block"
+                >
                   Comment
                 </p>
               </div>

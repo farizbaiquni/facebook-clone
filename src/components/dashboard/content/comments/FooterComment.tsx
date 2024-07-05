@@ -10,14 +10,14 @@ type FooterCommentPropsType = {
   authUserId: number;
   comment: GetCommentType;
   relativeTime: string;
-  totalReactions: number;
+  handleOnClickReplyComment: () => void;
 };
 
 const FooterComment = ({
   authUserId,
   comment,
   relativeTime,
-  totalReactions,
+  handleOnClickReplyComment,
 }: FooterCommentPropsType) => {
   const icons = new Map([
     [ReactionsEnum.LIKE, "/icons/posts/like.svg"],
@@ -181,7 +181,12 @@ const FooterComment = ({
           handleReactionToggle={handleReactionToggle}
           handleOnClickReactionOption={handleOnClickReactionOption}
         />
-        <p className={`cursor-pointer font-[700] hover:underline`}>Reply</p>
+        <p
+          onClick={handleOnClickReplyComment}
+          className={`cursor-pointer font-[700] hover:underline`}
+        >
+          Reply
+        </p>
         <p className={`cursor-pointer font-[700] hover:underline`}>Share</p>
       </div>
 

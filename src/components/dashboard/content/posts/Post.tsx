@@ -182,6 +182,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
 
       {/* Comment */}
       <Comments
+        postId={post.post_id}
         offset={offset}
         comments={comments}
         loadMoreComments={loadMoreComments}
@@ -189,12 +190,14 @@ const Post = ({ authUser, postParam }: PostProps) => {
       />
 
       {/* Input Comment */}
-      <InputComment
-        userId={authUser.userId}
-        postId={post.post_id}
-        ref={inputRef}
-        handleAddComment={addCommentPostCallAPI}
-      />
+      <div className="mx-4">
+        <InputComment
+          userId={authUser.userId}
+          postId={post.post_id}
+          ref={inputRef}
+          handleAddComment={addCommentPostCallAPI}
+        />
+      </div>
     </div>
   );
 };

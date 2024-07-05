@@ -8,17 +8,24 @@ import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import FooterComment from "./FooterComment";
 import Image from "next/image";
+import InputComment from "../input_comment/InputComment";
 
 type CommentsProps = {
+  postId: number;
   comment: GetCommentType;
   handleDeleteCommentCallApi: (commentId: number, userId: number) => void;
 };
 
-const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
+const Comment = ({ postId, comment, handleDeleteCommentCallApi }: CommentsProps) => {
+  const inputRef = useRef<{
+    focus: () => void;
+    scrollIntoView: () => void;
+  }>(null);
   const authUser = useContext(UserContext);
   const isCurrentCommentFromAuthUser = comment.user_id === authUser?.userId;
   const relativeTime = formatRelativeTime(comment.updated_at);
   const fullName = comment.first_name + " " + comment.last_name;
+  const [isShowInputComment, setIsShowInputComment] = useState(false);
 
   const menuCommentRef = useRef<HTMLDivElement>(null);
   const [isShowMenuComment, setIsShowMenuComment] = useState(false);
@@ -26,6 +33,11 @@ const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [isShowModalConfirmationDeleteComment, setIsShowModalConfirmationDeleteComment] =
     useState(false);
+
+  const handleOnClickReplyComment = () => {
+    setIsShowInputComment(!isShowInputComment);
+    inputRef.current?.focus();
+  };
 
   const handleClickOutside = (event: MouseEvent) => {
     if (menuCommentRef.current && !menuCommentRef.current.contains(event.target as Node)) {
@@ -47,6 +59,10 @@ const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
     setIsShowModalConfirmationDeleteComment(true);
     setIsShowMenuComment(false);
     handleDeleteCommentCallApi(comment.comment_id, comment.user_id);
+  };
+
+  const handleAddReplyComment = () => {
+    setIsShowInputComment(false);
   };
 
   useEffect(() => {
@@ -113,7 +129,7 @@ const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
 
         {/* Media of comment */}
         {comment.media_url !== null && comment.media_url !== undefined && (
-          <div className={`mt-2 w-[190px] bg-red-500`}>
+          <div className={`mt-2 w-[190px]`}>
             <Image
               src={comment.media_url}
               width={200}
@@ -129,8 +145,20 @@ const Comment = ({ comment, handleDeleteCommentCallApi }: CommentsProps) => {
           authUserId={authUser!.userId}
           comment={comment}
           relativeTime={relativeTime}
-          totalReactions={comment.total_reactions}
+          handleOnClickReplyComment={handleOnClickReplyComment}
         />
+
+        {isShowInputComment && (
+          <InputComment
+            userId={authUser!.userId}
+            postId={postId}
+            ref={inputRef}
+            isCommentReply={true}
+            firstName={comment.first_name}
+            lastName={comment.last_name}
+            handleAddComment={handleAddReplyComment}
+          />
+        )}
 
         {comment.total_replies > 0 && (
           <p className="cursor-pointer pl-2 text-[15px] font-semibold text-gray-500 hover:underline">
