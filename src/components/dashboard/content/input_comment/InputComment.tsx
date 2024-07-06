@@ -1,6 +1,5 @@
 import React, {
   useState,
-  ChangeEvent,
   forwardRef,
   useRef,
   useImperativeHandle,
@@ -11,7 +10,6 @@ import React, {
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid";
 import { createThumbnail } from "@/utils/createThumbnailFromVideo";
-import { uploadFileImagesVideos } from "@/utils/uploadStorageFirebase";
 import ActionButtonInputComment from "./ActionButtonInputComment";
 import GifCommentSelector from "../comments/GifCommentSelector";
 import { MediaImageVideoEnum, MediaImageVideoType, MediaTypeEnum } from "@/types/mediaPost";
@@ -117,19 +115,19 @@ type InputCommentProps = {
   userId: number;
   postId: number;
   isCommentReply?: boolean;
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
 
   handleAddComment: (
     commentText: string,
     imageVideo: MediaImageVideoType | null,
     gif: GifType | null,
-    parentCommentId?: number,
+    tagNameUserParentComment?: string | null,
   ) => void;
 };
 
 const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
-  ({ userId, postId, isCommentReply, firstName, lastName, handleAddComment }, ref) => {
+  ({ userId, postId, isCommentReply, firstName = "", lastName = "", handleAddComment }, ref) => {
     const user = useContext(UserContext);
 
     const [tagParentCommentUser, setTagParentCommentUser] = useState<string[]>(
@@ -220,7 +218,12 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
       if (commentText.trim().length <= 0 && imageVideo === null && gif === null) {
         return;
       }
-      const isSuccess = await handleAddComment(commentText, imageVideo, gif);
+      const isSuccess = await handleAddComment(
+        commentText,
+        imageVideo,
+        gif,
+        tagParentCommentUser.length > 0 ? tagParentCommentUser.join(" ").trim() : null,
+      );
       clearAllInput();
     };
 
@@ -293,12 +296,16 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
             className="h-8 w-8 rounded-full object-cover"
           />
         </div>
-        {/* Input Comment */}
+
         <div className="flex flex-1 flex-col gap-y-2">
+          {/* Input comment */}
           <div
             className={`flex flex-1 rounded-md bg-[#F0F2F5] ${isTextareaEverFocus ? "flex-col py-2" : "items-center"}`}
           >
-            <div className={`relative mx-2 flex ${!isTextareaEverFocus && "h-full items-center"}`}>
+            {/* Upper - Input comment text */}
+            <div
+              className={`relative mx-2 flex ${!isTextareaEverFocus && "h-full w-full items-center"}`}
+            >
               <div className="absolute z-10 flex flex-wrap bg-blue-200">
                 {tagParentCommentUser.map((item, index) => (
                   <span key={index} className={`${index !== 0 && "ml-1"}`}>
@@ -317,10 +324,14 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
                 onKeyDown={handleKeyDown}
               />
             </div>
+
+            {/* Footer - Action button */}
             <div
               className={`mx-1 flex select-none items-center justify-between ${isTextareaEverFocus && "py-1"}`}
             >
+              {/* Action Button Attachment */}
               <div className="flex">
+                {/*  Action Button - Comment With An Avatar Sticker */}
                 {imageVideo === null && gif === null && (
                   <ActionButtonInputComment
                     icon={
@@ -329,6 +340,8 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
                     tooltip="Comment with an avatar sticker"
                   />
                 )}
+
+                {/*  Action Button - Insert Emoji */}
                 <div className="relative">
                   <div ref={emojiOptionRef}>
                     <ActionButtonInputComment
@@ -341,7 +354,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
                   {isShowEmojiSelector && (
                     <div
                       ref={emojiSelectorRef}
-                      className="custom-scrollbar absolute -left-72 bottom-8 h-[300px] w-[330px] select-none overflow-x-hidden overflow-y-scroll rounded-lg bg-white pr-2 shadow-lg"
+                      className="custom-scrollbar absolute -left-72 bottom-8 z-20 h-[300px] w-[330px] select-none overflow-x-hidden overflow-y-scroll rounded-lg bg-white pr-2 shadow-lg"
                     >
                       <div className="grid w-fit grid-cols-8 gap-2 p-1">
                         {emojis.map((emoji, index) => (
@@ -360,6 +373,7 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
 
                 {imageVideo === null && gif === null && (
                   <Fragment>
+                    {/*  Action Button - Insert Image or Video */}
                     <div ref={fileInputOptionRef}>
                       <ActionButtonInputComment
                         icon={
@@ -377,6 +391,8 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
                         onChange={(e) => handleAddFileFromInput(e.target.files!)}
                       />
                     </div>
+
+                    {/*  Action Button - Comment With A GIF */}
                     <div className="relative">
                       <div ref={gifOptionRef}>
                         <ActionButtonInputComment
@@ -404,6 +420,8 @@ const InputComment = forwardRef<InputCommentRef, InputCommentProps>(
                   </Fragment>
                 )}
               </div>
+
+              {/* Submit button */}
               <div className="group/tooltip relative cursor-pointer">
                 <PaperAirplaneIcon
                   onClick={onClickSubmitComment}

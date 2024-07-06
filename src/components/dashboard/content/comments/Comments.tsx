@@ -1,19 +1,22 @@
 import { GetCommentType } from "@/types/comments";
 import Comment from "./Comment";
+import { UserType } from "@/types/users";
 
 type CommentsPropsType = {
+  authUser: UserType;
   postId: number;
   offset: number | null;
   comments: Map<number, GetCommentType>;
   loadMoreComments: () => void;
-  handleDeleteCommentCallApi: (commentId: number, userId: number) => void;
+  deleteCommentPostCallApi: (commentId: number, userId: number) => void;
 };
 const Comments = ({
+  authUser,
   postId,
   offset,
   comments,
   loadMoreComments,
-  handleDeleteCommentCallApi,
+  deleteCommentPostCallApi,
 }: CommentsPropsType) => {
   return (
     <div>
@@ -26,18 +29,21 @@ const Comments = ({
         </p>
       )}
 
-      {Array.from(comments.values()).map((comment) => {
-        if (!comment.is_deleted) {
-          return (
-            <Comment
-              postId={postId}
-              key={comment.comment_id}
-              comment={comment}
-              handleDeleteCommentCallApi={handleDeleteCommentCallApi}
-            />
-          );
-        }
-      })}
+      <div className="px-4">
+        {Array.from(comments.values()).map((comment) => {
+          if (!comment.is_deleted) {
+            return (
+              <Comment
+                authUser={authUser}
+                postId={postId}
+                key={comment.comment_id}
+                comment={comment}
+                deleteCommentPostCallApi={deleteCommentPostCallApi}
+              />
+            );
+          }
+        })}
+      </div>
     </div>
   );
 };

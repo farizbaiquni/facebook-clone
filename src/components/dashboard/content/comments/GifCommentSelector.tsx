@@ -11,10 +11,7 @@ type GifCommentSelectorProps = {
   setIsShowGifSelector: (param: boolean) => void;
 };
 
-const GifCommentSelector = ({
-  setGif,
-  setIsShowGifSelector,
-}: GifCommentSelectorProps) => {
+const GifCommentSelector = ({ setGif, setIsShowGifSelector }: GifCommentSelectorProps) => {
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [gifs, setGifs] = useState<GifsAPIType>({
     results: [],
@@ -83,7 +80,7 @@ const GifCommentSelector = ({
   );
 
   return (
-    <div className="absolute -left-56 bottom-8 flex w-[280px] flex-col overflow-hidden rounded-lg bg-white">
+    <div className="absolute -left-56 bottom-8 z-20 flex w-[280px] flex-col overflow-hidden rounded-lg bg-white">
       {/* Header */}
       <div className="flex items-center justify-center gap-x-2 py-3">
         <div className="">
@@ -102,23 +99,19 @@ const GifCommentSelector = ({
         </div>
       </div>
       {/* Content */}
-      <div
-        ref={scrollRef}
-        className="custom-scrollbar h-[300px] overflow-y-scroll"
-      >
+      <div ref={scrollRef} className="custom-scrollbar h-[300px] overflow-y-scroll">
         {/* Non Keyword Search */}
-        {searchKeyword.trim().length > 0 &&
-          filteredGifs.results.length <= 0 && (
-            <div className="flex h-full w-full flex-col items-center justify-center">
-              <Image
-                alt="no-gift"
-                width={110}
-                height={110}
-                src={"/icons/postings/null_states_media_gray_wash.svg"}
-              />
-              <p className="text-gray-600">No GIFs to show</p>
-            </div>
-          )}
+        {searchKeyword.trim().length > 0 && filteredGifs.results.length <= 0 && (
+          <div className="flex h-full w-full flex-col items-center justify-center">
+            <Image
+              alt="no-gift"
+              width={110}
+              height={110}
+              src={"/icons/postings/null_states_media_gray_wash.svg"}
+            />
+            <p className="text-gray-600">No GIFs to show</p>
+          </div>
+        )}
 
         {/* Keyword Search */}
         {searchKeyword.trim().length > 0

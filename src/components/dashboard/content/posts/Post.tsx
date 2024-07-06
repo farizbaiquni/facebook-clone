@@ -63,7 +63,6 @@ const Post = ({ authUser, postParam }: PostProps) => {
     commentText: string,
     imageVideo: MediaImageVideoType | null,
     gif: GifType | null,
-    parentCommentId?: number,
   ) => {
     try {
       let mediaTypeId: number | null = null;
@@ -101,7 +100,6 @@ const Post = ({ authUser, postParam }: PostProps) => {
       let res: any = await axios.get(
         `/api/comments?postId=${postId}&offset=${offset}&limit=${limit}`,
       );
-      console.log(res.data);
       const response: SuccessResponseType<GetCommentType[]> = res.data;
       if (response.data.length <= 0) return;
       const updatedComment: GetCommentType = {
@@ -119,7 +117,7 @@ const Post = ({ authUser, postParam }: PostProps) => {
     }
   };
 
-  const handleDeleteCommentCallApi = async (commentId: number, userId: number) => {
+  const deleteCommentPostCallApi = async (commentId: number, userId: number) => {
     try {
       const response = await axios.delete(
         `/api/comments?postId=${post.post_id}&commentId=${commentId}&userId=${userId}`,
@@ -182,11 +180,12 @@ const Post = ({ authUser, postParam }: PostProps) => {
 
       {/* Comment */}
       <Comments
+        authUser={authUser}
         postId={post.post_id}
         offset={offset}
         comments={comments}
         loadMoreComments={loadMoreComments}
-        handleDeleteCommentCallApi={handleDeleteCommentCallApi}
+        deleteCommentPostCallApi={deleteCommentPostCallApi}
       />
 
       {/* Input Comment */}

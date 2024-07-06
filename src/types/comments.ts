@@ -1,5 +1,16 @@
 import { MediaTypeEnum } from "./mediaPost";
 
+export type AddCommentReplyType = {
+  user_id: number;
+  post_id: number;
+  parent_comment_id: number | null;
+  tag_id_user_parent_comment: number;
+  tag_name_user_parent_comment: string | null;
+  content: string | null;
+  media_type_id: MediaTypeEnum | null;
+  media_url: string | null;
+};
+
 export type AddCommentType = {
   user_id: number;
   post_id: number;
